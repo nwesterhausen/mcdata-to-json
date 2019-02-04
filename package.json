@@ -1,5 +1,5 @@
 {
-  "name": "mcnbt-to-json",
+  "name": "mcdata-to-json",
   "version": "0.0.1",
   "description": "Node.js app to turn Minecraft .dat and .json files into unified json.",
   "main": "main.js",
