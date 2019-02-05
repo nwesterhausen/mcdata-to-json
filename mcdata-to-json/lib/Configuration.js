@@ -7,9 +7,10 @@ import {
     basename
 } from 'path';
 import {
-    statSync
+    statSync, ensureDirSync
 } from 'fs-extra';
-import log from './logger';
+import log from './CustomLogger';
+import { fstatSync, mkdirSync } from 'fs';
 
 
 // Grab any CLI arguments
@@ -54,7 +55,8 @@ const MC = paramMcdir || process.env.MC_DIR || rundir,
     STATS = join(WORLD, 'stats'),
     ADVANCEMENTS = join(WORLD, 'advancements'),
     PLAYERDATA = join(WORLD, 'playerdata'),
-    OUTPUT_DIR = paramOutdir || process.env.OUTPUT_DIR || rundir;
+    OUTPUT_DIR = paramOutdir || process.env.OUTPUT_DIR || join(rundir, 'output'),
+    TEMP_DIR = join(OUTPUT_DIR, 'temp');
 
 if (!MC) {
     log.error('No minecraft directory set!');
@@ -95,12 +97,11 @@ try {
 }
 log.info('Minecraft dir passed validation checks.');
 
-if (!OUTPUT_DIR) {
-    log.error('Failed to set output dir!');
-}
 log.debug(`argument --outdir ${ paramOutdir}`);
 log.debug(`environemnt.OUTPUT_DIR ${ process.env.OUTPUT_DIR}`);
-log.info(`Set output dir: ${ OUTPUT_DIR}`);
+ensureDirSync(OUTPUT_DIR);
+ensureDirSync(TEMP_DIR);
+log.info(`Set output dir: ${OUTPUT_DIR}`);
 
 export default {
     MC,
@@ -110,5 +111,6 @@ export default {
     ADVANCEMENTS,
     STATS,
     PLAYERDATA,
-    OUTPUT_DIR
+    OUTPUT_DIR,
+    TEMP_DIR
 };
