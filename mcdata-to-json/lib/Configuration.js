@@ -1,78 +1,93 @@
 /**
  * Handles CLI arguments and sets configuration.
  */
-import {
-    dirname,
-    join,
-    basename
-} from 'path';
-import {
-    statSync, ensureDirSync
-} from 'fs-extra';
+import path from 'path';
+import fs from 'fs-extra';
+import nopt from 'nopt';
+import noptUsage from 'nopt-usage';
 import log from './CustomLogger';
-import { fstatSync, mkdirSync } from 'fs';
-
+import version from '../data/Version';
 
 // Grab any CLI arguments
-let paramMcdir,
-    paramOutdir,
-    paramDebug = false,
-    paramInfo = false,
-    rundir = dirname(process.argv[1]);
+let rundir = path.dirname(process.argv[1]),
+    loglevels = ['error', 'warn', 'info', 'debug'],
+    optDescriptions = {
+        'minecraft': 'The minecraft folder containing server.properties and world',
+        'outputdir': 'The dir to put the created JSON into.',
+        'loglevel': 'How verbose to log to console.',
+        'help': 'Show the help message.'
+    },
+    defaultOpts = {
+        'minecraft': rundir,
+        'outputdir': path.join(rundir, 'output'),
+        'loglevel': 'info',
+        'help': false
+    },
+    knownOpts = {
+        'minecraft': path,
+        'outputdir': path,
+        'loglevel': loglevels,
+        'help': Boolean
+    },
+    shortHands = {
+        'silent': ['--loglevel=error'],
+        'quiet': ['--loglevel=warn'],
+        'verbose': ['--loglevel=info'],
+        'debug': ['--loglevel=debug'],
+        's': ['--loglevel=error'],
+        'q': ['--loglevel=warn'],
+        'v': ['--loglevel=info'],
+        'vvv': ['--loglevel=debug']
+    },
+    usage = noptUsage(knownOpts, shortHands, optDescriptions, defaultOpts),
+    parsedOpts = nopt(knownOpts, shortHands, process.argv, 2),
+    helpMessage = `mcdata-to-json ${ version.version }
+    A node.js module to turn the data from your minecraft server or world into json.`;
 
-process.argv.forEach((val, index) => {
-    // console.log(`${index}: ${val}`);
-    if (index > 1) {
-        let option = val.split('=')[0];
-
-        switch (option) { // eslint-disable-line default-case
-            case '--minecraft':
-                paramMcdir = val.split('=')[1];
-                break;
-            case '--outdir':
-                paramOutdir = val.split('=')[1];
-                break;
-            case '--debug':
-            case '-vvv':
-                paramDebug = true;
-            case '--verbose': // eslint-disable-line no-fallthrough
-            case '-v':
-                paramInfo = true;
-                break;
-        }
+// Set default options
+for (let key in Object.keys(defaultOpts)) {
+    if (!parsedOpts.hasOwnProperty(key)) {
+        parsedOpts[key] = defaultOpts[key];
     }
-});
+}
 
-log.showDebug(paramDebug || process.env.SHOW_DEBUG);
-log.showInfo(paramInfo || process.env.SHOW_INFO);
+console.log(JSON.stringify(parsedOpts));
+if (parsedOpts.help) {
+    console.log(helpMessage);
+    console.log('Usage: ');
+    console.log(usage);
+    process.exit(0);
+}
+
+log.setLevel(loglevels.indexOf(parsedOpts.loglevel));
 
 log.debug(`current working dir ${ rundir}`);
 
-const MC = paramMcdir || process.env.MC_DIR || rundir,
-    PROPERTIES_FILE = join(MC, 'server.properties'),
-    LOGS = join(MC, 'logs'),
-    WORLD = join(MC, 'world'),
-    STATS = join(WORLD, 'stats'),
-    ADVANCEMENTS = join(WORLD, 'advancements'),
-    PLAYERDATA = join(WORLD, 'playerdata'),
-    OUTPUT_DIR = paramOutdir || process.env.OUTPUT_DIR || join(rundir, 'output'),
-    TEMP_DIR = join(OUTPUT_DIR, 'temp');
+const MC = parsedOpts.minecraft,
+    PROPERTIES_FILE = path.join(MC, 'server.properties'),
+    LOGS = path.join(MC, 'logs'),
+    WORLD = path.join(MC, 'world'),
+    STATS = path.join(WORLD, 'stats'),
+    ADVANCEMENTS = path.join(WORLD, 'advancements'),
+    PLAYERDATA = path.join(WORLD, 'playerdata'),
+    OUTPUT_DIR = parsedOpts.outputdir,
+    TEMP_DIR = path.join(OUTPUT_DIR, 'temp');
 
 if (!MC) {
     log.error('No minecraft directory set!');
     process.exit(1);
 }
-log.debug(`argument --minecraft ${ paramMcdir}`);
+log.debug(`argument --minecraft ${ parsedOpts.minecraft }`);
 log.debug(`environemnt.MC_DIR ${ process.env.MC_DIR}`);
 log.info(`Set Minecraft dir: ${ MC}`);
 // Check for server.properties, to validate minecraft folder..
 try {
-    statSync(PROPERTIES_FILE);
-    statSync(WORLD);
-    statSync(LOGS);
+    fs.statSync(PROPERTIES_FILE);
+    fs.statSync(WORLD);
+    fs.statSync(LOGS);
 } catch (err) {
     if (err.code === 'ENOENT') {
-        let testedPath = basename(err.path);
+        let testedPath = path.basename(err.path);
 
         log.error(`No ${ testedPath } found in Minecraft dir!`);
         process.exit(1);
@@ -82,12 +97,12 @@ try {
 }
 // Check for items with the world directory
 try {
-    statSync(ADVANCEMENTS);
-    statSync(STATS);
-    statSync(PLAYERDATA);
+    fs.statSync(ADVANCEMENTS);
+    fs.statSync(STATS);
+    fs.statSync(PLAYERDATA);
 } catch (err) {
     if (err.code === 'ENOENT') {
-        let testedPath = basename(err.path);
+        let testedPath = path.basename(err.path);
 
         log.error(`No ${ testedPath } found in Minecraft world dir!`);
         process.exit(1);
@@ -97,10 +112,10 @@ try {
 }
 log.info('Minecraft dir passed validation checks.');
 
-log.debug(`argument --outdir ${ paramOutdir}`);
+log.debug(`argument --outdir ${ parsedOpts.outputdir }`);
 log.debug(`environemnt.OUTPUT_DIR ${ process.env.OUTPUT_DIR}`);
-ensureDirSync(OUTPUT_DIR);
-ensureDirSync(TEMP_DIR);
+fs.ensureDirSync(OUTPUT_DIR);
+fs.ensureDirSync(TEMP_DIR);
 log.info(`Set output dir: ${OUTPUT_DIR}`);
 
 export default {

@@ -93,7 +93,6 @@ module.exports = {
     "handle-callback-err": 1,
     "no-new-require": 2,
 
-    "array-bracket-spacing": [2, "always"],
     "block-spacing": [2, "always"],
     "brace-style": [2, "1tbs", {
       "allowSingleLine": false
@@ -136,7 +135,6 @@ module.exports = {
     }],
     "no-unneeded-ternary": 2,
     "object-curly-spacing": [2, "always"],
-    "one-var": [2, "always"],
     "operator-linebreak": [2, "none"],
     "quote-props": [2, "always"],
     "quotes": [2, "single", "avoid-escape"],

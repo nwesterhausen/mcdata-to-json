@@ -10,30 +10,30 @@ import {
     red
 } from 'colors/safe';
 
-let shouldLogDebug = false,
-    shouldLogInfo = false;
+let loglevel = 1;
 
 export default {
-    'showDebug': function(bool) {
-        shouldLogDebug = bool;
-    },
-    'showInfo': function(bool) {
-        shouldLogInfo = bool;
+    'setLevel': function(newlevel) {
+        loglevel = newlevel;
     },
     'debug': function(msg) {
-        if (shouldLogDebug) {
+        if (loglevel >= 3) {
             console.debug(bgBlue.black(' DEBUG '), blue(msg));
         }
     },
     'info': function(msg) {
-        if (shouldLogInfo) {
+        if (loglevel >= 2) {
             console.info(bgGreen.black(' INFO  '), green(msg));
         }
     },
     'warn': function(msg) {
-        return console.warn(bgYellow.black(' WARN  '), yellow(msg));
+        if (loglevel >= 1) {
+            return console.warn(bgYellow.black(' WARN  '), yellow(msg));
+        }
     },
     'error': function(msg) {
-        return console.error(bgRed.black(' ERROR '), red(msg));
+        if (loglevel >= 0) {
+            return console.error(bgRed.black(' ERROR '), red(msg));
+        }
     }
 };
