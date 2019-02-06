@@ -7,6 +7,7 @@ import nopt from 'nopt';
 import noptUsage from 'nopt-usage';
 import log from './CustomLogger';
 import version from '../data/Version';
+import { defaults } from 'lodash';
 
 // Grab any CLI arguments
 let rundir = path.dirname(process.argv[1]),
@@ -40,18 +41,10 @@ let rundir = path.dirname(process.argv[1]),
         'vvv': ['--loglevel=debug']
     },
     usage = noptUsage(knownOpts, shortHands, optDescriptions, defaultOpts),
-    parsedOpts = nopt(knownOpts, shortHands, process.argv, 2),
+    parsedOpts = defaults(nopt(knownOpts, shortHands, process.argv, 2), defaultOpts),
     helpMessage = `mcdata-to-json ${ version.version }
     A node.js module to turn the data from your minecraft server or world into json.`;
 
-// Set default options
-for (let key in Object.keys(defaultOpts)) {
-    if (!parsedOpts.hasOwnProperty(key)) {
-        parsedOpts[key] = defaultOpts[key];
-    }
-}
-
-console.log(JSON.stringify(parsedOpts));
 if (parsedOpts.help) {
     console.log(helpMessage);
     console.log('Usage: ');
