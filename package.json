@@ -21,8 +21,7 @@
     "mca-js": "^0.1.1",
     "nbt": "^0.8.1",
     "node-int64": "^0.4.0",
-    "nopt": "^4.0.1",
-    "nopt-usage": "^0.1.0"
+    "nopt": "^4.0.1"
   },
   "devDependencies": {
     "@babel/cli": "^7.2.3",

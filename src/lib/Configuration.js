@@ -4,7 +4,6 @@
 import path from 'path';
 import fs from 'fs-extra';
 import nopt from 'nopt';
-import noptUsage from 'nopt-usage';
 import log from './CustomLogger';
 import version from '../data/Version';
 import { defaults } from 'lodash';
@@ -12,12 +11,6 @@ import { defaults } from 'lodash';
 // Grab any CLI arguments
 let rundir = path.dirname(process.argv[1]),
     loglevels = ['error', 'warn', 'info', 'debug'],
-    optDescriptions = {
-        'minecraft': 'The minecraft folder containing server.properties and world',
-        'outputdir': 'The dir to put the created JSON into.',
-        'loglevel': 'How verbose to log to console.',
-        'help': 'Show the help message.'
-    },
     defaultOpts = {
         'minecraft': rundir,
         'outputdir': path.join(rundir, 'output'),
@@ -40,14 +33,22 @@ let rundir = path.dirname(process.argv[1]),
         'v': ['--loglevel=info'],
         'vvv': ['--loglevel=debug']
     },
-    usage = noptUsage(knownOpts, shortHands, optDescriptions, defaultOpts),
+    usage = `Usage:
+    --help, -h                      Show this help message and exit.
+    --minecraft=path                The minecraft folder containing server.properties and world.
+    --outputdir=path                The directory to save the generated JSON files into.
+    --loglevel=<level>              How verbose to log to the console. Also you can use one of
+                                    the helper functions to accomplish this to varying degrees:
+    --silent, -s, --loglevel=error  Log only errors.
+    --quiet, -q, --loglevel=warn    Log only warnings and errors.
+    -v, --loglevel=info [Default]   Log everything except for debug messages.
+    -vvv, -debug, --loglevel=debug  Log everything.`,
     parsedOpts = defaults(nopt(knownOpts, shortHands, process.argv, 2), defaultOpts),
     helpMessage = `mcdata-to-json ${ version.version }
     A node.js module to turn the data from your minecraft server or world into json.`;
 
 if (parsedOpts.help) {
     console.log(helpMessage);
-    console.log('Usage: ');
     console.log(usage);
     process.exit(0);
 }

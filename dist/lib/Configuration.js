@@ -11,8 +11,6 @@ var _fsExtra = _interopRequireDefault(require("fs-extra"));
 
 var _nopt = _interopRequireDefault(require("nopt"));
 
-var _noptUsage = _interopRequireDefault(require("nopt-usage"));
-
 var _CustomLogger = _interopRequireDefault(require("./CustomLogger"));
 
 var _Version = _interopRequireDefault(require("../data/Version"));
@@ -27,12 +25,6 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 // Grab any CLI arguments
 var rundir = _path.default.dirname(process.argv[1]),
     loglevels = ['error', 'warn', 'info', 'debug'],
-    optDescriptions = {
-  'minecraft': 'The minecraft folder containing server.properties and world',
-  'outputdir': 'The dir to put the created JSON into.',
-  'loglevel': 'How verbose to log to console.',
-  'help': 'Show the help message.'
-},
     defaultOpts = {
   'minecraft': rundir,
   'outputdir': _path.default.join(rundir, 'output'),
@@ -55,13 +47,12 @@ var rundir = _path.default.dirname(process.argv[1]),
   'v': ['--loglevel=info'],
   'vvv': ['--loglevel=debug']
 },
-    usage = (0, _noptUsage.default)(knownOpts, shortHands, optDescriptions, defaultOpts),
+    usage = "Usage:\n    --help, -h                      Show this help message and exit.\n    --minecraft=path                The minecraft folder containing server.properties and world.\n    --outputdir=path                The directory to save the generated JSON files into.\n    --loglevel=<level>              How verbose to log to the console. Also you can use one of\n                                    the helper functions to accomplish this to varying degrees:\n    --silent, -s, --loglevel=error  Log only errors.\n    --quiet, -q, --loglevel=warn    Log only warnings and errors.\n    -v, --loglevel=info [Default]   Log everything except for debug messages.\n    -vvv, -debug, --loglevel=debug  Log everything.",
     parsedOpts = (0, _lodash.defaults)((0, _nopt.default)(knownOpts, shortHands, process.argv, 2), defaultOpts),
     helpMessage = "mcdata-to-json ".concat(_Version.default.version, "\n    A node.js module to turn the data from your minecraft server or world into json.");
 
 if (parsedOpts.help) {
   console.log(helpMessage);
-  console.log('Usage: ');
   console.log(usage);
   process.exit(0);
 }
