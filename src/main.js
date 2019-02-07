@@ -12,3 +12,4 @@ import LogsParser from './LogsParser';
 log.info(`Beginning log read from ${config.LOGS}`);
 LogsParser.setDirs(config.LOGS, config.TEMP_DIR);
 LogsParser.prepareLogFiles();
+LogsParser.parseLogFiles();

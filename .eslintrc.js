@@ -66,7 +66,7 @@ module.exports = {
     "no-return-assign": 2,
     "no-self-compare": 2,
     "no-throw-literal": 2,
-    "no-unused-expressions": [2, {
+    "no-unused-expressions": [1, {
       "allowShortCircuit": true
     }],
     "no-useless-call": 2,
@@ -86,7 +86,7 @@ module.exports = {
     "no-shadow-restricted-names": 2,
     "no-shadow": 2,
     "no-undef-init": 2,
-    "no-unused-vars": 2,
+    "no-unused-vars": 1,
     "no-use-before-define": 2,
 
     "global-require": 2,

@@ -20,3 +20,5 @@ _CustomLogger.default.info("Beginning log read from ".concat(_Configuration.defa
 _LogsParser.default.setDirs(_Configuration.default.LOGS, _Configuration.default.TEMP_DIR);
 
 _LogsParser.default.prepareLogFiles();
+
+_LogsParser.default.parseLogFiles();
