@@ -19,6 +19,8 @@ var _default = {
   'SEV_WARN': 11,
   'SEV_ERROR': 12,
   'TYPE_ERROR': 27,
+  'TYPE_OVERLOADED': 30,
+  'TYPE_KEEPENTITY': 31,
   // Cause of death codes
   'ARROW_DEATH': 0,
   'CACTUS_DEATH': 1,

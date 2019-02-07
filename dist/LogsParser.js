@@ -149,6 +149,10 @@ var getDateFromFilename = function getDateFromFilename(filename) {
       return [timestamp, _LogConst.default.TYPE_SERVERREADY, logline.substr(logline.indexOf(']: ') + 3), sev];
     } else if (logline.match(_LogsRegex.default.serverstopRE)) {
       return [timestamp, _LogConst.default.TYPE_SERVERSTOP, logline.substr(logline.indexOf(']: ') + 3), sev];
+    } else if (logline.match(_LogsRegex.default.overloadedRE)) {
+      return [timestamp, _LogConst.default.TYPE_OVERLOADED, logline.substr(logline.indexOf(']: ') + 3), sev];
+    } else if (logline.match(_LogsRegex.default.keepentityRE)) {
+      return [timestamp, _LogConst.default.TYPE_KEEPENTITY, logline.substr(logline.indexOf(']: ') + 3), sev];
     }
 
     return [timestamp, _LogConst.default.TYPE_SERVERINFO, logline.substr(logline.indexOf(']: ') + 3), sev];
@@ -280,6 +284,28 @@ var _default = {
       });
 
       _fs.default.writeFileSync(tmplogPath, JSON.stringify(rawlogJSON));
+
+      _CustomLogger.default.debug("Dumped full log JSON to ".concat(tmplogPath));
+
+      var cleanedJSON = rawlogJSON.filter(function (obj) {
+        return obj.type !== _LogConst.default.TYPE_KEEPENTITY && obj.type !== _LogConst.default.TYPE_OVERLOADED;
+      });
+
+      _fs.default.writeFileSync(_path.default.join(workdir, 'filtered_logs.json'), JSON.stringify(cleanedJSON));
+
+      _CustomLogger.default.info("".concat(rawlogJSON.length - cleanedJSON.length, " records cleaned (filtered out 'keeping entity' and 'server overloaded' messages)."));
+
+      _CustomLogger.default.debug("Wrote 'cleaned' JSON file to ".concat(_path.default.join(workdir, 'filtered_logs.json')));
+
+      var specialEventJSON = cleanedJSON.filter(function (obj) {
+        return obj.type !== _LogConst.default.TYPE_SERVERINFO;
+      });
+
+      _fs.default.writeFileSync(_path.default.join(workdir, 'special_event_logs.json'), JSON.stringify(specialEventJSON));
+
+      _CustomLogger.default.info("".concat(specialEventJSON.length, " records determined worth saving."));
+
+      _CustomLogger.default.debug("Wrote 'important' JSON file to ".concat(_path.default.join(workdir, 'special_event_logs.json')));
     });
   },
   rawlogJSON: rawlogJSON

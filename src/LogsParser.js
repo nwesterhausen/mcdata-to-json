@@ -136,6 +136,10 @@ let getDateFromFilename = function(filename) {
                 return [timestamp, logconst.TYPE_SERVERREADY, logline.substr(logline.indexOf(']: ') + 3), sev];
             } else if (logline.match(logregx.serverstopRE)) {
                 return [timestamp, logconst.TYPE_SERVERSTOP, logline.substr(logline.indexOf(']: ') + 3), sev];
+            } else if (logline.match(logregx.overloadedRE)) {
+                return [timestamp, logconst.TYPE_OVERLOADED, logline.substr(logline.indexOf(']: ') + 3), sev];
+            } else if (logline.match(logregx.keepentityRE)) {
+                return [timestamp, logconst.TYPE_KEEPENTITY, logline.substr(logline.indexOf(']: ') + 3), sev];
             }
             return [timestamp, logconst.TYPE_SERVERINFO, logline.substr(logline.indexOf(']: ') + 3), sev];
     
@@ -244,6 +248,21 @@ export default {
                 return a.timestamp - b.timestamp;
             });
             fs.writeFileSync(tmplogPath, JSON.stringify(rawlogJSON));
+            log.debug(`Dumped full log JSON to ${tmplogPath}`);
+            let cleanedJSON = rawlogJSON.filter((obj) => {
+                return obj.type !== logconst.TYPE_KEEPENTITY && obj.type !== logconst.TYPE_OVERLOADED;
+            });
+
+            fs.writeFileSync(path.join(workdir, 'filtered_logs.json'), JSON.stringify(cleanedJSON));
+            log.info(`${rawlogJSON.length - cleanedJSON.length} records cleaned (filtered out 'keeping entity' and 'server overloaded' messages).`);
+            log.debug(`Wrote 'cleaned' JSON file to ${path.join(workdir, 'filtered_logs.json')}`);
+            let specialEventJSON = cleanedJSON.filter((obj) => {
+                return obj.type !== logconst.TYPE_SERVERINFO;
+            });
+
+            fs.writeFileSync(path.join(workdir, 'special_event_logs.json'), JSON.stringify(specialEventJSON));
+            log.info(`${specialEventJSON.length} records determined worth saving.`);
+            log.debug(`Wrote 'important' JSON file to ${path.join(workdir, 'special_event_logs.json')}`);
         });
     },
     rawlogJSON
