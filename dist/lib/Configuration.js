@@ -29,13 +29,15 @@ var rundir = _path.default.dirname(process.argv[1]),
   'minecraft': rundir,
   'outputdir': _path.default.join(rundir, 'output'),
   'loglevel': 'info',
-  'help': false
+  'help': false,
+  'use-env': false
 },
     knownOpts = {
   'minecraft': _path.default,
   'outputdir': _path.default,
   'loglevel': loglevels,
-  'help': Boolean
+  'help': Boolean,
+  'use-env': Boolean
 },
     shortHands = {
   'silent': ['--loglevel=error'],
@@ -45,9 +47,11 @@ var rundir = _path.default.dirname(process.argv[1]),
   's': ['--loglevel=error'],
   'q': ['--loglevel=warn'],
   'v': ['--loglevel=info'],
-  'vvv': ['--loglevel=debug']
+  'vvv': ['--loglevel=debug'],
+  'e': ['--use-env'],
+  'env': ['--use-env']
 },
-    usage = "Usage:\n    --help, -h                      Show this help message and exit.\n    --minecraft=path                The minecraft folder containing server.properties and world.\n    --outputdir=path                The directory to save the generated JSON files into.\n    --loglevel=<level>              How verbose to log to the console. Also you can use one of\n                                    the helper functions to accomplish this to varying degrees:\n    --silent, -s, --loglevel=error  Log only errors.\n    --quiet, -q, --loglevel=warn    Log only warnings and errors.\n    -v, --loglevel=info [Default]   Log everything except for debug messages.\n    -vvv, -debug, --loglevel=debug  Log everything.",
+    usage = "Usage:\n    --help, -h                      Show this help message and exit.\n    --minecraft=path                The minecraft folder containing server.properties and world.\n    --outputdir=path                The directory to save the generated JSON files into.\n    --use-env                       Load configuration values from ENV:\n                                        env.MINECRAFT_DIR and env.OUTPUT_DIR\n    --loglevel=<level>              How verbose to log to the console. Also you can use one of\n                                    the helper functions to accomplish this to varying degrees:\n    --silent, -s, --loglevel=error  Log only errors.\n    --quiet, -q, --loglevel=warn    Log only warnings and errors.\n    -v, --loglevel=info [Default]   Log everything except for debug messages.\n    -vvv, -debug, --loglevel=debug  Log everything.",
     parsedOpts = (0, _lodash.defaults)((0, _nopt.default)(knownOpts, shortHands, process.argv, 2), defaultOpts),
     helpMessage = "mcdata-to-json ".concat(_Version.default.version, "\n    A node.js module to turn the data from your minecraft server or world into json.");
 
@@ -55,6 +59,16 @@ if (parsedOpts.help) {
   console.log(helpMessage);
   console.log(usage);
   process.exit(0);
+}
+
+if (parsedOpts["use-env"]) {
+  if (!parsedOpts.minecraft && process.env.MINECRAFT_DIR) {
+    parsedOpts.minecraft = process.env.MINECRAFT_DIR;
+  }
+
+  if (!parsedOpts.outputdir && process.env.OUTPUT_DIR) {
+    parsedOpts.outputdir = process.env.OUTPUT_DIR;
+  }
 }
 
 _CustomLogger.default.setLevel(loglevels.indexOf(parsedOpts.loglevel));
