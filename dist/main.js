@@ -6,7 +6,7 @@ var _Configuration = _interopRequireDefault(require("./lib/Configuration"));
 
 var _LogsParser = _interopRequireDefault(require("./LogsParser"));
 
-var _AdvancementLoader = _interopRequireDefault(require("./lib/AdvancementLoader"));
+var _ServerDataTool = _interopRequireDefault(require("./lib/ServerDataTool"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -25,8 +25,8 @@ _LogsParser.default.prepareLogFiles();
 
 _LogsParser.default.parseLogFiles();
 
-_AdvancementLoader.default.setMinecraftRoot(_Configuration.default.MC);
+_ServerDataTool.default.setMinecraftRoot(_Configuration.default.MC);
 
-_AdvancementLoader.default.setTempRoot(_Configuration.default.TEMP_DIR);
+_ServerDataTool.default.setTempRoot(_Configuration.default.TEMP_DIR);
 
-_AdvancementLoader.default.exportMinecraftAdvancements();
+_ServerDataTool.default.exportMinecraftAdvancements();
