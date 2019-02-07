@@ -15,13 +15,15 @@ let rundir = path.dirname(process.argv[1]),
         'minecraft': rundir,
         'outputdir': path.join(rundir, 'output'),
         'loglevel': 'info',
-        'help': false
+        'help': false,
+        'use-env': false
     },
     knownOpts = {
         'minecraft': path,
         'outputdir': path,
         'loglevel': loglevels,
-        'help': Boolean
+        'help': Boolean,
+        'use-env': Boolean
     },
     shortHands = {
         'silent': ['--loglevel=error'],
@@ -31,12 +33,16 @@ let rundir = path.dirname(process.argv[1]),
         's': ['--loglevel=error'],
         'q': ['--loglevel=warn'],
         'v': ['--loglevel=info'],
-        'vvv': ['--loglevel=debug']
+        'vvv': ['--loglevel=debug'],
+        'e': ['--use-env'],
+        'env': ['--use-env']
     },
     usage = `Usage:
     --help, -h                      Show this help message and exit.
     --minecraft=path                The minecraft folder containing server.properties and world.
     --outputdir=path                The directory to save the generated JSON files into.
+    --use-env                       Load configuration values from ENV:
+                                        env.MINECRAFT_DIR and env.OUTPUT_DIR
     --loglevel=<level>              How verbose to log to the console. Also you can use one of
                                     the helper functions to accomplish this to varying degrees:
     --silent, -s, --loglevel=error  Log only errors.
@@ -51,6 +57,14 @@ if (parsedOpts.help) {
     console.log(helpMessage);
     console.log(usage);
     process.exit(0);
+}
+if (parsedOpts["use-env"]) {
+    if (!parsedOpts.minecraft && process.env.MINECRAFT_DIR) {
+        parsedOpts.minecraft = process.env.MINECRAFT_DIR;
+    }
+    if (!parsedOpts.outputdir && process.env.OUTPUT_DIR) {
+        parsedOpts.outputdir = process.env.OUTPUT_DIR;
+    }
 }
 
 log.setLevel(loglevels.indexOf(parsedOpts.loglevel));
@@ -72,8 +86,8 @@ if (!MC) {
     process.exit(1);
 }
 log.debug(`argument --minecraft ${ parsedOpts.minecraft }`);
-log.debug(`environemnt.MC_DIR ${ process.env.MC_DIR}`);
-log.info(`Set Minecraft dir: ${ MC}`);
+log.debug(`environemnt.MC_DIR ${ process.env.MC_DIR }`);
+log.info(`Set Minecraft dir: ${ MC }`);
 // Check for server.properties, to validate minecraft folder..
 try {
     fs.statSync(PROPERTIES_FILE);
@@ -107,7 +121,7 @@ try {
 log.info('Minecraft dir passed validation checks.');
 
 log.debug(`argument --outdir ${ parsedOpts.outputdir }`);
-log.debug(`environemnt.OUTPUT_DIR ${ process.env.OUTPUT_DIR}`);
+log.debug(`environemnt.OUTPUT_DIR ${ process.env.OUTPUT_DIR }`);
 fs.ensureDirSync(OUTPUT_DIR);
 fs.ensureDirSync(TEMP_DIR);
 log.info(`Set output dir: ${OUTPUT_DIR}`);
