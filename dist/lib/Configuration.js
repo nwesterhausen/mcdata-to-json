@@ -55,23 +55,31 @@ var rundir = _path.default.dirname(process.argv[1]),
     parsedOpts = (0, _lodash.defaults)((0, _nopt.default)(knownOpts, shortHands, process.argv, 2), defaultOpts),
     helpMessage = "mcdata-to-json ".concat(_Version.default.version, "\n    A node.js module to turn the data from your minecraft server or world into json.");
 
+_CustomLogger.default.setLevel(loglevels.indexOf(parsedOpts.loglevel));
+
+_CustomLogger.default.debug('Process.env vars:');
+
+_CustomLogger.default.debug("MINECRAFT_DIR: ".concat(process.env.MINECRAFT_DIR));
+
+_CustomLogger.default.debug("OUTPUT_DIR: ".concat(process.env.OUTPUT_DIR));
+
 if (parsedOpts.help) {
   console.log(helpMessage);
   console.log(usage);
   process.exit(0);
 }
 
-if (parsedOpts["use-env"]) {
-  if (!parsedOpts.minecraft && process.env.MINECRAFT_DIR) {
+if (parsedOpts['use-env']) {
+  _CustomLogger.default.debug('Trying to load values from environment.');
+
+  if (parsedOpts.minecraft === defaultOpts.minecraft && process.env.MINECRAFT_DIR) {
     parsedOpts.minecraft = process.env.MINECRAFT_DIR;
   }
 
-  if (!parsedOpts.outputdir && process.env.OUTPUT_DIR) {
+  if (!parsedOpts.outputdir === defaultOpts.outputdir && process.env.OUTPUT_DIR) {
     parsedOpts.outputdir = process.env.OUTPUT_DIR;
   }
 }
-
-_CustomLogger.default.setLevel(loglevels.indexOf(parsedOpts.loglevel));
 
 _CustomLogger.default.debug("current working dir ".concat(rundir));
 
@@ -90,10 +98,6 @@ if (!MC) {
 
   process.exit(1);
 }
-
-_CustomLogger.default.debug("argument --minecraft ".concat(parsedOpts.minecraft));
-
-_CustomLogger.default.debug("environemnt.MC_DIR ".concat(process.env.MC_DIR));
 
 _CustomLogger.default.info("Set Minecraft dir: ".concat(MC)); // Check for server.properties, to validate minecraft folder..
 
@@ -136,10 +140,6 @@ try {
 }
 
 _CustomLogger.default.info('Minecraft dir passed validation checks.');
-
-_CustomLogger.default.debug("argument --outdir ".concat(parsedOpts.outputdir));
-
-_CustomLogger.default.debug("environemnt.OUTPUT_DIR ".concat(process.env.OUTPUT_DIR));
 
 _fsExtra.default.ensureDirSync(OUTPUT_DIR);
 

@@ -53,21 +53,27 @@ let rundir = path.dirname(process.argv[1]),
     helpMessage = `mcdata-to-json ${ version.version }
     A node.js module to turn the data from your minecraft server or world into json.`;
 
+log.setLevel(loglevels.indexOf(parsedOpts.loglevel));
+
+log.debug('Process.env vars:');
+log.debug(`MINECRAFT_DIR: ${ process.env.MINECRAFT_DIR }`);
+log.debug(`OUTPUT_DIR: ${ process.env.OUTPUT_DIR }`);
+
 if (parsedOpts.help) {
     console.log(helpMessage);
     console.log(usage);
     process.exit(0);
 }
-if (parsedOpts["use-env"]) {
-    if (!parsedOpts.minecraft && process.env.MINECRAFT_DIR) {
+if (parsedOpts['use-env']) {
+    log.debug('Trying to load values from environment.');
+    if (parsedOpts.minecraft === defaultOpts.minecraft && process.env.MINECRAFT_DIR) {
         parsedOpts.minecraft = process.env.MINECRAFT_DIR;
     }
-    if (!parsedOpts.outputdir && process.env.OUTPUT_DIR) {
+    if (!parsedOpts.outputdir === defaultOpts.outputdir && process.env.OUTPUT_DIR) {
         parsedOpts.outputdir = process.env.OUTPUT_DIR;
     }
 }
 
-log.setLevel(loglevels.indexOf(parsedOpts.loglevel));
 
 log.debug(`current working dir ${ rundir}`);
 
@@ -85,8 +91,6 @@ if (!MC) {
     log.error('No minecraft directory set!');
     process.exit(1);
 }
-log.debug(`argument --minecraft ${ parsedOpts.minecraft }`);
-log.debug(`environemnt.MC_DIR ${ process.env.MC_DIR }`);
 log.info(`Set Minecraft dir: ${ MC }`);
 // Check for server.properties, to validate minecraft folder..
 try {
@@ -120,8 +124,6 @@ try {
 }
 log.info('Minecraft dir passed validation checks.');
 
-log.debug(`argument --outdir ${ parsedOpts.outputdir }`);
-log.debug(`environemnt.OUTPUT_DIR ${ process.env.OUTPUT_DIR }`);
 fs.ensureDirSync(OUTPUT_DIR);
 fs.ensureDirSync(TEMP_DIR);
 log.info(`Set output dir: ${OUTPUT_DIR}`);
