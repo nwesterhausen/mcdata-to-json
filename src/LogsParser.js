@@ -153,7 +153,7 @@ let getDateFromFilename = function(filename) {
             appendLogActionTo(createdJSON, parseLogLine(createdDate, input));
         });
         rl.on('close', () => {
-            log.info(`Completed parsing ${filepath}`);
+            log.debug(`Completed parsing ${filepath}`);
             rawlogJSON.push(...createdJSON);
         });
     },
@@ -172,7 +172,7 @@ let getDateFromFilename = function(filename) {
                     appendLogActionTo(createdJSON, parseLogLine(createdDate, input));
                 });
                 rl.on('close', () => {
-                    log.info(`Completed parsing ${filepath}`);
+                    log.debug(`Completed parsing ${filepath}`);
                     rawlogJSON.push(...createdJSON);
                     resolve(filepath);
                 });
@@ -238,7 +238,7 @@ export default {
         }
         log.info(`Began parse of ${logfiles.length} log files.`);
         Promise.all(promises).then((files) => {
-            log.debug(`Promises completed: ${files}.`);
+            log.info(`Completed parsing ${files.length} log files.`);
             log.info(`Sorting ${rawlogJSON.length} records.`);
             rawlogJSON.sort((a, b) => {
                 return a.timestamp - b.timestamp;

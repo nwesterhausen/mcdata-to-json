@@ -168,10 +168,9 @@ var getDateFromFilename = function getDateFromFilename(filename) {
     appendLogActionTo(createdJSON, parseLogLine(createdDate, input));
   });
   rl.on('close', function () {
-    _CustomLogger.default.info("Completed parsing ".concat(filepath));
+    _CustomLogger.default.debug("Completed parsing ".concat(filepath));
 
     rawlogJSON.push.apply(rawlogJSON, createdJSON);
-    runningJobs--;
   });
 },
     jsonFromLogfilePromise = function jsonFromLogfilePromise(filepath) {
@@ -190,7 +189,7 @@ var getDateFromFilename = function getDateFromFilename(filename) {
         appendLogActionTo(createdJSON, parseLogLine(createdDate, input));
       });
       rl.on('close', function () {
-        _CustomLogger.default.info("Completed parsing ".concat(filepath));
+        _CustomLogger.default.debug("Completed parsing ".concat(filepath));
 
         rawlogJSON.push.apply(rawlogJSON, createdJSON);
         resolve(filepath);
@@ -272,7 +271,7 @@ var _default = {
     _CustomLogger.default.info("Began parse of ".concat(logfiles.length, " log files."));
 
     Promise.all(promises).then(function (files) {
-      _CustomLogger.default.debug("Promises completed: ".concat(files, "."));
+      _CustomLogger.default.info("Completed parsing ".concat(files.length, " log files."));
 
       _CustomLogger.default.info("Sorting ".concat(rawlogJSON.length, " records."));
 
@@ -282,6 +281,7 @@ var _default = {
 
       _fs.default.writeFileSync(tmplogPath, JSON.stringify(rawlogJSON));
     });
-  }
+  },
+  rawlogJSON: rawlogJSON
 };
 exports.default = _default;
