@@ -1,5 +1,6 @@
 dist/output
-test/
+test/output
+test/snapshot
 
 # Logs
 logs

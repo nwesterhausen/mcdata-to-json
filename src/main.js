@@ -8,8 +8,12 @@
 import log from './lib/CustomLogger';
 import config from './lib/Configuration';
 import LogsParser from './LogsParser';
+import a from './lib/AdvancementLoader';
 
 log.info(`Beginning log read from ${config.LOGS}`);
 LogsParser.setDirs(config.LOGS, config.TEMP_DIR);
 LogsParser.prepareLogFiles();
 LogsParser.parseLogFiles();
+a.setMinecraftRoot(config.MC);
+a.setTempRoot(config.TEMP_DIR);
+a.exportMinecraftAdvancements();
