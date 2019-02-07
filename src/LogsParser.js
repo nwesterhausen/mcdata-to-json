@@ -44,18 +44,6 @@ let getDateFromFilename = function(filename) {
         // log.debug(`Created timestamp ${t.toISOString()}`);
         return t.getTime();
     },
-    getTimestampFromHHMMSSAndFilename = function(timeString, parentFilename) {
-        // Expects [HH:MM:SS]
-        let h = timeString.split(':')[0],
-            m = timeString.split(':')[1],
-            s = timeString.split(':')[2],
-            t = getDateFromFilename(parentFilename);
-
-        t.setSeconds(s);
-        t.setMinutes(m);
-        t.setHours(h);
-        return t.getTime();
-    },
     appendLogActionTo = function(dest, actionarray) {
         if (!actionarray) {
             return;
@@ -265,5 +253,6 @@ export default {
             log.debug(`Wrote 'important' JSON file to ${path.join(workdir, 'special_event_logs.json')}`);
         });
     },
-    rawlogJSON
+    rawlogJSON,
+    jsonFromLogfile
 };

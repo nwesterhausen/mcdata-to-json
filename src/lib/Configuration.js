@@ -60,8 +60,8 @@ log.debug(`MINECRAFT_DIR: ${ process.env.MINECRAFT_DIR }`);
 log.debug(`OUTPUT_DIR: ${ process.env.OUTPUT_DIR }`);
 
 if (parsedOpts.help) {
-    console.log(helpMessage);
-    console.log(usage);
+    console.log(helpMessage); // eslint-disable-line no-console
+    console.log(usage); // eslint-disable-line no-console
     process.exit(0);
 }
 if (parsedOpts['use-env']) {

@@ -64,8 +64,10 @@ _CustomLogger.default.debug("MINECRAFT_DIR: ".concat(process.env.MINECRAFT_DIR))
 _CustomLogger.default.debug("OUTPUT_DIR: ".concat(process.env.OUTPUT_DIR));
 
 if (parsedOpts.help) {
-  console.log(helpMessage);
-  console.log(usage);
+  console.log(helpMessage); // eslint-disable-line no-console
+
+  console.log(usage); // eslint-disable-line no-console
+
   process.exit(0);
 }
 

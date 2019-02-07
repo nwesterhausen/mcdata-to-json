@@ -57,17 +57,6 @@ var getDateFromFilename = function getDateFromFilename(filename) {
 
   return t.getTime();
 },
-    getTimestampFromHHMMSSAndFilename = function getTimestampFromHHMMSSAndFilename(timeString, parentFilename) {
-  // Expects [HH:MM:SS]
-  var h = timeString.split(':')[0],
-      m = timeString.split(':')[1],
-      s = timeString.split(':')[2],
-      t = getDateFromFilename(parentFilename);
-  t.setSeconds(s);
-  t.setMinutes(m);
-  t.setHours(h);
-  return t.getTime();
-},
     appendLogActionTo = function appendLogActionTo(dest, actionarray) {
   if (!actionarray) {
     return;
@@ -308,6 +297,7 @@ var _default = {
       _CustomLogger.default.debug("Wrote 'important' JSON file to ".concat(_path.default.join(workdir, 'special_event_logs.json')));
     });
   },
-  rawlogJSON: rawlogJSON
+  rawlogJSON: rawlogJSON,
+  jsonFromLogfile: jsonFromLogfile
 };
 exports.default = _default;
