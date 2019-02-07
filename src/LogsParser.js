@@ -242,7 +242,7 @@ export default {
             });
 
             fs.writeFileSync(path.join(workdir, 'filtered_logs.json'), JSON.stringify(cleanedJSON));
-            log.info(`${rawlogJSON.length - cleanedJSON.length} records cleaned (filtered out 'keeping entity' and 'server overloaded' messages).`);
+            log.info(`${rawlogJSON.length - cleanedJSON.length} records removed (filtered out 'keeping entity' and 'server overloaded' messages).`);
             log.debug(`Wrote 'cleaned' JSON file to ${path.join(workdir, 'filtered_logs.json')}`);
             let specialEventJSON = cleanedJSON.filter((obj) => {
                 return obj.type !== logconst.TYPE_SERVERINFO;

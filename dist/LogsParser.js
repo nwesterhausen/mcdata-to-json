@@ -282,7 +282,7 @@ var _default = {
 
       _fs.default.writeFileSync(_path.default.join(workdir, 'filtered_logs.json'), JSON.stringify(cleanedJSON));
 
-      _CustomLogger.default.info("".concat(rawlogJSON.length - cleanedJSON.length, " records cleaned (filtered out 'keeping entity' and 'server overloaded' messages)."));
+      _CustomLogger.default.info("".concat(rawlogJSON.length - cleanedJSON.length, " records removed (filtered out 'keeping entity' and 'server overloaded' messages)."));
 
       _CustomLogger.default.debug("Wrote 'cleaned' JSON file to ".concat(_path.default.join(workdir, 'filtered_logs.json')));
 
