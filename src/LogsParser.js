@@ -12,13 +12,12 @@ let logfiles = [],
     workdir = '',
     tmplogPath = '',
     latestlogDate = '',
-    rawlogJSON = [],
-    runningJobs = 0;
+    rawlogJSON = [];
 
 
 let getDateFromFilename = function(filename) {
         // Expects YYYY-MM-DD-#.log
-        log.debug(`Creating timestamp from ${filename}`);
+        // log.debug(`Creating timestamp from ${filename}`);
         let y = filename.split('-')[0],
             m = filename.split('-')[1],
             d = filename.split('-')[2],
@@ -28,7 +27,7 @@ let getDateFromFilename = function(filename) {
             t = new Date();
         }
 
-        log.debug(`Created timestamp ${t.toISOString()}`);
+        // log.debug(`Created timestamp ${t.toISOString()}`);
         return t;
     },
     getTimestampFromHHMMSSAndBasedate = function(timeString, basedate) {
@@ -156,7 +155,6 @@ let getDateFromFilename = function(filename) {
         rl.on('close', () => {
             log.info(`Completed parsing ${filepath}`);
             rawlogJSON.push(...createdJSON);
-            runningJobs--;
         });
     },
     jsonFromLogfilePromise = function(filepath) {
@@ -247,5 +245,6 @@ export default {
             });
             fs.writeFileSync(tmplogPath, JSON.stringify(rawlogJSON));
         });
-    }
+    },
+    rawlogJSON
 };

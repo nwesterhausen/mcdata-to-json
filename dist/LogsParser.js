@@ -27,13 +27,11 @@ var logfiles = [],
     workdir = '',
     tmplogPath = '',
     latestlogDate = '',
-    rawlogJSON = [],
-    runningJobs = 0;
+    rawlogJSON = [];
 
 var getDateFromFilename = function getDateFromFilename(filename) {
   // Expects YYYY-MM-DD-#.log
-  _CustomLogger.default.debug("Creating timestamp from ".concat(filename));
-
+  // log.debug(`Creating timestamp from ${filename}`);
   var y = filename.split('-')[0],
       m = filename.split('-')[1],
       d = filename.split('-')[2],
@@ -41,9 +39,8 @@ var getDateFromFilename = function getDateFromFilename(filename) {
 
   if (filename === 'latest.log') {
     t = new Date();
-  }
+  } // log.debug(`Created timestamp ${t.toISOString()}`);
 
-  _CustomLogger.default.debug("Created timestamp ".concat(t.toISOString()));
 
   return t;
 },
