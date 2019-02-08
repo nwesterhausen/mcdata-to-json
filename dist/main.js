@@ -6,6 +6,8 @@ var _Configuration = _interopRequireDefault(require("./lib/Configuration"));
 
 var _LogsParser = _interopRequireDefault(require("./LogsParser"));
 
+var _ServerDataTool = _interopRequireDefault(require("./lib/ServerDataTool"));
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /**
@@ -15,8 +17,16 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * By default will output in the current directory, or the OUTPUT_DIR env
  * variable, OR the --outdir="" parameter.
  */
-_CustomLogger.default.info("Beginning log read from ".concat(_Configuration.default.LOGS));
+var DOMAIN = 'Main';
 
-_LogsParser.default.setDirs(_Configuration.default.LOGS, _Configuration.default.TEMP_DIR);
+_CustomLogger.default.debug(DOMAIN, 'Passing configuration to components.');
+
+_ServerDataTool.default.setConfig(_Configuration.default);
+
+_LogsParser.default.setConfig(_Configuration.default);
+
+_CustomLogger.default.info(DOMAIN, "Starting Log Processing ".concat(_Configuration.default.LOGS));
 
 _LogsParser.default.prepareLogFiles();
+
+_LogsParser.default.parseLogFiles();

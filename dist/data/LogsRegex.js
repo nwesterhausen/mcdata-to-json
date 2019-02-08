@@ -37,6 +37,8 @@ var _default = {
   'uuiddescRE': new RegExp(/(UUID of player ).+$/),
   'commandRE': new RegExp(/\[[A-Za-z0-9_-]+: (?:Given|Set).+\]/),
   'serverreadyRE': new RegExp(/\]: Done \([0-9.]+s\)! For help, type "help" or "?"/),
-  'serverstopRE': new RegExp(/\]: Stopping server/)
+  'serverstopRE': new RegExp(/\]: Stopping server/),
+  'overloadedRE': new RegExp(/\]: Can't keep up! Is the server overloaded?/),
+  'keepentityRE': new RegExp(/\]: Keeping entity [a-zA-Z:]+ that already exists/)
 };
 exports.default = _default;

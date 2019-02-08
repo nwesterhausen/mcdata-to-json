@@ -13,24 +13,24 @@ var _default = {
   'setLevel': function setLevel(newlevel) {
     loglevel = newlevel;
   },
-  'debug': function debug(msg) {
+  'debug': function debug(domain, msg) {
     if (loglevel >= 3) {
-      console.debug(_safe.bgBlue.black(' DEBUG '), (0, _safe.blue)(msg));
+      console.debug(_safe.bgBlue.black(' DEBUG '), (0, _safe.blue)("[".concat(domain, "] ").concat(msg)));
     }
   },
-  'info': function info(msg) {
+  'info': function info(domain, msg) {
     if (loglevel >= 2) {
-      console.info(_safe.bgGreen.black(' INFO  '), (0, _safe.green)(msg));
+      console.info(_safe.bgGreen.black(' INFO  '), (0, _safe.green)("[".concat(domain, "] ").concat(msg)));
     }
   },
-  'warn': function warn(msg) {
+  'warn': function warn(domain, msg) {
     if (loglevel >= 1) {
-      return console.warn(_safe.bgYellow.black(' WARN  '), (0, _safe.yellow)(msg));
+      return console.warn(_safe.bgYellow.black(' WARN  '), (0, _safe.yellow)("[".concat(domain, "] ").concat(msg)));
     }
   },
-  'error': function error(msg) {
+  'error': function error(domain, msg) {
     if (loglevel >= 0) {
-      return console.error(_safe.bgRed.black(' ERROR '), (0, _safe.red)(msg));
+      return console.error(_safe.bgRed.black(' ERROR '), (0, _safe.red)("[".concat(domain, "] ").concat(msg)));
     }
   }
 };
