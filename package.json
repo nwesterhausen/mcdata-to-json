@@ -5,8 +5,8 @@
   "main": "dist/main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "babel src --out-dir dist --presets=@babel/preset-env --copy-files",
-    "build-watch": "babel src -w --out-dir dist --presets=@babel/preset-env --copy-files"
+    "dev": "watch 'npm run build' src",
+    "build": "babel src --out-dir dist --presets=@babel/preset-env --copy-files"
   },
   "author": "Nicholas Westerhausen",
   "license": "MIT",
@@ -30,6 +30,7 @@
     "@babel/preset-env": "^7.3.1",
     "@babel/register": "^7.0.0",
     "eslint": "^5.13.0",
-    "eslint-watch": "^4.0.2"
+    "eslint-watch": "^4.0.2",
+    "watch": "^1.0.2"
   }
 }
