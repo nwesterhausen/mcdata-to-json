@@ -32,7 +32,7 @@ var logfiles = [],
 
 var getDateFromFilename = function getDateFromFilename(filename) {
   // Expects YYYY-MM-DD-#.log
-  // log.debug(DOMAIN, `Creating timestamp from ${filename}`);
+  // log.debug(`Creating timestamp from ${filename}`, DOMAIN);
   var y = filename.split('-')[0],
       m = filename.split('-')[1],
       d = filename.split('-')[2],
@@ -40,28 +40,28 @@ var getDateFromFilename = function getDateFromFilename(filename) {
 
   if (filename === 'latest.log') {
     t = new Date();
-  } // log.debug(DOMAIN, `Created timestamp ${t.toISOString()}`);
+  } // log.debug(`Created timestamp ${t.toISOString()}`, DOMAIN);
 
 
   return t;
 },
     getTimestampFromHHMMSSAndBasedate = function getTimestampFromHHMMSSAndBasedate(timeString, basedate) {
   // Expects [HH:MM:SS]
-  // log.debug(DOMAIN, `Creating timestamp from ${timeString}`);
+  // log.debug(`Creating timestamp from ${timeString}`, DOMAIN);
   var h = timeString.split(':')[0],
       m = timeString.split(':')[1],
       s = timeString.split(':')[2],
       t = basedate;
   t.setSeconds(s);
   t.setMinutes(m);
-  t.setHours(h); // log.debug(DOMAIN, `Created timestamp ${t.toISOString()}`);
+  t.setHours(h); // log.debug(`Created timestamp ${t.toISOString()}`, DOMAIN);
 
   return t.getTime();
 },
     appendLogActionTo = function appendLogActionTo(dest, actionarray) {
   if (!actionarray) {
     return;
-  } // log.debug(DOMAIN, `Appending ${actionarray} to destination`);
+  } // log.debug(`Appending ${actionarray} to destination`, DOMAIN);
 
 
   dest.push({
@@ -149,7 +149,7 @@ var getDateFromFilename = function getDateFromFilename(filename) {
   }
 },
     jsonFromLogfile = function jsonFromLogfile(filepath) {
-  _CustomLogger.default.debug(DOMAIN, "Creating JSON for file ".concat(filepath));
+  _CustomLogger.default.debug("Creating JSON for file ".concat(filepath), DOMAIN);
 
   var createdJSON = [],
       createdDate = getDateFromFilename(filepath);
@@ -162,14 +162,14 @@ var getDateFromFilename = function getDateFromFilename(filename) {
     appendLogActionTo(createdJSON, parseLogLine(createdDate, input));
   });
   rl.on('close', function () {
-    _CustomLogger.default.debug(DOMAIN, "Completed parsing ".concat(filepath));
+    _CustomLogger.default.debug("Completed parsing ".concat(filepath), DOMAIN);
 
     rawlogJSON.push.apply(rawlogJSON, createdJSON);
   });
 },
     jsonFromLogfilePromise = function jsonFromLogfilePromise(filepath) {
   return new Promise(function (resolve, reject) {
-    _CustomLogger.default.debug(DOMAIN, "Creating JSON for file ".concat(filepath));
+    _CustomLogger.default.debug("Creating JSON for file ".concat(filepath), DOMAIN);
 
     var createdJSON = [],
         createdDate = getDateFromFilename(filepath);
@@ -183,7 +183,7 @@ var getDateFromFilename = function getDateFromFilename(filename) {
         appendLogActionTo(createdJSON, parseLogLine(createdDate, input));
       });
       rl.on('close', function () {
-        _CustomLogger.default.debug(DOMAIN, "Completed parsing ".concat(filepath));
+        _CustomLogger.default.debug("Completed parsing ".concat(filepath), DOMAIN);
 
         rawlogJSON.push.apply(rawlogJSON, createdJSON);
         resolve(filepath);
@@ -199,7 +199,7 @@ var _default = {
     logfiledir = config.LOGS;
     latestlogDate = _fs.default.statSync(_path.default.join(logfiledir, 'latest.log')).mtime.toISOString();
 
-    _CustomLogger.default.debug(DOMAIN, "latest.log date: ".concat(latestlogDate));
+    _CustomLogger.default.debug("latest.log date: ".concat(latestlogDate), DOMAIN);
 
     workdir = config.TEMP_DIR;
     tmplogPath = _path.default.join(workdir, 'all_logs.json');
@@ -207,28 +207,28 @@ var _default = {
   'prepareLogFiles': function prepareLogFiles() {
     var rawLogFiles = _fs.default.readdirSync(logfiledir);
 
-    _CustomLogger.default.debug(DOMAIN, "Preparing following log files: ".concat(JSON.stringify(rawLogFiles))); // Go through the log dir and sort the files
+    _CustomLogger.default.debug("Preparing following log files: ".concat(JSON.stringify(rawLogFiles)), DOMAIN); // Go through the log dir and sort the files
 
 
     for (var i = 0; i < rawLogFiles.length; i++) {
-      _CustomLogger.default.debug(DOMAIN, "Working on file: ".concat(rawLogFiles[i])); // Unzip gziped files, keeeping track of them
+      _CustomLogger.default.debug("Working on file: ".concat(rawLogFiles[i]), DOMAIN); // Unzip gziped files, keeeping track of them
 
 
       if (rawLogFiles[i].endsWith('.gz')) {
-        _CustomLogger.default.debug(DOMAIN, 'Detected gzip file.');
+        _CustomLogger.default.debug('Detected gzip file.', DOMAIN);
 
         var tmpLogFile = rawLogFiles[i].substr(0, rawLogFiles[i].length - 3),
             compressedFile = _fs.default.readFileSync(_path.default.join(logfiledir, rawLogFiles[i])),
             unzippedFile = _zlib.default.unzipSync(compressedFile);
 
-        _CustomLogger.default.debug(DOMAIN, 'Unzipping file into log dir.');
+        _CustomLogger.default.debug('Unzipping file into log dir.', DOMAIN);
 
         _fs.default.writeFileSync(_path.default.join(logfiledir, tmpLogFile), unzippedFile);
 
         unzippedFiles.push(tmpLogFile);
         logfiles.push(tmpLogFile);
 
-        _CustomLogger.default.debug(DOMAIN, "Unzipped ".concat(tmpLogFile));
+        _CustomLogger.default.debug("Unzipped ".concat(tmpLogFile), DOMAIN);
       } else if (rawLogFiles[i].endsWith('.log')) {
         logfiles.push(rawLogFiles[i]);
       }
@@ -236,11 +236,11 @@ var _default = {
 
     logfiles = logfiles.sort();
 
-    _CustomLogger.default.debug(DOMAIN, 'Log file list sorted internally');
+    _CustomLogger.default.debug('Log file list sorted internally', DOMAIN);
   },
   'combineLogFiles': function combineLogFiles() {
     // Append all the files into one file
-    _CustomLogger.default.debug(DOMAIN, 'Clearing the temp.log file');
+    _CustomLogger.default.debug('Clearing the temp.log file', DOMAIN);
 
     _fs.default.writeFileSync(tmplogPath, '');
 
@@ -248,13 +248,13 @@ var _default = {
       // special case for latest.log, we want it to be the date instead
       var fileHeader = logfiles[i] === 'latest.log' ? "[Filedate:".concat(latestlogDate, ".log]\n") : "[Filename:".concat(logfiles[i], "]\n");
 
-      _CustomLogger.default.debug(DOMAIN, "Appending ".concat(logfiles[i], " to temp.log."));
+      _CustomLogger.default.debug("Appending ".concat(logfiles[i], " to temp.log."), DOMAIN);
 
       _fs.default.appendFileSync(tmplogPath, fileHeader + _fs.default.readFileSync(_path.default.join(logfiledir, logfiles[i])));
     }
   },
   'parseLogFiles': function parseLogFiles() {
-    _CustomLogger.default.debug(DOMAIN, 'Beginning parse of all log files.');
+    _CustomLogger.default.debug('Beginning parse of all log files.', DOMAIN);
 
     var promises = [];
 
@@ -262,12 +262,12 @@ var _default = {
       promises.push(jsonFromLogfilePromise(logfiles[i]));
     }
 
-    _CustomLogger.default.info(DOMAIN, "Began parse of ".concat(logfiles.length, " log files."));
+    _CustomLogger.default.info("Began parse of ".concat(logfiles.length, " log files."), DOMAIN);
 
     Promise.all(promises).then(function (files) {
-      _CustomLogger.default.info(DOMAIN, "Completed parsing ".concat(files.length, " log files."));
+      _CustomLogger.default.info("Completed parsing ".concat(files.length, " log files."), DOMAIN);
 
-      _CustomLogger.default.info(DOMAIN, "Sorting ".concat(rawlogJSON.length, " records."));
+      _CustomLogger.default.info("Sorting ".concat(rawlogJSON.length, " records."), DOMAIN);
 
       rawlogJSON.sort(function (a, b) {
         return a.timestamp - b.timestamp;
@@ -275,7 +275,7 @@ var _default = {
 
       _fs.default.writeFileSync(tmplogPath, JSON.stringify(rawlogJSON));
 
-      _CustomLogger.default.debug(DOMAIN, "Dumped full log JSON to ".concat(tmplogPath));
+      _CustomLogger.default.debug("Dumped full log JSON to ".concat(tmplogPath), DOMAIN);
 
       var cleanedJSON = rawlogJSON.filter(function (obj) {
         return obj.type !== _LogConst.default.TYPE_KEEPENTITY && obj.type !== _LogConst.default.TYPE_OVERLOADED;
@@ -283,9 +283,9 @@ var _default = {
 
       _fs.default.writeFileSync(_path.default.join(workdir, 'filtered_logs.json'), JSON.stringify(cleanedJSON));
 
-      _CustomLogger.default.info(DOMAIN, "".concat(rawlogJSON.length - cleanedJSON.length, " records removed (filtered out 'keeping entity' and 'server overloaded' messages)."));
+      _CustomLogger.default.info("".concat(rawlogJSON.length - cleanedJSON.length, " records removed (filtered out 'keeping entity' and 'server overloaded' messages)."), DOMAIN);
 
-      _CustomLogger.default.debug(DOMAIN, "Wrote 'cleaned' JSON file to ".concat(_path.default.join(workdir, 'filtered_logs.json')));
+      _CustomLogger.default.debug("Wrote 'cleaned' JSON file to ".concat(_path.default.join(workdir, 'filtered_logs.json')), DOMAIN);
 
       var specialEventJSON = cleanedJSON.filter(function (obj) {
         return obj.type !== _LogConst.default.TYPE_SERVERINFO;
@@ -293,9 +293,9 @@ var _default = {
 
       _fs.default.writeFileSync(_path.default.join(workdir, 'special_event_logs.json'), JSON.stringify(specialEventJSON));
 
-      _CustomLogger.default.info(DOMAIN, "".concat(specialEventJSON.length, " records determined worth saving."));
+      _CustomLogger.default.info("".concat(specialEventJSON.length, " records determined worth saving."), DOMAIN);
 
-      _CustomLogger.default.debug(DOMAIN, "Wrote 'important' JSON file to ".concat(_path.default.join(workdir, 'special_event_logs.json')));
+      _CustomLogger.default.debug("Wrote 'important' JSON file to ".concat(_path.default.join(workdir, 'special_event_logs.json')), DOMAIN);
     });
   },
   rawlogJSON: rawlogJSON,

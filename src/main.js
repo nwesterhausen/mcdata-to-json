@@ -9,15 +9,26 @@ import log from './lib/CustomLogger';
 import config from './lib/Configuration';
 import LogsParser from './LogsParser';
 import ServerDataExtractor from './lib/ServerDataExtractor';
-const DOMAIN = 'Main';
+import AdvancementParser from './AdvancementParser';
 
-log.debug(DOMAIN, 'Passing configuration to components.');
+const DOMAIN = 'Main';
+const sleep = require( 'system-sleep' );
+
+log.debug('Passing configuration to components.', DOMAIN);
 ServerDataExtractor.setConfig(config);
 LogsParser.setConfig(config);
-log.info(DOMAIN, 'Starting Log Processing');
+AdvancementParser.setConfig(config);
+log.info('Starting Log Processing', DOMAIN);
 LogsParser.prepareLogFiles();
 LogsParser.parseLogFiles();
-log.info(DOMAIN, 'Starting JSON file processing (advancements, stats)');
-// TODO use a single JSON parser OR a parser for each filetype??
-log.info(DOMAIN, 'Starting NBT data processing (level.dat, playerdata)');
-// TODO
+log.debug(`ServerDataExtractor.getBusy(): ${ServerDataExtractor.getBusy()}`, DOMAIN);
+if (ServerDataExtractor.getBusy()) {
+    log.info('Waiting for minecraft data extraction to complete.', DOMAIN);
+    while (ServerDataExtractor.getBusy()) {
+        sleep(1000);
+    }
+}
+log.info('Starting JSON file processing (advancements, stats)', DOMAIN);
+
+log.info('Starting NBT data processing (level.dat, playerdata)', DOMAIN);
+

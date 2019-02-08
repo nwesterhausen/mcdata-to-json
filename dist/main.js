@@ -8,6 +8,8 @@ var _LogsParser = _interopRequireDefault(require("./LogsParser"));
 
 var _ServerDataExtractor = _interopRequireDefault(require("./lib/ServerDataExtractor"));
 
+var _AdvancementParser = _interopRequireDefault(require("./AdvancementParser"));
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /**
@@ -19,19 +21,32 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  */
 var DOMAIN = 'Main';
 
-_CustomLogger.default.debug(DOMAIN, 'Passing configuration to components.');
+var sleep = require('system-sleep');
+
+_CustomLogger.default.debug('Passing configuration to components.', DOMAIN);
 
 _ServerDataExtractor.default.setConfig(_Configuration.default);
 
 _LogsParser.default.setConfig(_Configuration.default);
 
-_CustomLogger.default.info(DOMAIN, 'Starting Log Processing');
+_AdvancementParser.default.setConfig(_Configuration.default);
+
+_CustomLogger.default.info('Starting Log Processing', DOMAIN);
 
 _LogsParser.default.prepareLogFiles();
 
 _LogsParser.default.parseLogFiles();
 
-_CustomLogger.default.info(DOMAIN, 'Starting JSON file processing (advancements, stats)'); // TODO use a single JSON parser OR a parser for each filetype??
+_CustomLogger.default.debug("ServerDataExtractor.getBusy(): ".concat(_ServerDataExtractor.default.getBusy()), DOMAIN);
 
+if (_ServerDataExtractor.default.getBusy()) {
+  _CustomLogger.default.info('Waiting for minecraft data extraction to complete.', DOMAIN);
 
-_CustomLogger.default.info(DOMAIN, 'Starting NBT data processing (level.dat, playerdata)'); // TODO
+  while (_ServerDataExtractor.default.getBusy()) {
+    sleep(1000);
+  }
+}
+
+_CustomLogger.default.info('Starting JSON file processing (advancements, stats)', DOMAIN);
+
+_CustomLogger.default.info('Starting NBT data processing (level.dat, playerdata)', DOMAIN);

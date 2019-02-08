@@ -53,11 +53,13 @@ let rundir = path.dirname(process.argv[1]),
     helpMessage = `mcdata-to-json ${ version.version }
     A node.js module to turn the data from your minecraft server or world into json.`;
 
-log.setLevel(loglevels.indexOf(parsedOpts.loglevel));
+const LOGLEVEL = (loglevels.indexOf(parsedOpts.loglevel));
 
-log.debug(DOMAIN, 'Process.env vars:');
-log.debug(DOMAIN, `MINECRAFT_DIR: ${ process.env.MINECRAFT_DIR }`);
-log.debug(DOMAIN, `OUTPUT_DIR: ${ process.env.OUTPUT_DIR }`);
+log.setLevel(LOGLEVEL);
+
+log.debug('Process.env vars:', DOMAIN);
+log.debug(`MINECRAFT_DIR: ${ process.env.MINECRAFT_DIR }`, DOMAIN);
+log.debug(`OUTPUT_DIR: ${ process.env.OUTPUT_DIR }`, DOMAIN);
 
 if (parsedOpts.help) {
     console.log(helpMessage); // eslint-disable-line no-console
@@ -65,7 +67,7 @@ if (parsedOpts.help) {
     process.exit(0);
 }
 if (parsedOpts['use-env']) {
-    log.debug(DOMAIN, 'Trying to load values from environment.');
+    log.debug('Trying to load values from environment.', DOMAIN);
     if (parsedOpts.minecraft === defaultOpts.minecraft && process.env.MINECRAFT_DIR) {
         parsedOpts.minecraft = process.env.MINECRAFT_DIR;
     }
@@ -75,7 +77,7 @@ if (parsedOpts['use-env']) {
 }
 
 
-log.debug(DOMAIN, `current working dir ${ rundir}`);
+log.debug(`current working dir ${ rundir}`, DOMAIN);
 
 const MC = parsedOpts.minecraft,
     PROPERTIES_FILE = path.join(MC, 'server.properties'),
@@ -88,10 +90,10 @@ const MC = parsedOpts.minecraft,
     TEMP_DIR = path.join(OUTPUT_DIR, 'temp');
 
 if (!MC) {
-    log.error(DOMAIN, 'No minecraft directory set!');
+    log.error('No minecraft directory set!', DOMAIN);
     process.exit(1);
 }
-log.info(DOMAIN, `Set Minecraft dir: ${ MC }`);
+log.info(`Set Minecraft dir: ${ MC }`, DOMAIN);
 // Check for server.properties, to validate minecraft folder..
 try {
     fs.statSync(PROPERTIES_FILE);
@@ -101,7 +103,7 @@ try {
     if (err.code === 'ENOENT') {
         let testedPath = path.basename(err.path);
 
-        log.error(DOMAIN, `No ${ testedPath } found in Minecraft dir!`);
+        log.error(`No ${ testedPath } found in Minecraft dir!`, DOMAIN);
         process.exit(1);
     } else {
         throw err;
@@ -116,17 +118,17 @@ try {
     if (err.code === 'ENOENT') {
         let testedPath = path.basename(err.path);
 
-        log.error(DOMAIN, `No ${ testedPath } found in Minecraft world dir!`);
+        log.error(`No ${ testedPath } found in Minecraft world dir!`, DOMAIN);
         process.exit(1);
     } else {
         throw err;
     }
 }
-log.info(DOMAIN, 'Minecraft dir passed validation checks.');
+log.info('Minecraft dir passed validation checks.', DOMAIN);
 
 fs.ensureDirSync(OUTPUT_DIR);
 fs.ensureDirSync(TEMP_DIR);
-log.info(DOMAIN, `Set output dir: ${OUTPUT_DIR}`);
+log.info(`Set output dir: ${OUTPUT_DIR}`, DOMAIN);
 
 export default {
     MC,
@@ -137,5 +139,6 @@ export default {
     STATS,
     PLAYERDATA,
     OUTPUT_DIR,
-    TEMP_DIR
+    TEMP_DIR,
+    LOGLEVEL
 };
