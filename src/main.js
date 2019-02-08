@@ -17,4 +17,3 @@ LogsParser.prepareLogFiles();
 LogsParser.parseLogFiles();
 a.setMinecraftRoot(config.MC);
 a.setTempRoot(config.TEMP_DIR);
-a.exportMinecraftAdvancements();

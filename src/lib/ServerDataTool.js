@@ -10,9 +10,46 @@ import log from './CustomLogger';
 const DOMAIN = 'DataExtrator';
 let minecraftRoot = 'unset',
     tempRoot = 'unset',
-    serverjarPath = 'unset';
+    serverjarPath = 'unset',
+    advancementsExported = false,
+    loottablesExported = false,
+    recipesExported = false,
+    tagsExported = false,
+    blocklistExported = false,
+    commandlistExported = false,
+    registriesExported = false;
 
-let exportMinecraftAdvancementsPromise = function() {
+let checkForData = function() {
+        log.debug(DOMAIN, 'Resetting data export status.');
+        advancementsExported = false;
+        loottablesExported = false;
+        recipesExported = false;
+        tagsExported = false;
+        blocklistExported = false;
+        commandlistExported = false;
+        registriesExported = false;
+        if (fs.existsSync(path.join(tempRoot, 'data'))) {
+            if (fs.existsSync(path.join(tempRoot, 'data', 'minecraft'))) {
+                advancementsExported = fs.existsSync(path.join(tempRoot, 'data', 'minecraft', 'advancements'));
+                loottablesExported = fs.existsSync(path.join(tempRoot, 'data', 'minecraft', 'loot_tables'));
+                recipesExported = fs.existsSync(path.join(tempRoot, 'data', 'minecraft', 'recipes'));
+                tagsExported = fs.existsSync(path.join(tempRoot, 'data', 'minecraft', 'tags'));
+            }
+            if (fs.existsSync(path.join(tempRoot, 'data', 'reports'))) {
+                blocklistExported = fs.existsSync(path.join(tempRoot, 'data', 'reports', 'blocks.json'));
+                blocklistExported = fs.existsSync(path.join(tempRoot, 'data', 'reports', 'commands.json'));
+                blocklistExported = fs.existsSync(path.join(tempRoot, 'data', 'reports', 'registries.json'));
+            }
+        }        
+        log.debug(DOMAIN, `advancements data is cached: ${advancementsExported}`);
+        log.debug(DOMAIN, `loottables data is cached: ${loottablesExported}`);
+        log.debug(DOMAIN, `recipes data is cached: ${recipesExported}`);
+        log.debug(DOMAIN, `tags data is cached: ${tagsExported}`);
+        log.debug(DOMAIN, `blocklist data is cached: ${blocklistExported}`);
+        log.debug(DOMAIN, `commandlist data is cached: ${commandlistExported}`);
+        log.debug(DOMAIN, `registries data is cached: ${registriesExported}`);
+    },
+    exportMinecraftDataPromise = function() {
         return new Promise((resolve, reject) => {
             log.debug(DOMAIN, 'Running minecraft data export from server jar.');
             if (tempRoot === 'unset' || serverjarPath === 'unset') {
@@ -20,7 +57,7 @@ let exportMinecraftAdvancementsPromise = function() {
                 log.error(DOMAIN, `datadir: ${tempRoot}, serverjar: ${serverjarPath}`);
                 reject('Failed to set directories.');
             }
-            cp.exec(`java -cp ${serverjarPath} net.minecraft.data.Main --server --output ${tempRoot}`,
+            cp.exec(`java -cp ${serverjarPath} net.minecraft.data.Main --all --output ${tempRoot}`,
                 (err, stdout, stderr) => { // eslint-disable-line 
                     if (err) {
                         log.error(DOMAIN, 'Failed to run command to export minecraft data.');
@@ -33,15 +70,15 @@ let exportMinecraftAdvancementsPromise = function() {
                 });
         });
     },
-    exportMinecraftAdvancements = function() {
+    ensureMinecraftAdvancements = function() {
         log.debug(DOMAIN, 'Checking for data already in output folder.');
-        if (!fs.existsSync(path.join(tempRoot, 'data'))) {
+        if (!advancementsExported) {
             log.info(DOMAIN, 'Using server.jar to generate advancement data.');
-            exportMinecraftAdvancementsPromise().then( (val) => {
+            exportMinecraftDataPromise().then( (val) => {
                 log.debug(DOMAIN, val);
             });
         } else {
-            log.info(DOMAIN, `Using cached minecraft report data in ${path.join(tempRoot, 'data')}`);
+            log.info(DOMAIN, `Using cached minecraft advancements in ${path.join(tempRoot, 'data', 'minecraft', 'advancements')}`);
         }
     };
 
@@ -52,6 +89,7 @@ export default {
     },
     'setTempRoot': function(temproot) {
         tempRoot = temproot;
+        checkForData();
     },
-    exportMinecraftAdvancements
+    exportMinecraftAdvancements: ensureMinecraftAdvancements
 };

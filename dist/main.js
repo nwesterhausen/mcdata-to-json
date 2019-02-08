@@ -30,5 +30,3 @@ _LogsParser.default.parseLogFiles();
 _ServerDataTool.default.setMinecraftRoot(_Configuration.default.MC);
 
 _ServerDataTool.default.setTempRoot(_Configuration.default.TEMP_DIR);
-
-_ServerDataTool.default.exportMinecraftAdvancements();
