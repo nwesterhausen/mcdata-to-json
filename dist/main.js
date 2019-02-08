@@ -19,14 +19,14 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  */
 var DOMAIN = 'Main';
 
-_CustomLogger.default.info(DOMAIN, "Beginning log read from ".concat(_Configuration.default.LOGS));
+_CustomLogger.default.debug(DOMAIN, 'Passing configuration to components.');
 
-_LogsParser.default.setDirs(_Configuration.default.LOGS, _Configuration.default.TEMP_DIR);
+_ServerDataTool.default.setConfig(_Configuration.default);
+
+_LogsParser.default.setConfig(_Configuration.default);
+
+_CustomLogger.default.info(DOMAIN, "Starting Log Processing ".concat(_Configuration.default.LOGS));
 
 _LogsParser.default.prepareLogFiles();
 
 _LogsParser.default.parseLogFiles();
-
-_ServerDataTool.default.setMinecraftRoot(_Configuration.default.MC);
-
-_ServerDataTool.default.setTempRoot(_Configuration.default.TEMP_DIR);

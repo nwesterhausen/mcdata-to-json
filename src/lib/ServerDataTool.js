@@ -40,7 +40,7 @@ let checkForData = function() {
                 blocklistExported = fs.existsSync(path.join(tempRoot, 'data', 'reports', 'commands.json'));
                 blocklistExported = fs.existsSync(path.join(tempRoot, 'data', 'reports', 'registries.json'));
             }
-        }        
+        }
         log.debug(DOMAIN, `advancements data is cached: ${advancementsExported}`);
         log.debug(DOMAIN, `loottables data is cached: ${loottablesExported}`);
         log.debug(DOMAIN, `recipes data is cached: ${recipesExported}`);
@@ -83,13 +83,11 @@ let checkForData = function() {
     };
 
 export default {
-    'setMinecraftRoot': function(mcpath) {
-        minecraftRoot = mcpath;
-        serverjarPath = path.join(mcpath, 'server.jar');
-    },
-    'setTempRoot': function(temproot) {
-        tempRoot = temproot;
+    'setConfig': function(config) {
+        minecraftRoot = config.MC;
+        tempRoot = config.TEMP_DIR;
+        serverjarPath = path.join(minecraftRoot, 'server.jar');
         checkForData();
     },
-    exportMinecraftAdvancements: ensureMinecraftAdvancements
+    ensureMinecraftAdvancements
 };

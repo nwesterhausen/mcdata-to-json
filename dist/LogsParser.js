@@ -195,13 +195,13 @@ var getDateFromFilename = function getDateFromFilename(filename) {
 };
 
 var _default = {
-  'setDirs': function setDirs(logsdir, tempdir) {
-    logfiledir = logsdir;
+  'setConfig': function setConfig(config) {
+    logfiledir = config.LOGS;
     latestlogDate = _fs.default.statSync(_path.default.join(logfiledir, 'latest.log')).mtime.toISOString();
 
     _CustomLogger.default.debug(DOMAIN, "latest.log date: ".concat(latestlogDate));
 
-    workdir = tempdir;
+    workdir = config.TEMP_DIR;
     tmplogPath = _path.default.join(workdir, 'all_logs.json');
   },
   'prepareLogFiles': function prepareLogFiles() {

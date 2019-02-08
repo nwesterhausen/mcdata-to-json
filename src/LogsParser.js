@@ -176,11 +176,11 @@ let getDateFromFilename = function(filename) {
     };
 
 export default {
-    'setDirs': function(logsdir, tempdir) {
-        logfiledir = logsdir;
+    'setConfig': function(config) {
+        logfiledir = config.LOGS;
         latestlogDate = fs.statSync(path.join(logfiledir, 'latest.log')).mtime.toISOString();
         log.debug(DOMAIN, `latest.log date: ${ latestlogDate }`);
-        workdir = tempdir;
+        workdir = config.TEMP_DIR;
         tmplogPath = path.join(workdir, 'all_logs.json');
     },
     'prepareLogFiles': function() {

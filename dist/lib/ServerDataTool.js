@@ -114,14 +114,12 @@ var checkForData = function checkForData() {
 };
 
 var _default = {
-  'setMinecraftRoot': function setMinecraftRoot(mcpath) {
-    minecraftRoot = mcpath;
-    serverjarPath = _path.default.join(mcpath, 'server.jar');
-  },
-  'setTempRoot': function setTempRoot(temproot) {
-    tempRoot = temproot;
+  'setConfig': function setConfig(config) {
+    minecraftRoot = config.MC;
+    tempRoot = config.TEMP_DIR;
+    serverjarPath = _path.default.join(minecraftRoot, 'server.jar');
     checkForData();
   },
-  exportMinecraftAdvancements: ensureMinecraftAdvancements
+  ensureMinecraftAdvancements: ensureMinecraftAdvancements
 };
 exports.default = _default;
