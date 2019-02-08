@@ -59,18 +59,12 @@ var exportMinecraftDataPromise = function exportMinecraftDataPromise() {
     });
   });
 },
-    ensureMinecraftAdvancements = function ensureMinecraftAdvancements() {
-  _CustomLogger.default.debug(DOMAIN, 'Checking for data already in output folder.');
+    runDataGenerator = function runDataGenerator() {
+  _CustomLogger.default.info(DOMAIN, 'Using server.jar to generate advancement data.');
 
-  if (!advancementsExported) {
-    _CustomLogger.default.info(DOMAIN, 'Using server.jar to generate advancement data.');
-
-    exportMinecraftDataPromise().then(function (val) {
-      _CustomLogger.default.debug(DOMAIN, val);
-    });
-  } else {
-    _CustomLogger.default.info(DOMAIN, "Using cached minecraft advancements in ".concat(_path.default.join(tempRoot, 'data', 'minecraft', 'advancements')));
-  }
+  exportMinecraftDataPromise().then(function (val) {
+    _CustomLogger.default.debug(DOMAIN, val);
+  });
 },
     checkForData = function checkForData() {
   _CustomLogger.default.debug(DOMAIN, 'Resetting data export status.');
@@ -128,6 +122,13 @@ var _default = {
     serverjarPath = _path.default.join(minecraftRoot, 'server.jar');
     checkForData();
   },
-  ensureMinecraftAdvancements: ensureMinecraftAdvancements
+  runDataGenerator: runDataGenerator,
+  advancementsExported: advancementsExported,
+  loottablesExported: loottablesExported,
+  recipesExported: recipesExported,
+  tagsExported: tagsExported,
+  blocklistExported: blocklistExported,
+  commandlistExported: commandlistExported,
+  registriesExported: registriesExported
 };
 exports.default = _default;

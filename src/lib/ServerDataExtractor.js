@@ -40,16 +40,11 @@ let exportMinecraftDataPromise = function() {
                 });
         });
     },
-    ensureMinecraftAdvancements = function() {
-        log.debug(DOMAIN, 'Checking for data already in output folder.');
-        if (!advancementsExported) {
-            log.info(DOMAIN, 'Using server.jar to generate advancement data.');
-            exportMinecraftDataPromise().then( (val) => {
-                log.debug(DOMAIN, val);
-            });
-        } else {
-            log.info(DOMAIN, `Using cached minecraft advancements in ${path.join(tempRoot, 'data', 'minecraft', 'advancements')}`);
-        }
+    runDataGenerator = function() {
+        log.info(DOMAIN, 'Using server.jar to generate advancement data.');
+        exportMinecraftDataPromise().then( (val) => {
+            log.debug(DOMAIN, val);
+        });
     },
     checkForData = function() {
         log.debug(DOMAIN, 'Resetting data export status.');
@@ -95,5 +90,12 @@ export default {
         serverjarPath = path.join(minecraftRoot, 'server.jar');
         checkForData();
     },
-    ensureMinecraftAdvancements
+    runDataGenerator,
+    advancementsExported,
+    loottablesExported,
+    recipesExported,
+    tagsExported,
+    blocklistExported,
+    commandlistExported,
+    registriesExported
 };
