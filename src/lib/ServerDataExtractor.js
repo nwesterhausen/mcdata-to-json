@@ -7,6 +7,7 @@ import path from 'path';
 import cp from 'child_process';
 import log from './CustomLogger';
 
+const StreamZip = require('node-stream-zip');
 const DOMAIN = 'DataExtractor';
 let minecraftRoot = 'unset',
     tempRoot = 'unset',
@@ -26,6 +27,51 @@ let setBusy = function(bool) {
     },
     getBusy = function() {
         return busy;
+    },
+    extractMinecraftDataPromise = function() {
+        let serverzipPath = path.join(tempRoot, 'server.zip');
+
+        log.debug(`Trying to extract from ${serverjarPath} by copying to ${serverzipPath}`, DOMAIN);
+        fs.copyFileSync(serverjarPath, serverzipPath);
+        const zip = new StreamZip({
+            'file': serverzipPath
+        });
+        const datadir = path.join(tempRoot, 'data');
+        const assetsdir = path.join(tempRoot, 'assets');
+
+        fs.ensureDirSync(datadir);
+        fs.ensureDirSync(assetsdir);
+        return new Promise( (resolve, reject) => {
+            zip.on('error', (err) => {
+                log.error(`Zip failed to open. ${err}`, DOMAIN);
+                reject();
+            });
+            zip.on('extract', (entry, file) => {
+                log.debug(`Extracted ${entry.name} to ${file}`, DOMAIN);
+            });
+            zip.on('ready', () => {
+                zip.extract('data', datadir, (err, count) => {
+                    if (err) {
+                        log.error(`Error extracting data from zip: ${err}`);
+                        zip.close();
+                        reject(err);
+                    } else {
+                        log.debug(`Extracted ${count} items from ${serverzipPath}`);
+                        zip.extract('assets', assetsdir, (err1, count1) => {
+                            if (err) {
+                                log.error(`Error extracting lang from zip: ${err1}`);
+                                zip.close();
+                                reject(err1);
+                            } else {
+                                log.debug(`Extracted ${count1} items from ${serverzipPath}`);
+                                zip.close();
+                                resolve();
+                            }
+                        });
+                    }
+                });
+            });
+        });
     },
     exportMinecraftDataPromise = function() {
         const tempdirectory = tempRoot,
@@ -56,8 +102,10 @@ let setBusy = function(bool) {
     },
     runDataGenerator = function() {
         log.info('Using server.jar to generate advancement data.', DOMAIN);
-        exportMinecraftDataPromise().then( (val) => {
+        extractMinecraftDataPromise().then( (val) => {
             log.debug(val, DOMAIN);
+        }).catch( (val) => {
+            log.error(val, DOMAIN);
         });
     },
     checkForData = function() {
@@ -82,11 +130,14 @@ let setBusy = function(bool) {
                 blocklistExported = fs.existsSync(path.join(tempRoot, 'data', 'reports', 'registries.json'));
             }
         } else {
-            exportMinecraftDataPromise().then((val) => {
-                log.debug(`Data export promise returned ${val}`, DOMAIN);
-                log.info('Completed export of minecraft data.', DOMAIN);
-                checkForData();
-            });
+            extractMinecraftDataPromise()
+                .then((val) => {
+                    log.debug(`Data export promise returned ${val}`, DOMAIN);
+                    log.info('Completed export of minecraft data.', DOMAIN);
+                    checkForData();
+                }).catch( (val) => {
+                    log.error(val, DOMAIN);
+                });
         }
         log.debug(`advancements data is cached: ${advancementsExported}`, DOMAIN);
         log.debug(`loottables data is cached: ${loottablesExported}`, DOMAIN);
@@ -99,7 +150,7 @@ let setBusy = function(bool) {
 
 export default {
     'setConfig': function(config) {
-        minecraftRoot = config.MC;
+        minecraftRoot = config.MC_DIR;
         tempRoot = config.TEMP_DIR;
         serverjarPath = path.join(minecraftRoot, 'server.jar');
         checkForData();

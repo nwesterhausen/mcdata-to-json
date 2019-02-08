@@ -88,23 +88,23 @@ if (parsedOpts['use-env']) {
 
 _CustomLogger.default.debug("current working dir ".concat(rundir), DOMAIN);
 
-var MC = parsedOpts.minecraft,
-    PROPERTIES_FILE = _path.default.join(MC, 'server.properties'),
-    LOGS = _path.default.join(MC, 'logs'),
-    WORLD = _path.default.join(MC, 'world'),
+var MC_DIR = parsedOpts.minecraft,
+    PROPERTIES_FILE = _path.default.join(MC_DIR, 'server.properties'),
+    LOGS = _path.default.join(MC_DIR, 'logs'),
+    WORLD = _path.default.join(MC_DIR, 'world'),
     STATS = _path.default.join(WORLD, 'stats'),
     ADVANCEMENTS = _path.default.join(WORLD, 'advancements'),
     PLAYERDATA = _path.default.join(WORLD, 'playerdata'),
     OUTPUT_DIR = parsedOpts.outputdir,
     TEMP_DIR = _path.default.join(OUTPUT_DIR, 'temp');
 
-if (!MC) {
+if (!MC_DIR) {
   _CustomLogger.default.error('No minecraft directory set!', DOMAIN);
 
   process.exit(1);
 }
 
-_CustomLogger.default.info("Set Minecraft dir: ".concat(MC), DOMAIN); // Check for server.properties, to validate minecraft folder..
+_CustomLogger.default.info("Set Minecraft dir: ".concat(MC_DIR), DOMAIN); // Check for server.properties, to validate minecraft folder..
 
 
 try {
@@ -153,7 +153,7 @@ _fsExtra.default.ensureDirSync(TEMP_DIR);
 _CustomLogger.default.info("Set output dir: ".concat(OUTPUT_DIR), DOMAIN);
 
 var _default = {
-  MC: MC,
+  MC_DIR: MC_DIR,
   PROPERTIES_FILE: PROPERTIES_FILE,
   LOGS: LOGS,
   WORLD: WORLD,

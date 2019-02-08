@@ -79,21 +79,21 @@ if (parsedOpts['use-env']) {
 
 log.debug(`current working dir ${ rundir}`, DOMAIN);
 
-const MC = parsedOpts.minecraft,
-    PROPERTIES_FILE = path.join(MC, 'server.properties'),
-    LOGS = path.join(MC, 'logs'),
-    WORLD = path.join(MC, 'world'),
+const MC_DIR = parsedOpts.minecraft,
+    PROPERTIES_FILE = path.join(MC_DIR, 'server.properties'),
+    LOGS = path.join(MC_DIR, 'logs'),
+    WORLD = path.join(MC_DIR, 'world'),
     STATS = path.join(WORLD, 'stats'),
     ADVANCEMENTS = path.join(WORLD, 'advancements'),
     PLAYERDATA = path.join(WORLD, 'playerdata'),
     OUTPUT_DIR = parsedOpts.outputdir,
     TEMP_DIR = path.join(OUTPUT_DIR, 'temp');
 
-if (!MC) {
+if (!MC_DIR) {
     log.error('No minecraft directory set!', DOMAIN);
     process.exit(1);
 }
-log.info(`Set Minecraft dir: ${ MC }`, DOMAIN);
+log.info(`Set Minecraft dir: ${ MC_DIR }`, DOMAIN);
 // Check for server.properties, to validate minecraft folder..
 try {
     fs.statSync(PROPERTIES_FILE);
@@ -131,7 +131,7 @@ fs.ensureDirSync(TEMP_DIR);
 log.info(`Set output dir: ${OUTPUT_DIR}`, DOMAIN);
 
 export default {
-    MC,
+    MC_DIR,
     PROPERTIES_FILE,
     LOGS,
     WORLD,

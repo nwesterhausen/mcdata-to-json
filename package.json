@@ -22,6 +22,7 @@
     "mca-js": "^0.1.1",
     "nbt": "^0.8.1",
     "node-int64": "^0.4.0",
+    "node-stream-zip": "^1.8.0",
     "nopt": "^4.0.1",
     "progress": "^2.0.3",
     "system-sleep": "^1.3.6"

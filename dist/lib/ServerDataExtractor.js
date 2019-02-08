@@ -19,6 +19,8 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * Tool to create JSON files with minecraft server data:
  * blocks, items, advancements are all used by scripts.
  */
+var StreamZip = require('node-stream-zip');
+
 var DOMAIN = 'DataExtractor';
 var minecraftRoot = 'unset',
     tempRoot = 'unset',
@@ -39,6 +41,62 @@ var setBusy = function setBusy(bool) {
 },
     getBusy = function getBusy() {
   return busy;
+},
+    extractMinecraftDataPromise = function extractMinecraftDataPromise() {
+  var serverzipPath = _path.default.join(tempRoot, 'server.zip');
+
+  _CustomLogger.default.debug("Trying to extract from ".concat(serverjarPath, " by copying to ").concat(serverzipPath), DOMAIN);
+
+  _fsExtra.default.copyFileSync(serverjarPath, serverzipPath);
+
+  var zip = new StreamZip({
+    'file': serverzipPath
+  });
+
+  var datadir = _path.default.join(tempRoot, 'data');
+
+  var assetsdir = _path.default.join(tempRoot, 'assets');
+
+  _fsExtra.default.ensureDirSync(datadir);
+
+  _fsExtra.default.ensureDirSync(assetsdir);
+
+  return new Promise(function (resolve, reject) {
+    zip.on('error', function (err) {
+      _CustomLogger.default.error("Zip failed to open. ".concat(err), DOMAIN);
+
+      reject();
+    });
+    zip.on('extract', function (entry, file) {
+      _CustomLogger.default.debug("Extracted ".concat(entry.name, " to ").concat(file), DOMAIN);
+    });
+    zip.on('ready', function () {
+      zip.extract('data', datadir, function (err, count) {
+        if (err) {
+          _CustomLogger.default.error("Error extracting data from zip: ".concat(err));
+
+          zip.close();
+          reject(err);
+        } else {
+          _CustomLogger.default.debug("Extracted ".concat(count, " items from ").concat(serverzipPath));
+
+          zip.extract('assets', assetsdir, function (err1, count1) {
+            if (err) {
+              _CustomLogger.default.error("Error extracting lang from zip: ".concat(err1));
+
+              zip.close();
+              reject(err1);
+            } else {
+              _CustomLogger.default.debug("Extracted ".concat(count1, " items from ").concat(serverzipPath));
+
+              zip.close();
+              resolve();
+            }
+          });
+        }
+      });
+    });
+  });
 },
     exportMinecraftDataPromise = function exportMinecraftDataPromise() {
   var tempdirectory = tempRoot,
@@ -78,8 +136,10 @@ var setBusy = function setBusy(bool) {
     runDataGenerator = function runDataGenerator() {
   _CustomLogger.default.info('Using server.jar to generate advancement data.', DOMAIN);
 
-  exportMinecraftDataPromise().then(function (val) {
+  extractMinecraftDataPromise().then(function (val) {
     _CustomLogger.default.debug(val, DOMAIN);
+  }).catch(function (val) {
+    _CustomLogger.default.error(val, DOMAIN);
   });
 },
     checkForData = function checkForData() {
@@ -107,12 +167,14 @@ var setBusy = function setBusy(bool) {
       blocklistExported = _fsExtra.default.existsSync(_path.default.join(tempRoot, 'data', 'reports', 'registries.json'));
     }
   } else {
-    exportMinecraftDataPromise().then(function (val) {
+    extractMinecraftDataPromise().then(function (val) {
       _CustomLogger.default.debug("Data export promise returned ".concat(val), DOMAIN);
 
       _CustomLogger.default.info('Completed export of minecraft data.', DOMAIN);
 
       checkForData();
+    }).catch(function (val) {
+      _CustomLogger.default.error(val, DOMAIN);
     });
   }
 
@@ -133,7 +195,7 @@ var setBusy = function setBusy(bool) {
 
 var _default = {
   'setConfig': function setConfig(config) {
-    minecraftRoot = config.MC;
+    minecraftRoot = config.MC_DIR;
     tempRoot = config.TEMP_DIR;
     serverjarPath = _path.default.join(minecraftRoot, 'server.jar');
     checkForData();
