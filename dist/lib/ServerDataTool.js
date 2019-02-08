@@ -19,18 +19,19 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * Tool to create JSON files with minecraft server data:
  * blocks, items, advancements are all used by scripts.
  */
+var DOMAIN = 'DataExtrator';
 var minecraftRoot = 'unset',
     tempRoot = 'unset',
     serverjarPath = 'unset';
 
 var exportMinecraftAdvancementsPromise = function exportMinecraftAdvancementsPromise() {
   return new Promise(function (resolve, reject) {
-    _CustomLogger.default.debug('Running minecraft data export from server jar.');
+    _CustomLogger.default.debug(DOMAIN, 'Running minecraft data export from server jar.');
 
     if (tempRoot === 'unset' || serverjarPath === 'unset') {
-      _CustomLogger.default.error('Tried to run data generation without setting serverjar and/or output folder.');
+      _CustomLogger.default.error(DOMAIN, 'Tried to run data generation without setting serverjar and/or output folder.');
 
-      _CustomLogger.default.error("datadir: ".concat(tempRoot, ", serverjar: ").concat(serverjarPath));
+      _CustomLogger.default.error(DOMAIN, "datadir: ".concat(tempRoot, ", serverjar: ").concat(serverjarPath));
 
       reject('Failed to set directories.');
     }
@@ -38,13 +39,13 @@ var exportMinecraftAdvancementsPromise = function exportMinecraftAdvancementsPro
     _child_process.default.exec("java -cp ".concat(serverjarPath, " net.minecraft.data.Main --server --output ").concat(tempRoot), function (err, stdout, stderr) {
       // eslint-disable-line 
       if (err) {
-        _CustomLogger.default.error('Failed to run command to export minecraft data.');
+        _CustomLogger.default.error(DOMAIN, 'Failed to run command to export minecraft data.');
 
-        _CustomLogger.default.error(err);
+        _CustomLogger.default.error(DOMAIN, err);
 
         reject(err);
       } else {
-        _CustomLogger.default.info('Completed export of minecraft data.');
+        _CustomLogger.default.info(DOMAIN, 'Completed export of minecraft data.');
 
         resolve(stdout);
       }
@@ -52,16 +53,16 @@ var exportMinecraftAdvancementsPromise = function exportMinecraftAdvancementsPro
   });
 },
     exportMinecraftAdvancements = function exportMinecraftAdvancements() {
-  _CustomLogger.default.debug('Checking for data already in output folder.');
+  _CustomLogger.default.debug(DOMAIN, 'Checking for data already in output folder.');
 
   if (!_fsExtra.default.existsSync(_path.default.join(tempRoot, 'data'))) {
-    _CustomLogger.default.info('Using server.jar to generate advancement data.');
+    _CustomLogger.default.info(DOMAIN, 'Using server.jar to generate advancement data.');
 
     exportMinecraftAdvancementsPromise().then(function (val) {
-      _CustomLogger.default.debug(val);
+      _CustomLogger.default.debug(DOMAIN, val);
     });
   } else {
-    _CustomLogger.default.info("Using cached minecraft report data in ".concat(_path.default.join(tempRoot, 'data')));
+    _CustomLogger.default.info(DOMAIN, "Using cached minecraft report data in ".concat(_path.default.join(tempRoot, 'data')));
   }
 };
 

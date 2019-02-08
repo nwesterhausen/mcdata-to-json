@@ -9,8 +9,9 @@ import log from './lib/CustomLogger';
 import config from './lib/Configuration';
 import LogsParser from './LogsParser';
 import a from './lib/ServerDataTool';
+const DOMAIN = 'Main';
 
-log.info(`Beginning log read from ${config.LOGS}`);
+log.info(DOMAIN, `Beginning log read from ${config.LOGS}`);
 LogsParser.setDirs(config.LOGS, config.TEMP_DIR);
 LogsParser.prepareLogFiles();
 LogsParser.parseLogFiles();

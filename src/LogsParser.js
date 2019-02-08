@@ -6,6 +6,7 @@ import log from './lib/CustomLogger';
 import logconst from './data/LogConst';
 import logregx from './data/LogsRegex';
 
+const DOMAIN = 'LogParser';
 let logfiles = [],
     unzippedFiles = [],
     logfiledir = '',
@@ -17,7 +18,7 @@ let logfiles = [],
 
 let getDateFromFilename = function(filename) {
         // Expects YYYY-MM-DD-#.log
-        // log.debug(`Creating timestamp from ${filename}`);
+        // log.debug(DOMAIN, `Creating timestamp from ${filename}`);
         let y = filename.split('-')[0],
             m = filename.split('-')[1],
             d = filename.split('-')[2],
@@ -27,12 +28,12 @@ let getDateFromFilename = function(filename) {
             t = new Date();
         }
 
-        // log.debug(`Created timestamp ${t.toISOString()}`);
+        // log.debug(DOMAIN, `Created timestamp ${t.toISOString()}`);
         return t;
     },
     getTimestampFromHHMMSSAndBasedate = function(timeString, basedate) {
         // Expects [HH:MM:SS]
-        // log.debug(`Creating timestamp from ${timeString}`);
+        // log.debug(DOMAIN, `Creating timestamp from ${timeString}`);
         let h = timeString.split(':')[0],
             m = timeString.split(':')[1],
             s = timeString.split(':')[2],
@@ -41,14 +42,14 @@ let getDateFromFilename = function(filename) {
         t.setSeconds(s);
         t.setMinutes(m);
         t.setHours(h);
-        // log.debug(`Created timestamp ${t.toISOString()}`);
+        // log.debug(DOMAIN, `Created timestamp ${t.toISOString()}`);
         return t.getTime();
     },
     appendLogActionTo = function(dest, actionarray) {
         if (!actionarray) {
             return;
         }
-        // log.debug(`Appending ${actionarray} to destination`);
+        // log.debug(DOMAIN, `Appending ${actionarray} to destination`);
         dest.push({
             'timestamp': actionarray[0],
             'type': actionarray[1],
@@ -134,7 +135,7 @@ let getDateFromFilename = function(filename) {
         }
     },
     jsonFromLogfile = function(filepath) {
-        log.debug(`Creating JSON for file ${ filepath }`);
+        log.debug(DOMAIN, `Creating JSON for file ${ filepath }`);
         let createdJSON = [],
             createdDate = getDateFromFilename(filepath);
         const rl = readline.createInterface({
@@ -145,13 +146,13 @@ let getDateFromFilename = function(filename) {
             appendLogActionTo(createdJSON, parseLogLine(createdDate, input));
         });
         rl.on('close', () => {
-            log.debug(`Completed parsing ${filepath}`);
+            log.debug(DOMAIN, `Completed parsing ${filepath}`);
             rawlogJSON.push(...createdJSON);
         });
     },
     jsonFromLogfilePromise = function(filepath) {
         return new Promise((resolve, reject) => {
-            log.debug(`Creating JSON for file ${ filepath }`);
+            log.debug(DOMAIN, `Creating JSON for file ${ filepath }`);
             let createdJSON = [],
                 createdDate = getDateFromFilename(filepath);
 
@@ -164,7 +165,7 @@ let getDateFromFilename = function(filename) {
                     appendLogActionTo(createdJSON, parseLogLine(createdDate, input));
                 });
                 rl.on('close', () => {
-                    log.debug(`Completed parsing ${filepath}`);
+                    log.debug(DOMAIN, `Completed parsing ${filepath}`);
                     rawlogJSON.push(...createdJSON);
                     resolve(filepath);
                 });
@@ -178,79 +179,79 @@ export default {
     'setDirs': function(logsdir, tempdir) {
         logfiledir = logsdir;
         latestlogDate = fs.statSync(path.join(logfiledir, 'latest.log')).mtime.toISOString();
-        log.debug(`latest.log date: ${ latestlogDate }`);
+        log.debug(DOMAIN, `latest.log date: ${ latestlogDate }`);
         workdir = tempdir;
         tmplogPath = path.join(workdir, 'all_logs.json');
     },
     'prepareLogFiles': function() {
         let rawLogFiles = fs.readdirSync(logfiledir);
 
-        log.debug(`Preparing following log files: ${ JSON.stringify(rawLogFiles) }`);
+        log.debug(DOMAIN, `Preparing following log files: ${ JSON.stringify(rawLogFiles) }`);
         // Go through the log dir and sort the files
         for (let i = 0; i < rawLogFiles.length; i++) {
-            log.debug(`Working on file: ${ rawLogFiles[i] }`);
+            log.debug(DOMAIN, `Working on file: ${ rawLogFiles[i] }`);
             // Unzip gziped files, keeeping track of them
             if (rawLogFiles[i].endsWith('.gz')) {
-                log.debug('Detected gzip file.');
+                log.debug(DOMAIN, 'Detected gzip file.');
                 let tmpLogFile = rawLogFiles[i].substr(0, rawLogFiles[i].length - 3),
                     compressedFile = fs.readFileSync(path.join(logfiledir, rawLogFiles[i])),
                     unzippedFile = zlib.unzipSync(compressedFile);
 
-                log.debug('Unzipping file into log dir.');
+                log.debug(DOMAIN, 'Unzipping file into log dir.');
                 fs.writeFileSync(path.join(logfiledir, tmpLogFile), unzippedFile);
 
                 unzippedFiles.push(tmpLogFile);
                 logfiles.push(tmpLogFile);
-                log.debug(`Unzipped ${tmpLogFile}`);
+                log.debug(DOMAIN, `Unzipped ${tmpLogFile}`);
             } else if (rawLogFiles[i].endsWith('.log')) {
                 logfiles.push(rawLogFiles[i]);
             }
         }
         logfiles = logfiles.sort();
-        log.debug('Log file list sorted internally');
+        log.debug(DOMAIN, 'Log file list sorted internally');
     },
     'combineLogFiles': function() {
         // Append all the files into one file
-        log.debug('Clearing the temp.log file');
+        log.debug(DOMAIN, 'Clearing the temp.log file');
         fs.writeFileSync(tmplogPath, '');
         for (let i = 0; i < logfiles.length; i++) {
             // special case for latest.log, we want it to be the date instead
             let fileHeader = logfiles[i] === 'latest.log' ? `[Filedate:${latestlogDate}.log]\n` : `[Filename:${logfiles[i]}]\n`;
             
-            log.debug(`Appending ${logfiles[i]} to temp.log.`);
+            log.debug(DOMAIN, `Appending ${logfiles[i]} to temp.log.`);
             fs.appendFileSync(tmplogPath, fileHeader + fs.readFileSync(path.join(logfiledir, logfiles[i])));
         }
     },
     'parseLogFiles': function() {
-        log.debug('Beginning parse of all log files.');
+        log.debug(DOMAIN, 'Beginning parse of all log files.');
         let promises = [];
 
         for (let i = 0; i < logfiles.length; i++) {
             promises.push(jsonFromLogfilePromise(logfiles[i]));
         }
-        log.info(`Began parse of ${logfiles.length} log files.`);
+        log.info(DOMAIN, `Began parse of ${logfiles.length} log files.`);
         Promise.all(promises).then((files) => {
-            log.info(`Completed parsing ${files.length} log files.`);
-            log.info(`Sorting ${rawlogJSON.length} records.`);
+            log.info(DOMAIN, `Completed parsing ${files.length} log files.`);
+            log.info(DOMAIN, `Sorting ${rawlogJSON.length} records.`);
             rawlogJSON.sort((a, b) => {
                 return a.timestamp - b.timestamp;
             });
             fs.writeFileSync(tmplogPath, JSON.stringify(rawlogJSON));
-            log.debug(`Dumped full log JSON to ${tmplogPath}`);
+            log.debug(DOMAIN, `Dumped full log JSON to ${tmplogPath}`);
             let cleanedJSON = rawlogJSON.filter((obj) => {
                 return obj.type !== logconst.TYPE_KEEPENTITY && obj.type !== logconst.TYPE_OVERLOADED;
             });
 
             fs.writeFileSync(path.join(workdir, 'filtered_logs.json'), JSON.stringify(cleanedJSON));
-            log.info(`${rawlogJSON.length - cleanedJSON.length} records removed (filtered out 'keeping entity' and 'server overloaded' messages).`);
-            log.debug(`Wrote 'cleaned' JSON file to ${path.join(workdir, 'filtered_logs.json')}`);
+            log.info(DOMAIN, `${rawlogJSON.length - cleanedJSON.length} records removed (filtered out 'keeping entity' and 'server overloaded' messages).`);
+            log.debug(DOMAIN, `Wrote 'cleaned' JSON file to ${path.join(workdir, 'filtered_logs.json')}`);
             let specialEventJSON = cleanedJSON.filter((obj) => {
                 return obj.type !== logconst.TYPE_SERVERINFO;
             });
 
             fs.writeFileSync(path.join(workdir, 'special_event_logs.json'), JSON.stringify(specialEventJSON));
-            log.info(`${specialEventJSON.length} records determined worth saving.`);
-            log.debug(`Wrote 'important' JSON file to ${path.join(workdir, 'special_event_logs.json')}`);
+            log.info(DOMAIN, `${specialEventJSON.length} records determined worth saving.`);
+            log.debug(DOMAIN, `Wrote 'important' JSON file to ${path.join(workdir, 'special_event_logs.json')}`);
         });
     },
     rawlogJSON,

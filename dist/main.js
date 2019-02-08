@@ -17,7 +17,9 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * By default will output in the current directory, or the OUTPUT_DIR env
  * variable, OR the --outdir="" parameter.
  */
-_CustomLogger.default.info("Beginning log read from ".concat(_Configuration.default.LOGS));
+var DOMAIN = 'Main';
+
+_CustomLogger.default.info(DOMAIN, "Beginning log read from ".concat(_Configuration.default.LOGS));
 
 _LogsParser.default.setDirs(_Configuration.default.LOGS, _Configuration.default.TEMP_DIR);
 

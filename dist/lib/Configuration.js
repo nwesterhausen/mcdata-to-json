@@ -22,7 +22,8 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 /**
  * Handles CLI arguments and sets configuration.
  */
-// Grab any CLI arguments
+var DOMAIN = 'Configuration';
+
 var rundir = _path.default.dirname(process.argv[1]),
     loglevels = ['error', 'warn', 'info', 'debug'],
     defaultOpts = {
@@ -57,11 +58,11 @@ var rundir = _path.default.dirname(process.argv[1]),
 
 _CustomLogger.default.setLevel(loglevels.indexOf(parsedOpts.loglevel));
 
-_CustomLogger.default.debug('Process.env vars:');
+_CustomLogger.default.debug(DOMAIN, 'Process.env vars:');
 
-_CustomLogger.default.debug("MINECRAFT_DIR: ".concat(process.env.MINECRAFT_DIR));
+_CustomLogger.default.debug(DOMAIN, "MINECRAFT_DIR: ".concat(process.env.MINECRAFT_DIR));
 
-_CustomLogger.default.debug("OUTPUT_DIR: ".concat(process.env.OUTPUT_DIR));
+_CustomLogger.default.debug(DOMAIN, "OUTPUT_DIR: ".concat(process.env.OUTPUT_DIR));
 
 if (parsedOpts.help) {
   console.log(helpMessage); // eslint-disable-line no-console
@@ -72,7 +73,7 @@ if (parsedOpts.help) {
 }
 
 if (parsedOpts['use-env']) {
-  _CustomLogger.default.debug('Trying to load values from environment.');
+  _CustomLogger.default.debug(DOMAIN, 'Trying to load values from environment.');
 
   if (parsedOpts.minecraft === defaultOpts.minecraft && process.env.MINECRAFT_DIR) {
     parsedOpts.minecraft = process.env.MINECRAFT_DIR;
@@ -83,7 +84,7 @@ if (parsedOpts['use-env']) {
   }
 }
 
-_CustomLogger.default.debug("current working dir ".concat(rundir));
+_CustomLogger.default.debug(DOMAIN, "current working dir ".concat(rundir));
 
 var MC = parsedOpts.minecraft,
     PROPERTIES_FILE = _path.default.join(MC, 'server.properties'),
@@ -96,12 +97,12 @@ var MC = parsedOpts.minecraft,
     TEMP_DIR = _path.default.join(OUTPUT_DIR, 'temp');
 
 if (!MC) {
-  _CustomLogger.default.error('No minecraft directory set!');
+  _CustomLogger.default.error(DOMAIN, 'No minecraft directory set!');
 
   process.exit(1);
 }
 
-_CustomLogger.default.info("Set Minecraft dir: ".concat(MC)); // Check for server.properties, to validate minecraft folder..
+_CustomLogger.default.info(DOMAIN, "Set Minecraft dir: ".concat(MC)); // Check for server.properties, to validate minecraft folder..
 
 
 try {
@@ -114,7 +115,7 @@ try {
   if (err.code === 'ENOENT') {
     var testedPath = _path.default.basename(err.path);
 
-    _CustomLogger.default.error("No ".concat(testedPath, " found in Minecraft dir!"));
+    _CustomLogger.default.error(DOMAIN, "No ".concat(testedPath, " found in Minecraft dir!"));
 
     process.exit(1);
   } else {
@@ -133,7 +134,7 @@ try {
   if (err.code === 'ENOENT') {
     var _testedPath = _path.default.basename(err.path);
 
-    _CustomLogger.default.error("No ".concat(_testedPath, " found in Minecraft world dir!"));
+    _CustomLogger.default.error(DOMAIN, "No ".concat(_testedPath, " found in Minecraft world dir!"));
 
     process.exit(1);
   } else {
@@ -141,13 +142,13 @@ try {
   }
 }
 
-_CustomLogger.default.info('Minecraft dir passed validation checks.');
+_CustomLogger.default.info(DOMAIN, 'Minecraft dir passed validation checks.');
 
 _fsExtra.default.ensureDirSync(OUTPUT_DIR);
 
 _fsExtra.default.ensureDirSync(TEMP_DIR);
 
-_CustomLogger.default.info("Set output dir: ".concat(OUTPUT_DIR));
+_CustomLogger.default.info(DOMAIN, "Set output dir: ".concat(OUTPUT_DIR));
 
 var _default = {
   MC: MC,

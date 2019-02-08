@@ -16,24 +16,24 @@ export default {
     'setLevel': function(newlevel) {
         loglevel = newlevel;
     },
-    'debug': function(msg) {
+    'debug': function(domain, msg) {
         if (loglevel >= 3) {
-            console.debug(bgBlue.black(' DEBUG '), blue(msg));
+            console.debug(bgBlue.black(' DEBUG '), blue(`[${domain}] ${msg}`));
         }
     },
-    'info': function(msg) {
+    'info': function(domain, msg) {
         if (loglevel >= 2) {
-            console.info(bgGreen.black(' INFO  '), green(msg));
+            console.info(bgGreen.black(' INFO  '), green(`[${domain}] ${msg}`));
         }
     },
-    'warn': function(msg) {
+    'warn': function(domain, msg) {
         if (loglevel >= 1) {
-            return console.warn(bgYellow.black(' WARN  '), yellow(msg));
+            return console.warn(bgYellow.black(' WARN  '), yellow(`[${domain}] ${msg}`));
         }
     },
-    'error': function(msg) {
+    'error': function(domain, msg) {
         if (loglevel >= 0) {
-            return console.error(bgRed.black(' ERROR '), red(msg));
+            return console.error(bgRed.black(' ERROR '), red(`[${domain}] ${msg}`));
         }
     }
 };
