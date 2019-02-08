@@ -12,10 +12,6 @@ var loglevel = 1;
 var _default = {
   'setLevel': function setLevel(newlevel) {
     loglevel = newlevel;
-
-    if (loglevel === '0') {
-      console.debug(_safe.bgBlue.black(' DEBUG '), _safe.bgGreen.black(' INFO  '), _safe.bgYellow.black(' WARN  '), _safe.bgRed.black(' ERROR '));
-    }
   },
   'debug': function debug(msg) {
     var domain = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'Undefined';

@@ -15,10 +15,6 @@ let loglevel = 1;
 export default {
     'setLevel': function(newlevel) {
         loglevel = newlevel;
-        if (loglevel === '0') {
-            console.debug(bgBlue.black(' DEBUG '), bgGreen.black(' INFO  '),
-                bgYellow.black(' WARN  '), bgRed.black(' ERROR '));
-        }
     },
     'debug': function(msg, domain = 'Undefined') {
         if (loglevel >= 3) {
