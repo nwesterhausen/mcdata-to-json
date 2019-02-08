@@ -8,7 +8,7 @@
 import log from './lib/CustomLogger';
 import config from './lib/Configuration';
 import LogsParser from './LogsParser';
-import ServerDataExtractor from './lib/ServerDataTool';
+import ServerDataExtractor from './lib/ServerDataExtractor';
 const DOMAIN = 'Main';
 
 log.debug(DOMAIN, 'Passing configuration to components.');

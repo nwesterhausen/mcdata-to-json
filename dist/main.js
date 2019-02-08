@@ -6,7 +6,7 @@ var _Configuration = _interopRequireDefault(require("./lib/Configuration"));
 
 var _LogsParser = _interopRequireDefault(require("./LogsParser"));
 
-var _ServerDataTool = _interopRequireDefault(require("./lib/ServerDataTool"));
+var _ServerDataExtractor = _interopRequireDefault(require("./lib/ServerDataExtractor"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -21,7 +21,7 @@ var DOMAIN = 'Main';
 
 _CustomLogger.default.debug(DOMAIN, 'Passing configuration to components.');
 
-_ServerDataTool.default.setConfig(_Configuration.default);
+_ServerDataExtractor.default.setConfig(_Configuration.default);
 
 _LogsParser.default.setConfig(_Configuration.default);
 
