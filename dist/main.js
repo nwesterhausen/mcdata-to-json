@@ -25,8 +25,13 @@ _ServerDataExtractor.default.setConfig(_Configuration.default);
 
 _LogsParser.default.setConfig(_Configuration.default);
 
-_CustomLogger.default.info(DOMAIN, "Starting Log Processing ".concat(_Configuration.default.LOGS));
+_CustomLogger.default.info(DOMAIN, 'Starting Log Processing');
 
 _LogsParser.default.prepareLogFiles();
 
 _LogsParser.default.parseLogFiles();
+
+_CustomLogger.default.info(DOMAIN, 'Starting JSON file processing (advancements, stats'); // TODO use a single JSON parser OR a parser for each filetype??
+
+
+_CustomLogger.default.info(DOMAIN, 'Starting NBT data processing (level.dat, playerdata'); // TODO

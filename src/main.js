@@ -14,6 +14,10 @@ const DOMAIN = 'Main';
 log.debug(DOMAIN, 'Passing configuration to components.');
 ServerDataExtractor.setConfig(config);
 LogsParser.setConfig(config);
-log.info(DOMAIN, `Starting Log Processing ${config.LOGS}`);
+log.info(DOMAIN, 'Starting Log Processing');
 LogsParser.prepareLogFiles();
 LogsParser.parseLogFiles();
+log.info(DOMAIN, 'Starting JSON file processing (advancements, stats');
+// TODO use a single JSON parser OR a parser for each filetype??
+log.info(DOMAIN, 'Starting NBT data processing (level.dat, playerdata');
+// TODO

@@ -19,39 +19,9 @@ let minecraftRoot = 'unset',
     commandlistExported = false,
     registriesExported = false;
 
-let checkForData = function() {
-        log.debug(DOMAIN, 'Resetting data export status.');
-        advancementsExported = false;
-        loottablesExported = false;
-        recipesExported = false;
-        tagsExported = false;
-        blocklistExported = false;
-        commandlistExported = false;
-        registriesExported = false;
-        if (fs.existsSync(path.join(tempRoot, 'data'))) {
-            if (fs.existsSync(path.join(tempRoot, 'data', 'minecraft'))) {
-                advancementsExported = fs.existsSync(path.join(tempRoot, 'data', 'minecraft', 'advancements'));
-                loottablesExported = fs.existsSync(path.join(tempRoot, 'data', 'minecraft', 'loot_tables'));
-                recipesExported = fs.existsSync(path.join(tempRoot, 'data', 'minecraft', 'recipes'));
-                tagsExported = fs.existsSync(path.join(tempRoot, 'data', 'minecraft', 'tags'));
-            }
-            if (fs.existsSync(path.join(tempRoot, 'data', 'reports'))) {
-                blocklistExported = fs.existsSync(path.join(tempRoot, 'data', 'reports', 'blocks.json'));
-                blocklistExported = fs.existsSync(path.join(tempRoot, 'data', 'reports', 'commands.json'));
-                blocklistExported = fs.existsSync(path.join(tempRoot, 'data', 'reports', 'registries.json'));
-            }
-        }
-        log.debug(DOMAIN, `advancements data is cached: ${advancementsExported}`);
-        log.debug(DOMAIN, `loottables data is cached: ${loottablesExported}`);
-        log.debug(DOMAIN, `recipes data is cached: ${recipesExported}`);
-        log.debug(DOMAIN, `tags data is cached: ${tagsExported}`);
-        log.debug(DOMAIN, `blocklist data is cached: ${blocklistExported}`);
-        log.debug(DOMAIN, `commandlist data is cached: ${commandlistExported}`);
-        log.debug(DOMAIN, `registries data is cached: ${registriesExported}`);
-    },
-    exportMinecraftDataPromise = function() {
+let exportMinecraftDataPromise = function() {
         return new Promise((resolve, reject) => {
-            log.debug(DOMAIN, 'Running minecraft data export from server jar.');
+            log.info(DOMAIN, 'Running minecraft data export from server jar. This may take a couple minutes!');
             if (tempRoot === 'unset' || serverjarPath === 'unset') {
                 log.error(DOMAIN, 'Tried to run data generation without setting serverjar and/or output folder.');
                 log.error(DOMAIN, `datadir: ${tempRoot}, serverjar: ${serverjarPath}`);
@@ -80,6 +50,42 @@ let checkForData = function() {
         } else {
             log.info(DOMAIN, `Using cached minecraft advancements in ${path.join(tempRoot, 'data', 'minecraft', 'advancements')}`);
         }
+    }, 
+    checkForData = function() {
+        log.debug(DOMAIN, 'Resetting data export status.');
+        advancementsExported = false;
+        loottablesExported = false;
+        recipesExported = false;
+        tagsExported = false;
+        blocklistExported = false;
+        commandlistExported = false;
+        registriesExported = false;
+        if (fs.existsSync(path.join(tempRoot, 'data'))) {
+            if (fs.existsSync(path.join(tempRoot, 'data', 'minecraft'))) {
+                advancementsExported = fs.existsSync(path.join(tempRoot, 'data', 'minecraft', 'advancements'));
+                loottablesExported = fs.existsSync(path.join(tempRoot, 'data', 'minecraft', 'loot_tables'));
+                recipesExported = fs.existsSync(path.join(tempRoot, 'data', 'minecraft', 'recipes'));
+                tagsExported = fs.existsSync(path.join(tempRoot, 'data', 'minecraft', 'tags'));
+            }
+            if (fs.existsSync(path.join(tempRoot, 'data', 'reports'))) {
+                blocklistExported = fs.existsSync(path.join(tempRoot, 'data', 'reports', 'blocks.json'));
+                blocklistExported = fs.existsSync(path.join(tempRoot, 'data', 'reports', 'commands.json'));
+                blocklistExported = fs.existsSync(path.join(tempRoot, 'data', 'reports', 'registries.json'));
+            }
+        } else {
+            exportMinecraftDataPromise().then((val) => {
+                log.debug(DOMAIN, `Data export promise returned ${val}`);
+                log.info(DOMAIN, 'Completed export of minecraft data.');
+                checkForData();
+            });
+        }
+        log.debug(DOMAIN, `advancements data is cached: ${advancementsExported}`);
+        log.debug(DOMAIN, `loottables data is cached: ${loottablesExported}`);
+        log.debug(DOMAIN, `recipes data is cached: ${recipesExported}`);
+        log.debug(DOMAIN, `tags data is cached: ${tagsExported}`);
+        log.debug(DOMAIN, `blocklist data is cached: ${blocklistExported}`);
+        log.debug(DOMAIN, `commandlist data is cached: ${commandlistExported}`);
+        log.debug(DOMAIN, `registries data is cached: ${registriesExported}`);
     };
 
 export default {

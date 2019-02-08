@@ -31,49 +31,9 @@ var minecraftRoot = 'unset',
     commandlistExported = false,
     registriesExported = false;
 
-var checkForData = function checkForData() {
-  _CustomLogger.default.debug(DOMAIN, 'Resetting data export status.');
-
-  advancementsExported = false;
-  loottablesExported = false;
-  recipesExported = false;
-  tagsExported = false;
-  blocklistExported = false;
-  commandlistExported = false;
-  registriesExported = false;
-
-  if (_fsExtra.default.existsSync(_path.default.join(tempRoot, 'data'))) {
-    if (_fsExtra.default.existsSync(_path.default.join(tempRoot, 'data', 'minecraft'))) {
-      advancementsExported = _fsExtra.default.existsSync(_path.default.join(tempRoot, 'data', 'minecraft', 'advancements'));
-      loottablesExported = _fsExtra.default.existsSync(_path.default.join(tempRoot, 'data', 'minecraft', 'loot_tables'));
-      recipesExported = _fsExtra.default.existsSync(_path.default.join(tempRoot, 'data', 'minecraft', 'recipes'));
-      tagsExported = _fsExtra.default.existsSync(_path.default.join(tempRoot, 'data', 'minecraft', 'tags'));
-    }
-
-    if (_fsExtra.default.existsSync(_path.default.join(tempRoot, 'data', 'reports'))) {
-      blocklistExported = _fsExtra.default.existsSync(_path.default.join(tempRoot, 'data', 'reports', 'blocks.json'));
-      blocklistExported = _fsExtra.default.existsSync(_path.default.join(tempRoot, 'data', 'reports', 'commands.json'));
-      blocklistExported = _fsExtra.default.existsSync(_path.default.join(tempRoot, 'data', 'reports', 'registries.json'));
-    }
-  }
-
-  _CustomLogger.default.debug(DOMAIN, "advancements data is cached: ".concat(advancementsExported));
-
-  _CustomLogger.default.debug(DOMAIN, "loottables data is cached: ".concat(loottablesExported));
-
-  _CustomLogger.default.debug(DOMAIN, "recipes data is cached: ".concat(recipesExported));
-
-  _CustomLogger.default.debug(DOMAIN, "tags data is cached: ".concat(tagsExported));
-
-  _CustomLogger.default.debug(DOMAIN, "blocklist data is cached: ".concat(blocklistExported));
-
-  _CustomLogger.default.debug(DOMAIN, "commandlist data is cached: ".concat(commandlistExported));
-
-  _CustomLogger.default.debug(DOMAIN, "registries data is cached: ".concat(registriesExported));
-},
-    exportMinecraftDataPromise = function exportMinecraftDataPromise() {
+var exportMinecraftDataPromise = function exportMinecraftDataPromise() {
   return new Promise(function (resolve, reject) {
-    _CustomLogger.default.debug(DOMAIN, 'Running minecraft data export from server jar.');
+    _CustomLogger.default.info(DOMAIN, 'Running minecraft data export from server jar. This may take a couple minutes!');
 
     if (tempRoot === 'unset' || serverjarPath === 'unset') {
       _CustomLogger.default.error(DOMAIN, 'Tried to run data generation without setting serverjar and/or output folder.');
@@ -111,6 +71,54 @@ var checkForData = function checkForData() {
   } else {
     _CustomLogger.default.info(DOMAIN, "Using cached minecraft advancements in ".concat(_path.default.join(tempRoot, 'data', 'minecraft', 'advancements')));
   }
+},
+    checkForData = function checkForData() {
+  _CustomLogger.default.debug(DOMAIN, 'Resetting data export status.');
+
+  advancementsExported = false;
+  loottablesExported = false;
+  recipesExported = false;
+  tagsExported = false;
+  blocklistExported = false;
+  commandlistExported = false;
+  registriesExported = false;
+
+  if (_fsExtra.default.existsSync(_path.default.join(tempRoot, 'data'))) {
+    if (_fsExtra.default.existsSync(_path.default.join(tempRoot, 'data', 'minecraft'))) {
+      advancementsExported = _fsExtra.default.existsSync(_path.default.join(tempRoot, 'data', 'minecraft', 'advancements'));
+      loottablesExported = _fsExtra.default.existsSync(_path.default.join(tempRoot, 'data', 'minecraft', 'loot_tables'));
+      recipesExported = _fsExtra.default.existsSync(_path.default.join(tempRoot, 'data', 'minecraft', 'recipes'));
+      tagsExported = _fsExtra.default.existsSync(_path.default.join(tempRoot, 'data', 'minecraft', 'tags'));
+    }
+
+    if (_fsExtra.default.existsSync(_path.default.join(tempRoot, 'data', 'reports'))) {
+      blocklistExported = _fsExtra.default.existsSync(_path.default.join(tempRoot, 'data', 'reports', 'blocks.json'));
+      blocklistExported = _fsExtra.default.existsSync(_path.default.join(tempRoot, 'data', 'reports', 'commands.json'));
+      blocklistExported = _fsExtra.default.existsSync(_path.default.join(tempRoot, 'data', 'reports', 'registries.json'));
+    }
+  } else {
+    exportMinecraftDataPromise().then(function (val) {
+      _CustomLogger.default.debug(DOMAIN, "Data export promise returned ".concat(val));
+
+      _CustomLogger.default.info(DOMAIN, 'Completed export of minecraft data.');
+
+      checkForData();
+    });
+  }
+
+  _CustomLogger.default.debug(DOMAIN, "advancements data is cached: ".concat(advancementsExported));
+
+  _CustomLogger.default.debug(DOMAIN, "loottables data is cached: ".concat(loottablesExported));
+
+  _CustomLogger.default.debug(DOMAIN, "recipes data is cached: ".concat(recipesExported));
+
+  _CustomLogger.default.debug(DOMAIN, "tags data is cached: ".concat(tagsExported));
+
+  _CustomLogger.default.debug(DOMAIN, "blocklist data is cached: ".concat(blocklistExported));
+
+  _CustomLogger.default.debug(DOMAIN, "commandlist data is cached: ".concat(commandlistExported));
+
+  _CustomLogger.default.debug(DOMAIN, "registries data is cached: ".concat(registriesExported));
 };
 
 var _default = {
