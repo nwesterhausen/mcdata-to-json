@@ -50,7 +50,7 @@ let exportMinecraftDataPromise = function() {
         } else {
             log.info(DOMAIN, `Using cached minecraft advancements in ${path.join(tempRoot, 'data', 'minecraft', 'advancements')}`);
         }
-    }, 
+    },
     checkForData = function() {
         log.debug(DOMAIN, 'Resetting data export status.');
         advancementsExported = false;

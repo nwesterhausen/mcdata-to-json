@@ -31,7 +31,7 @@ _LogsParser.default.prepareLogFiles();
 
 _LogsParser.default.parseLogFiles();
 
-_CustomLogger.default.info(DOMAIN, 'Starting JSON file processing (advancements, stats'); // TODO use a single JSON parser OR a parser for each filetype??
+_CustomLogger.default.info(DOMAIN, 'Starting JSON file processing (advancements, stats)'); // TODO use a single JSON parser OR a parser for each filetype??
 
 
-_CustomLogger.default.info(DOMAIN, 'Starting NBT data processing (level.dat, playerdata'); // TODO
+_CustomLogger.default.info(DOMAIN, 'Starting NBT data processing (level.dat, playerdata)'); // TODO
