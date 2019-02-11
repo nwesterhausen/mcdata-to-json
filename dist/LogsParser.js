@@ -7,7 +7,7 @@ exports.default = void 0;
 
 var _zlib = _interopRequireDefault(require("zlib"));
 
-var _fs = _interopRequireDefault(require("fs"));
+var _fsExtra = _interopRequireDefault(require("fs-extra"));
 
 var _path = _interopRequireDefault(require("path"));
 
@@ -28,12 +28,13 @@ var DOMAIN = 'LogParser';
 var logfiles = [],
     unzippedFiles = [],
     rawlogJSON = [],
-    logfiledir = _Configuration.default.LOGS_DIR,
-    latestlogDate = _fs.default.statSync(_path.default.join(logfiledir, 'latest.log')).mtime.toISOString(),
-    workdir = _Configuration.default.TEMP_DIR,
+    latestlogDate = _fsExtra.default.statSync(_path.default.join(_Configuration.default.LOGS_DIR, 'latest.log')).mtime.toISOString(),
+    workdir = _path.default.join(_Configuration.default.TEMP_DIR, 'logs'),
     tmplogPath = _path.default.join(workdir, 'all_logs.json');
 
 _CustomLogger.default.debug("latest.log date: ".concat(latestlogDate), DOMAIN);
+
+_fsExtra.default.ensureDirSync(workdir);
 
 var getDateFromFilename = function getDateFromFilename(filename) {
   // Expects YYYY-MM-DD-#.log
@@ -44,7 +45,7 @@ var getDateFromFilename = function getDateFromFilename(filename) {
       t = new Date(y, m - 1, d);
 
   if (filename === 'latest.log') {
-    t = new Date();
+    t = new Date(latestlogDate);
   } // log.debug(`Created timestamp ${t.toISOString()}`, DOMAIN);
 
 
@@ -148,6 +149,12 @@ var getDateFromFilename = function getDateFromFilename(filename) {
       return [timestamp, _LogConst.default.TYPE_OVERLOADED, logline.substr(logline.indexOf(']: ') + 3), sev];
     } else if (logline.match(_LogsRegex.default.keepentityRE)) {
       return [timestamp, _LogConst.default.TYPE_KEEPENTITY, logline.substr(logline.indexOf(']: ') + 3), sev];
+    } else if (logline.match(_LogsRegex.default.movedquicklyRE)) {
+      return [timestamp, _LogConst.default.TYPE_MOVEDQUICKLY, logline.substr(logline.indexOf(']: ') + 3), sev];
+    } else if (logline.match(_LogsRegex.default.preparingspawnRE)) {
+      return [timestamp, _LogConst.default.TYPE_PREPARESPAWN, logline.substr(logline.indexOf(']: ') + 3), sev];
+    } else if (logline.match(_LogsRegex.default.argumentambiguityRE)) {
+      return [timestamp, _LogConst.default.TYPE_ARGUMENTABIGUITY, logline.substr(logline.indexOf(']: ') + 3), sev];
     }
 
     return [timestamp, _LogConst.default.TYPE_SERVERINFO, logline.substr(logline.indexOf(']: ') + 3), sev];
@@ -160,7 +167,7 @@ var getDateFromFilename = function getDateFromFilename(filename) {
       createdDate = getDateFromFilename(filepath);
 
   var rl = _readline.default.createInterface({
-    'input': _fs.default.createReadStream(_path.default.join(logfiledir, filepath))
+    'input': _fsExtra.default.createReadStream(_path.default.join(_Configuration.default.LOGS_DIR, filepath))
   });
 
   rl.on('line', function (input) {
@@ -181,7 +188,7 @@ var getDateFromFilename = function getDateFromFilename(filename) {
 
     try {
       var rl = _readline.default.createInterface({
-        'input': _fs.default.createReadStream(_path.default.join(logfiledir, filepath))
+        'input': _fsExtra.default.createReadStream(_path.default.join(_Configuration.default.LOGS_DIR, filepath))
       });
 
       rl.on('line', function (input) {
@@ -201,7 +208,7 @@ var getDateFromFilename = function getDateFromFilename(filename) {
 
 var _default = {
   'prepareLogFiles': function prepareLogFiles() {
-    var rawLogFiles = _fs.default.readdirSync(logfiledir);
+    var rawLogFiles = _fsExtra.default.readdirSync(_Configuration.default.LOGS_DIR);
 
     _CustomLogger.default.debug("Preparing following log files: ".concat(JSON.stringify(rawLogFiles)), DOMAIN); // Go through the log dir and sort the files
 
@@ -214,12 +221,12 @@ var _default = {
         _CustomLogger.default.debug('Detected gzip file.', DOMAIN);
 
         var tmpLogFile = rawLogFiles[i].substr(0, rawLogFiles[i].length - 3),
-            compressedFile = _fs.default.readFileSync(_path.default.join(logfiledir, rawLogFiles[i])),
+            compressedFile = _fsExtra.default.readFileSync(_path.default.join(_Configuration.default.LOGS_DIR, rawLogFiles[i])),
             unzippedFile = _zlib.default.unzipSync(compressedFile);
 
         _CustomLogger.default.debug('Unzipping file into log dir.', DOMAIN);
 
-        _fs.default.writeFileSync(_path.default.join(logfiledir, tmpLogFile), unzippedFile);
+        _fsExtra.default.writeFileSync(_path.default.join(_Configuration.default.LOGS_DIR, tmpLogFile), unzippedFile);
 
         unzippedFiles.push(tmpLogFile);
         logfiles.push(tmpLogFile);
@@ -238,7 +245,7 @@ var _default = {
     // Append all the files into one file
     _CustomLogger.default.debug('Clearing the temp.log file', DOMAIN);
 
-    _fs.default.writeFileSync(tmplogPath, '');
+    _fsExtra.default.writeFileSync(tmplogPath, '');
 
     for (var i = 0; i < logfiles.length; i++) {
       // special case for latest.log, we want it to be the date instead
@@ -246,7 +253,7 @@ var _default = {
 
       _CustomLogger.default.debug("Appending ".concat(logfiles[i], " to temp.log."), DOMAIN);
 
-      _fs.default.appendFileSync(tmplogPath, fileHeader + _fs.default.readFileSync(_path.default.join(logfiledir, logfiles[i])));
+      _fsExtra.default.appendFileSync(tmplogPath, fileHeader + _fsExtra.default.readFileSync(_path.default.join(_Configuration.default.LOGS_DIR, logfiles[i])));
     }
   },
   'parseLogFiles': function parseLogFiles() {
@@ -263,35 +270,45 @@ var _default = {
     Promise.all(promises).then(function (files) {
       _CustomLogger.default.info("Completed parsing ".concat(files.length, " log files."), DOMAIN);
 
-      _CustomLogger.default.info("Sorting ".concat(rawlogJSON.length, " records."), DOMAIN);
+      _CustomLogger.default.info("Sorting and filtering ".concat(rawlogJSON.length, " records."), DOMAIN);
 
       rawlogJSON.sort(function (a, b) {
         return a.timestamp - b.timestamp;
       });
 
-      _fs.default.writeFileSync(tmplogPath, JSON.stringify(rawlogJSON));
+      _fsExtra.default.writeFileSync(tmplogPath, JSON.stringify(rawlogJSON));
 
-      _CustomLogger.default.debug("Dumped full log JSON to ".concat(tmplogPath), DOMAIN);
+      _CustomLogger.default.debug("Dumped full log JSON to ".concat(tmplogPath), DOMAIN); // 'Clean' JSON
+      // no 'moved too quickly!'
+      // no 'server overloaded!'
+      // no 'keeping entity @e'
+
 
       var cleanedJSON = rawlogJSON.filter(function (obj) {
-        return obj.type !== _LogConst.default.TYPE_KEEPENTITY && obj.type !== _LogConst.default.TYPE_OVERLOADED;
+        return [_LogConst.default.TYPE_KEEPENTITY, _LogConst.default.TYPE_OVERLOADED, _LogConst.default.TYPE_MOVEDQUICKLY, _LogConst.default.TYPE_PREPARESPAWN, _LogConst.default.TYPE_ARGUMENTABIGUITY].indexOf(obj.type) === -1;
       });
 
-      _fs.default.writeFileSync(_path.default.join(workdir, 'filtered_logs.json'), JSON.stringify(cleanedJSON));
+      _fsExtra.default.writeFileSync(_path.default.join(workdir, 'filtered_logs.json'), JSON.stringify(cleanedJSON));
 
-      _CustomLogger.default.info("".concat(rawlogJSON.length - cleanedJSON.length, " records removed (filtered out 'keeping entity' and 'server overloaded' messages)."), DOMAIN);
+      _CustomLogger.default.debug("Wrote 'cleaned' JSON file to ".concat(_path.default.join(workdir, 'filtered_logs.json'), " (").concat(cleanedJSON.length, " records)"), DOMAIN); // Only chat messages
 
-      _CustomLogger.default.debug("Wrote 'cleaned' JSON file to ".concat(_path.default.join(workdir, 'filtered_logs.json')), DOMAIN);
 
-      var specialEventJSON = cleanedJSON.filter(function (obj) {
-        return obj.type !== _LogConst.default.TYPE_SERVERINFO;
+      var chatJSON = cleanedJSON.filter(function (obj) {
+        return obj.type === _LogConst.default.TYPE_CHAT;
       });
 
-      _fs.default.writeFileSync(_path.default.join(workdir, 'special_event_logs.json'), JSON.stringify(specialEventJSON));
+      _fsExtra.default.writeFileSync(_path.default.join(workdir, 'chat.json'), JSON.stringify(chatJSON));
 
-      _CustomLogger.default.info("".concat(specialEventJSON.length, " records determined worth saving."), DOMAIN);
+      _CustomLogger.default.debug("Wrote 'chat' JSON file to ".concat(_path.default.join(workdir, 'chat.json'), " (").concat(chatJSON.length, " records)"), DOMAIN); // Only command messages
 
-      _CustomLogger.default.debug("Wrote 'important' JSON file to ".concat(_path.default.join(workdir, 'special_event_logs.json')), DOMAIN);
+
+      var commandJSON = cleanedJSON.filter(function (obj) {
+        return obj.type === _LogConst.default.TYPE_COMMAND;
+      });
+
+      _fsExtra.default.writeFileSync(_path.default.join(workdir, 'command.json'), JSON.stringify(commandJSON));
+
+      _CustomLogger.default.debug("Wrote 'command' JSON file to ".concat(_path.default.join(workdir, 'command.json'), " (").concat(commandJSON.length, " records)"), DOMAIN);
     });
   },
   rawlogJSON: rawlogJSON,

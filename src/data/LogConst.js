@@ -15,6 +15,9 @@ export default {
     'TYPE_ERROR': 27,
     'TYPE_OVERLOADED': 30,
     'TYPE_KEEPENTITY': 31,
+    'TYPE_MOVEDQUICKLY': 32,
+    'TYPE_ARGUMENTABIGUITY': 33,
+    'TYPE_PREPARESPAWN': 34,
 
     // Cause of death codes
     'ARROW_DEATH': 0,

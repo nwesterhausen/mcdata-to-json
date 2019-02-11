@@ -33,5 +33,8 @@ export default {
     'serverreadyRE': new RegExp(/\]: Done \([0-9.]+s\)! For help, type "help" or "?"/),
     'serverstopRE': new RegExp(/\]: Stopping server/),
     'overloadedRE': new RegExp(/\]: Can't keep up! Is the server overloaded?/),
-    'keepentityRE': new RegExp(/\]: Keeping entity [a-zA-Z:]+ that already exists/)
+    'keepentityRE': new RegExp(/\]: Keeping entity [a-zA-Z:]+ that already exists/),
+    'movedquicklyRE': new RegExp(/\]: .+moved too quickly?/),
+    'argumentambiguityRE': new RegExp(/\]: Ambiguity between arguments .+$/),
+    'preparingspawnRE': new RegExp(/\]: Preparing spawn area: .+$/)
 };

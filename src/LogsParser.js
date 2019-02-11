@@ -1,5 +1,5 @@
 import zlib from 'zlib';
-import fs from 'fs';
+import fs from 'fs-extra';
 import path from 'path';
 import readline from 'readline';
 import log from './lib/CustomLogger';
@@ -11,12 +11,12 @@ const DOMAIN = 'LogParser';
 let logfiles = [],
     unzippedFiles = [],
     rawlogJSON = [],
-    logfiledir = config.LOGS_DIR,
-    latestlogDate = fs.statSync(path.join(logfiledir, 'latest.log')).mtime.toISOString(),
-    workdir = config.TEMP_DIR,
+    latestlogDate = fs.statSync(path.join(config.LOGS_DIR, 'latest.log')).mtime.toISOString(),
+    workdir = path.join(config.TEMP_DIR, 'logs'),
     tmplogPath = path.join(workdir, 'all_logs.json');
 
 log.debug(`latest.log date: ${ latestlogDate }`, DOMAIN);
+fs.ensureDirSync(workdir);
 
 let getDateFromFilename = function(filename) {
         // Expects YYYY-MM-DD-#.log
@@ -27,7 +27,7 @@ let getDateFromFilename = function(filename) {
             t = new Date(y, m - 1, d);
         
         if (filename === 'latest.log') {
-            t = new Date();
+            t = new Date(latestlogDate);
         }
 
         // log.debug(`Created timestamp ${t.toISOString()}`, DOMAIN);
@@ -131,6 +131,12 @@ let getDateFromFilename = function(filename) {
                 return [timestamp, logconst.TYPE_OVERLOADED, logline.substr(logline.indexOf(']: ') + 3), sev];
             } else if (logline.match(logregx.keepentityRE)) {
                 return [timestamp, logconst.TYPE_KEEPENTITY, logline.substr(logline.indexOf(']: ') + 3), sev];
+            } else if (logline.match(logregx.movedquicklyRE)) {
+                return [timestamp, logconst.TYPE_MOVEDQUICKLY, logline.substr(logline.indexOf(']: ') + 3), sev];
+            } else if (logline.match(logregx.preparingspawnRE)) {
+                return [timestamp, logconst.TYPE_PREPARESPAWN, logline.substr(logline.indexOf(']: ') + 3), sev];
+            } else if (logline.match(logregx.argumentambiguityRE)) {
+                return [timestamp, logconst.TYPE_ARGUMENTABIGUITY, logline.substr(logline.indexOf(']: ') + 3), sev];
             }
             return [timestamp, logconst.TYPE_SERVERINFO, logline.substr(logline.indexOf(']: ') + 3), sev];
     
@@ -141,7 +147,7 @@ let getDateFromFilename = function(filename) {
         let createdJSON = [],
             createdDate = getDateFromFilename(filepath);
         const rl = readline.createInterface({
-            'input': fs.createReadStream(path.join(logfiledir, filepath))
+            'input': fs.createReadStream(path.join(config.LOGS_DIR, filepath))
         });
 
         rl.on('line', (input) => {
@@ -160,7 +166,7 @@ let getDateFromFilename = function(filename) {
 
             try {
                 const rl = readline.createInterface({
-                    'input': fs.createReadStream(path.join(logfiledir, filepath))
+                    'input': fs.createReadStream(path.join(config.LOGS_DIR, filepath))
                 });
 
                 rl.on('line', (input) => {
@@ -179,7 +185,7 @@ let getDateFromFilename = function(filename) {
 
 export default {
     'prepareLogFiles': function() {
-        let rawLogFiles = fs.readdirSync(logfiledir);
+        let rawLogFiles = fs.readdirSync(config.LOGS_DIR);
 
         log.debug(`Preparing following log files: ${ JSON.stringify(rawLogFiles) }`, DOMAIN);
         // Go through the log dir and sort the files
@@ -189,11 +195,11 @@ export default {
             if (rawLogFiles[i].endsWith('.gz')) {
                 log.debug('Detected gzip file.', DOMAIN);
                 let tmpLogFile = rawLogFiles[i].substr(0, rawLogFiles[i].length - 3),
-                    compressedFile = fs.readFileSync(path.join(logfiledir, rawLogFiles[i])),
+                    compressedFile = fs.readFileSync(path.join(config.LOGS_DIR, rawLogFiles[i])),
                     unzippedFile = zlib.unzipSync(compressedFile);
 
                 log.debug('Unzipping file into log dir.', DOMAIN);
-                fs.writeFileSync(path.join(logfiledir, tmpLogFile), unzippedFile);
+                fs.writeFileSync(path.join(config.LOGS_DIR, tmpLogFile), unzippedFile);
 
                 unzippedFiles.push(tmpLogFile);
                 logfiles.push(tmpLogFile);
@@ -214,7 +220,7 @@ export default {
             let fileHeader = logfiles[i] === 'latest.log' ? `[Filedate:${latestlogDate}.log]\n` : `[Filename:${logfiles[i]}]\n`;
             
             log.debug(`Appending ${logfiles[i]} to temp.log.`, DOMAIN);
-            fs.appendFileSync(tmplogPath, fileHeader + fs.readFileSync(path.join(logfiledir, logfiles[i])));
+            fs.appendFileSync(tmplogPath, fileHeader + fs.readFileSync(path.join(config.LOGS_DIR, logfiles[i])));
         }
     },
     'parseLogFiles': function() {
@@ -227,26 +233,39 @@ export default {
         log.info(`Began parse of ${logfiles.length} log files.`, DOMAIN);
         Promise.all(promises).then((files) => {
             log.info(`Completed parsing ${files.length} log files.`, DOMAIN);
-            log.info(`Sorting ${rawlogJSON.length} records.`, DOMAIN);
+            log.info(`Sorting and filtering ${rawlogJSON.length} records.`, DOMAIN);
             rawlogJSON.sort((a, b) => {
                 return a.timestamp - b.timestamp;
             });
             fs.writeFileSync(tmplogPath, JSON.stringify(rawlogJSON));
             log.debug(`Dumped full log JSON to ${tmplogPath}`, DOMAIN);
+            
+            // 'Clean' JSON
+            // no 'moved too quickly!'
+            // no 'server overloaded!'
+            // no 'keeping entity @e'
             let cleanedJSON = rawlogJSON.filter((obj) => {
-                return obj.type !== logconst.TYPE_KEEPENTITY && obj.type !== logconst.TYPE_OVERLOADED;
+                return [logconst.TYPE_KEEPENTITY, logconst.TYPE_OVERLOADED, logconst.TYPE_MOVEDQUICKLY, logconst.TYPE_PREPARESPAWN, logconst.TYPE_ARGUMENTABIGUITY].indexOf(obj.type) === -1;
             });
 
             fs.writeFileSync(path.join(workdir, 'filtered_logs.json'), JSON.stringify(cleanedJSON));
-            log.info(`${rawlogJSON.length - cleanedJSON.length} records removed (filtered out 'keeping entity' and 'server overloaded' messages).`, DOMAIN);
-            log.debug(`Wrote 'cleaned' JSON file to ${path.join(workdir, 'filtered_logs.json')}`, DOMAIN);
-            let specialEventJSON = cleanedJSON.filter((obj) => {
-                return obj.type !== logconst.TYPE_SERVERINFO;
+            log.debug(`Wrote 'cleaned' JSON file to ${path.join(workdir, 'filtered_logs.json')} (${cleanedJSON.length} records)`, DOMAIN);
+            
+            // Only chat messages
+            let chatJSON = cleanedJSON.filter((obj) => {
+                return obj.type === logconst.TYPE_CHAT;
             });
 
-            fs.writeFileSync(path.join(workdir, 'special_event_logs.json'), JSON.stringify(specialEventJSON));
-            log.info(`${specialEventJSON.length} records determined worth saving.`, DOMAIN);
-            log.debug(`Wrote 'important' JSON file to ${path.join(workdir, 'special_event_logs.json')}`, DOMAIN);
+            fs.writeFileSync(path.join(workdir, 'chat.json'), JSON.stringify(chatJSON));
+            log.debug(`Wrote 'chat' JSON file to ${path.join(workdir, 'chat.json')} (${chatJSON.length} records)`, DOMAIN);
+
+            // Only command messages
+            let commandJSON = cleanedJSON.filter((obj) => {
+                return obj.type === logconst.TYPE_COMMAND;
+            });
+
+            fs.writeFileSync(path.join(workdir, 'command.json'), JSON.stringify(commandJSON));
+            log.debug(`Wrote 'command' JSON file to ${path.join(workdir, 'command.json')} (${commandJSON.length} records)`, DOMAIN);
         });
     },
     rawlogJSON,
