@@ -296,7 +296,7 @@ try {
 
 var PLAYERS = players;
 
-_CustomLogger.default.info("Registered ".concat(Object.keys(PLAYERS).length, " players."), DOMAIN);
+_CustomLogger.default.debug("Registered ".concat(Object.keys(PLAYERS).length, " players."), DOMAIN);
 
 var _default = {
   MC_DIR: MC_DIR,

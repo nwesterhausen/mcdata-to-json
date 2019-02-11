@@ -212,7 +212,7 @@ for (let f of playerdatFiles) {
 }
 const PLAYERS = players;
 
-log.info(`Registered ${Object.keys(PLAYERS).length} players.`, DOMAIN);
+log.debug(`Registered ${Object.keys(PLAYERS).length} players.`, DOMAIN);
 
 export default {
     MC_DIR,
