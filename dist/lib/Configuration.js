@@ -65,7 +65,7 @@ var isValidPath = function isValidPath(testpath, description) {
     _fsExtra.default.statSync(testpath);
   } catch (err) {
     if (err.code === 'ENOENT') {
-      _CustomLogger.default.warn("No ".concat(fileOrDirName, " found! (").concat(description, ")"), DOMAIN);
+      _CustomLogger.default.debug("\u26A0 ".concat(fileOrDirName, " not found! (").concat(description, ")"), DOMAIN);
 
       return false;
     } else {
@@ -190,6 +190,8 @@ if (isValidPath(_path.default.join(parsedOpts.worlddir, 'DIM1'), 'The End region
 if (isValidPath(_path.default.join(parsedOpts.worlddir, 'DIM-1'), 'Nether region files. Found in world directory.')) {
   parsedOpts.nether = _path.default.join(parsedOpts.worlddir, 'DIM-1');
 }
+
+_CustomLogger.default.info('Validated minecraft directory.', DOMAIN);
 
 var MC_DIR = parsedOpts.minecraft,
     PROPERTIES_FILE = parsedOpts.serverproprties,

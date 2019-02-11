@@ -63,7 +63,7 @@ let isValidPath = function(testpath, description) {
         fs.statSync(testpath);
     } catch (err) {
         if (err.code === 'ENOENT') {
-            log.warn(`No ${ fileOrDirName } found! (${description})`, DOMAIN);
+            log.debug(`⚠ ${ fileOrDirName } not found! (${description})`, DOMAIN);
             return false;
         } else {
             throw err;
@@ -158,6 +158,7 @@ if (isValidPath(path.join(parsedOpts.worlddir, 'DIM1'), 'The End region files. F
 if (isValidPath(path.join(parsedOpts.worlddir, 'DIM-1'), 'Nether region files. Found in world directory.')) {
     parsedOpts.nether = path.join(parsedOpts.worlddir, 'DIM-1');
 }
+log.info('Validated minecraft directory.', DOMAIN);
 
 const MC_DIR = parsedOpts.minecraft,
     PROPERTIES_FILE = parsedOpts.serverproprties,
