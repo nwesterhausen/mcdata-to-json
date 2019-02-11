@@ -5,6 +5,7 @@ import readline from 'readline';
 import log from './lib/CustomLogger';
 import logconst from './data/LogConst';
 import logregx from './data/LogsRegex';
+import config from './lib/Configuration';
 
 const DOMAIN = 'LogParser';
 let logfiles = [],
@@ -176,8 +177,8 @@ let getDateFromFilename = function(filename) {
     };
 
 export default {
-    'setConfig': function(config) {
-        logfiledir = config.LOGS;
+    'setConfig': function(config1) {
+        logfiledir = config.LOGS_DIR;
         latestlogDate = fs.statSync(path.join(logfiledir, 'latest.log')).mtime.toISOString();
         log.debug(`latest.log date: ${ latestlogDate }`, DOMAIN);
         workdir = config.TEMP_DIR;

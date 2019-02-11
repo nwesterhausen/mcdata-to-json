@@ -5,7 +5,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = void 0;
 
-var _path = _interopRequireDefault(require("path"));
+var _fsExtra = _interopRequireDefault(require("fs-extra"));
 
 var _CustomLogger = _interopRequireDefault(require("./lib/CustomLogger"));
 
@@ -44,12 +44,13 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  ***/
 var DOMAIN = 'AdvancementParser';
 var workdir = 'unset',
-    playerProgressDir = 'unset',
-    advancementDefinitions = {};
+    players = [];
 var _default = {
   'setConfig': function setConfig(config) {
     workdir = config.TEMP_DIR;
-    playerProgressDir = _path.default.join(config.MC_DIR, 'world', 'advancements');
+    players = config.PLAYERS;
+
+    _CustomLogger.default.info("Found ".concat(players.length, " player progress files."), DOMAIN);
   }
 };
 exports.default = _default;

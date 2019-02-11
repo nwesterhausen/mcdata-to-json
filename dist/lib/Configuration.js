@@ -90,13 +90,15 @@ _CustomLogger.default.debug("current working dir ".concat(rundir), DOMAIN);
 
 var MC_DIR = parsedOpts.minecraft,
     PROPERTIES_FILE = _path.default.join(MC_DIR, 'server.properties'),
-    LOGS = _path.default.join(MC_DIR, 'logs'),
-    WORLD = _path.default.join(MC_DIR, 'world'),
-    STATS = _path.default.join(WORLD, 'stats'),
-    ADVANCEMENTS = _path.default.join(WORLD, 'advancements'),
-    PLAYERDATA = _path.default.join(WORLD, 'playerdata'),
+    LOGS_DIR = _path.default.join(MC_DIR, 'logs'),
+    WORLD_DIR = _path.default.join(MC_DIR, 'world'),
+    STATS_DIR = _path.default.join(WORLD_DIR, 'stats'),
+    ADVANCEMENTS_DIR = _path.default.join(WORLD_DIR, 'advancements'),
+    PLAYERDATA_DIR = _path.default.join(WORLD_DIR, 'playerdata'),
     OUTPUT_DIR = parsedOpts.outputdir,
-    TEMP_DIR = _path.default.join(OUTPUT_DIR, 'temp');
+    TEMP_DIR = _path.default.join(OUTPUT_DIR, 'temp'),
+    DATA_DIR = _path.default.join(OUTPUT_DIR, 'data'),
+    ASSETS_DIR = _path.default.join(OUTPUT_DIR, 'assets');
 
 if (!MC_DIR) {
   _CustomLogger.default.error('No minecraft directory set!', DOMAIN);
@@ -110,9 +112,9 @@ _CustomLogger.default.info("Set Minecraft dir: ".concat(MC_DIR), DOMAIN); // Che
 try {
   _fsExtra.default.statSync(PROPERTIES_FILE);
 
-  _fsExtra.default.statSync(WORLD);
+  _fsExtra.default.statSync(WORLD_DIR);
 
-  _fsExtra.default.statSync(LOGS);
+  _fsExtra.default.statSync(LOGS_DIR);
 } catch (err) {
   if (err.code === 'ENOENT') {
     var testedPath = _path.default.basename(err.path);
@@ -127,11 +129,11 @@ try {
 
 
 try {
-  _fsExtra.default.statSync(ADVANCEMENTS);
+  _fsExtra.default.statSync(STATS_DIR);
 
-  _fsExtra.default.statSync(STATS);
+  _fsExtra.default.statSync(ADVANCEMENTS_DIR);
 
-  _fsExtra.default.statSync(PLAYERDATA);
+  _fsExtra.default.statSync(PLAYERDATA_DIR);
 } catch (err) {
   if (err.code === 'ENOENT') {
     var _testedPath = _path.default.basename(err.path);
@@ -150,18 +152,61 @@ _fsExtra.default.ensureDirSync(OUTPUT_DIR);
 
 _fsExtra.default.ensureDirSync(TEMP_DIR);
 
+_fsExtra.default.ensureDirSync(DATA_DIR);
+
+_fsExtra.default.ensureDirSync(ASSETS_DIR);
+
 _CustomLogger.default.info("Set output dir: ".concat(OUTPUT_DIR), DOMAIN);
+
+var playerdatFiles = _fsExtra.default.readdirSync(PLAYERDATA_DIR),
+    players = [];
+
+var _iteratorNormalCompletion = true;
+var _didIteratorError = false;
+var _iteratorError = undefined;
+
+try {
+  for (var _iterator = playerdatFiles[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+    var f = _step.value;
+
+    if (f.indexOf('.dat') > -1) {
+      players.push(f.split('.dat')[0]);
+
+      _CustomLogger.default.debug("Discovered player UUID: ".concat(f.split('.dat')[0]), DOMAIN);
+    }
+  }
+} catch (err) {
+  _didIteratorError = true;
+  _iteratorError = err;
+} finally {
+  try {
+    if (!_iteratorNormalCompletion && _iterator.return != null) {
+      _iterator.return();
+    }
+  } finally {
+    if (_didIteratorError) {
+      throw _iteratorError;
+    }
+  }
+}
+
+var PLAYERS = players;
+
+_CustomLogger.default.info("Registered ".concat(PLAYERS.length, " players."), DOMAIN);
 
 var _default = {
   MC_DIR: MC_DIR,
   PROPERTIES_FILE: PROPERTIES_FILE,
-  LOGS: LOGS,
-  WORLD: WORLD,
-  ADVANCEMENTS: ADVANCEMENTS,
-  STATS: STATS,
-  PLAYERDATA: PLAYERDATA,
+  LOGS_DIR: LOGS_DIR,
+  WORLD_DIR: WORLD_DIR,
+  ADVANCEMENTS_DIR: ADVANCEMENTS_DIR,
+  STATS_DIR: STATS_DIR,
+  PLAYERDATA_DIR: PLAYERDATA_DIR,
   OUTPUT_DIR: OUTPUT_DIR,
   TEMP_DIR: TEMP_DIR,
-  LOGLEVEL: LOGLEVEL
+  DATA_DIR: DATA_DIR,
+  ASSETS_DIR: ASSETS_DIR,
+  LOGLEVEL: LOGLEVEL,
+  PLAYERS: PLAYERS
 };
 exports.default = _default;

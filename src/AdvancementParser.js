@@ -29,17 +29,17 @@
  *   }
  * }
  ***/
-import path from 'path';
+import fs from 'fs-extra';
 import log from './lib/CustomLogger';
 
 const DOMAIN = 'AdvancementParser';
 let workdir = 'unset',
-    playerProgressDir = 'unset',
-    advancementDefinitions = {};
+    players = [];
 
 export default {
     'setConfig': function(config) {
         workdir = config.TEMP_DIR;
-        playerProgressDir = path.join(config.MC_DIR, 'world', 'advancements');
+        players = config.PLAYERS;
+        log.info(`Found ${players.length} player progress files.`, DOMAIN);
     }
 };

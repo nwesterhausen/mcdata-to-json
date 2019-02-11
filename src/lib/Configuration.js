@@ -81,13 +81,15 @@ log.debug(`current working dir ${ rundir}`, DOMAIN);
 
 const MC_DIR = parsedOpts.minecraft,
     PROPERTIES_FILE = path.join(MC_DIR, 'server.properties'),
-    LOGS = path.join(MC_DIR, 'logs'),
-    WORLD = path.join(MC_DIR, 'world'),
-    STATS = path.join(WORLD, 'stats'),
-    ADVANCEMENTS = path.join(WORLD, 'advancements'),
-    PLAYERDATA = path.join(WORLD, 'playerdata'),
+    LOGS_DIR = path.join(MC_DIR, 'logs'),
+    WORLD_DIR = path.join(MC_DIR, 'world'),
+    STATS_DIR = path.join(WORLD_DIR, 'stats'),
+    ADVANCEMENTS_DIR = path.join(WORLD_DIR, 'advancements'),
+    PLAYERDATA_DIR = path.join(WORLD_DIR, 'playerdata'),
     OUTPUT_DIR = parsedOpts.outputdir,
-    TEMP_DIR = path.join(OUTPUT_DIR, 'temp');
+    TEMP_DIR = path.join(OUTPUT_DIR, 'temp'),
+    DATA_DIR = path.join(OUTPUT_DIR, 'data'),
+    ASSETS_DIR = path.join(OUTPUT_DIR, 'assets');
 
 if (!MC_DIR) {
     log.error('No minecraft directory set!', DOMAIN);
@@ -97,8 +99,8 @@ log.info(`Set Minecraft dir: ${ MC_DIR }`, DOMAIN);
 // Check for server.properties, to validate minecraft folder..
 try {
     fs.statSync(PROPERTIES_FILE);
-    fs.statSync(WORLD);
-    fs.statSync(LOGS);
+    fs.statSync(WORLD_DIR);
+    fs.statSync(LOGS_DIR);
 } catch (err) {
     if (err.code === 'ENOENT') {
         let testedPath = path.basename(err.path);
@@ -111,9 +113,9 @@ try {
 }
 // Check for items with the world directory
 try {
-    fs.statSync(ADVANCEMENTS);
-    fs.statSync(STATS);
-    fs.statSync(PLAYERDATA);
+    fs.statSync(STATS_DIR);
+    fs.statSync(ADVANCEMENTS_DIR);
+    fs.statSync(PLAYERDATA_DIR);
 } catch (err) {
     if (err.code === 'ENOENT') {
         let testedPath = path.basename(err.path);
@@ -128,17 +130,35 @@ log.info('Minecraft dir passed validation checks.', DOMAIN);
 
 fs.ensureDirSync(OUTPUT_DIR);
 fs.ensureDirSync(TEMP_DIR);
+fs.ensureDirSync(DATA_DIR);
+fs.ensureDirSync(ASSETS_DIR);
 log.info(`Set output dir: ${OUTPUT_DIR}`, DOMAIN);
+
+let playerdatFiles = fs.readdirSync(PLAYERDATA_DIR),
+    players = [];
+
+for (let f of playerdatFiles) {
+    if (f.indexOf('.dat') > -1) {
+        players.push(f.split('.dat')[0]);
+        log.debug(`Discovered player UUID: ${f.split('.dat')[0]}`, DOMAIN);
+    }
+}
+const PLAYERS = players;
+
+log.info(`Registered ${PLAYERS.length} players.`, DOMAIN);
 
 export default {
     MC_DIR,
     PROPERTIES_FILE,
-    LOGS,
-    WORLD,
-    ADVANCEMENTS,
-    STATS,
-    PLAYERDATA,
+    LOGS_DIR,
+    WORLD_DIR,
+    ADVANCEMENTS_DIR,
+    STATS_DIR,
+    PLAYERDATA_DIR,
     OUTPUT_DIR,
     TEMP_DIR,
-    LOGLEVEL
+    DATA_DIR,
+    ASSETS_DIR,
+    LOGLEVEL,
+    PLAYERS
 };

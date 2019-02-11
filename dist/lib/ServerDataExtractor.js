@@ -23,22 +23,21 @@ var DOMAIN = 'DataExtractor';
 var minecraftRoot = 'unset',
     tempRoot = 'unset',
     serverjarPath = 'unset',
+    dataOutputPath = 'unset',
+    assetsOutputPath = 'unset',
     advancementsExported = false,
     loottablesExported = false,
     recipesExported = false,
     tagsExported = false,
-    blocklistExported = false,
-    commandlistExported = false,
-    registriesExported = false,
     structuresExported = false,
+    advancementsOutputPath = 'unset',
+    loottablesOutputPath = 'unset',
+    recipesOutputPath = 'unset',
+    structuresOutputPath = 'unset',
+    tagsOutputPath = 'unset',
     busy = false;
 
-var setBusy = function setBusy(bool) {
-  _CustomLogger.default.debug("Setting busy to ".concat(bool), DOMAIN);
-
-  busy = bool;
-},
-    getBusy = function getBusy() {
+var getBusy = function getBusy() {
   return busy;
 },
     extractMinecraftDataPromise = function extractMinecraftDataPromise() {
@@ -51,8 +50,7 @@ var setBusy = function setBusy(bool) {
   var zip = new StreamZip({
     'file': serverzipPath
   });
-
-  var datadir = _path.default.join(tempRoot, 'data');
+  var datadir = dataOutputPath;
 
   var assetsdir = _path.default.join(tempRoot, 'assets');
 
@@ -119,25 +117,23 @@ var setBusy = function setBusy(bool) {
   loottablesExported = false;
   recipesExported = false;
   structuresExported = false;
-  tagsExported = false;
-  blocklistExported = false;
-  commandlistExported = false;
-  registriesExported = false;
+  tagsExported = false; // blocklistExported = false;
+  // commandlistExported = false;
+  // registriesExported = false;
 
-  if (_fsExtra.default.existsSync(_path.default.join(tempRoot, 'data'))) {
-    if (_fsExtra.default.existsSync(_path.default.join(tempRoot, 'data', 'minecraft'))) {
-      advancementsExported = _fsExtra.default.existsSync(_path.default.join(tempRoot, 'data', 'minecraft', 'advancements'));
-      loottablesExported = _fsExtra.default.existsSync(_path.default.join(tempRoot, 'data', 'minecraft', 'loot_tables'));
-      recipesExported = _fsExtra.default.existsSync(_path.default.join(tempRoot, 'data', 'minecraft', 'recipes'));
-      structuresExported = _fsExtra.default.existsSync(_path.default.join(tempRoot, 'data', 'minecraft', 'structures'));
-      tagsExported = _fsExtra.default.existsSync(_path.default.join(tempRoot, 'data', 'minecraft', 'tags'));
-    }
+  if (_fsExtra.default.existsSync(dataOutputPath)) {
+    if (_fsExtra.default.existsSync(_path.default.join(dataOutputPath, 'minecraft'))) {
+      advancementsExported = _fsExtra.default.existsSync(advancementsOutputPath);
+      loottablesExported = _fsExtra.default.existsSync(loottablesOutputPath);
+      recipesExported = _fsExtra.default.existsSync(recipesOutputPath);
+      structuresExported = _fsExtra.default.existsSync(structuresOutputPath);
+      tagsExported = _fsExtra.default.existsSync(tagsOutputPath);
+    } // if (fs.existsSync(path.join(tempRoot, 'data', 'reports'))) {
+    //     blocklistExported = fs.existsSync(path.join(tempRoot, 'data', 'reports', 'blocks.json'));
+    //     commandlistExported = fs.existsSync(path.join(tempRoot, 'data', 'reports', 'commands.json'));
+    //     registriesExported = fs.existsSync(path.join(tempRoot, 'data', 'reports', 'registries.json'));
+    // }
 
-    if (_fsExtra.default.existsSync(_path.default.join(tempRoot, 'data', 'reports'))) {
-      blocklistExported = _fsExtra.default.existsSync(_path.default.join(tempRoot, 'data', 'reports', 'blocks.json'));
-      commandlistExported = _fsExtra.default.existsSync(_path.default.join(tempRoot, 'data', 'reports', 'commands.json'));
-      registriesExported = _fsExtra.default.existsSync(_path.default.join(tempRoot, 'data', 'reports', 'registries.json'));
-    }
   } else {
     busy = true;
     extractMinecraftDataPromise().then(function (val) {
@@ -162,19 +158,21 @@ var setBusy = function setBusy(bool) {
 
   _CustomLogger.default.debug("recipes data is cached: ".concat(structuresExported), DOMAIN);
 
-  _CustomLogger.default.debug("tags data is cached: ".concat(tagsExported), DOMAIN);
+  _CustomLogger.default.debug("tags data is cached: ".concat(tagsExported), DOMAIN); // log.debug(`blocklist data is cached: ${blocklistExported}`, DOMAIN);
+  // log.debug(`commandlist data is cached: ${commandlistExported}`, DOMAIN);
+  // log.debug(`registries data is cached: ${registriesExported}`, DOMAIN);
 
-  _CustomLogger.default.debug("blocklist data is cached: ".concat(blocklistExported), DOMAIN);
-
-  _CustomLogger.default.debug("commandlist data is cached: ".concat(commandlistExported), DOMAIN);
-
-  _CustomLogger.default.debug("registries data is cached: ".concat(registriesExported), DOMAIN);
 };
 
 var _default = {
   'setConfig': function setConfig(config) {
     minecraftRoot = config.MC_DIR;
-    tempRoot = config.TEMP_DIR;
+    dataOutputPath = config.DATA_DIR;
+    advancementsOutputPath = _path.default.join(config.DATA_DIR, 'advancements');
+    loottablesOutputPath = _path.default.join(config.DATA_DIR, 'loot_tables');
+    recipesOutputPath = _path.default.join(config.DATA_DIR, 'recipes');
+    structuresOutputPath = _path.default.join(config.DATA_DIR, 'structures');
+    tagsOutputPath = _path.default.join(config.DATA_DIR, 'tags');
     serverjarPath = _path.default.join(minecraftRoot, 'server.jar');
     checkForData();
   },
@@ -183,9 +181,6 @@ var _default = {
   loottablesExported: loottablesExported,
   recipesExported: recipesExported,
   tagsExported: tagsExported,
-  blocklistExported: blocklistExported,
-  commandlistExported: commandlistExported,
-  registriesExported: registriesExported,
   getBusy: getBusy
 };
 exports.default = _default;

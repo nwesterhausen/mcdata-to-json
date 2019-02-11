@@ -19,6 +19,8 @@ var _LogConst = _interopRequireDefault(require("./data/LogConst"));
 
 var _LogsRegex = _interopRequireDefault(require("./data/LogsRegex"));
 
+var _Configuration = _interopRequireDefault(require("./lib/Configuration"));
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var DOMAIN = 'LogParser';
@@ -195,13 +197,13 @@ var getDateFromFilename = function getDateFromFilename(filename) {
 };
 
 var _default = {
-  'setConfig': function setConfig(config) {
-    logfiledir = config.LOGS;
+  'setConfig': function setConfig(config1) {
+    logfiledir = _Configuration.default.LOGS_DIR;
     latestlogDate = _fs.default.statSync(_path.default.join(logfiledir, 'latest.log')).mtime.toISOString();
 
     _CustomLogger.default.debug("latest.log date: ".concat(latestlogDate), DOMAIN);
 
-    workdir = config.TEMP_DIR;
+    workdir = _Configuration.default.TEMP_DIR;
     tmplogPath = _path.default.join(workdir, 'all_logs.json');
   },
   'prepareLogFiles': function prepareLogFiles() {
