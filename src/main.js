@@ -7,12 +7,15 @@
  */
 import log from './lib/CustomLogger';
 import config from './lib/Configuration';
+import PlayerDataCombiner from './lib/PlayerDataCombiner';
 import LogsParser from './LogsParser';
 import ServerDataExtractor from './lib/ServerDataExtractor';
 import AdvancementParser from './AdvancementParser';
+import DatParser from './DatParser';
 import MojangApi from './lib/MojangApi';
 import fs from 'fs-extra';
 import path from 'path';
+import Configuration from './lib/Configuration';
 
 const DOMAIN = 'Main';
 
@@ -47,9 +50,13 @@ if (!ServerDataExtractor.checkForData()) {
     log.info('Cached data exists.', DOMAIN);
     log.info('Lazily updating cached player profiles.', DOMAIN);
     MojangApi.lazyProfileUpdate();
-    log.info('Starting log file processing.', DOMAIN);
-    LogsParser.prepareLogFiles();
-    LogsParser.parseLogFiles();
+    // log.info('Starting log file processing.', DOMAIN);
+    // LogsParser.prepareLogFiles();
+    // LogsParser.parseLogFiles();
+    DatParser.parsePlayerdata();
+    for (let i=0; i<Object.keys(config.PLAYERS).length; i++) {
+        PlayerDataCombiner.combinePlayerData(Object.keys(config.PLAYERS)[i]);
+    }
 }
 // log.info('Starting JSON file processing (advancements, stats)', DOMAIN);
 

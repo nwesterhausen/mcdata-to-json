@@ -4,11 +4,15 @@ var _CustomLogger = _interopRequireDefault(require("./lib/CustomLogger"));
 
 var _Configuration = _interopRequireDefault(require("./lib/Configuration"));
 
+var _PlayerDataCombiner = _interopRequireDefault(require("./lib/PlayerDataCombiner"));
+
 var _LogsParser = _interopRequireDefault(require("./LogsParser"));
 
 var _ServerDataExtractor = _interopRequireDefault(require("./lib/ServerDataExtractor"));
 
 var _AdvancementParser = _interopRequireDefault(require("./AdvancementParser"));
+
+var _DatParser = _interopRequireDefault(require("./DatParser"));
 
 var _MojangApi = _interopRequireDefault(require("./lib/MojangApi"));
 
@@ -62,12 +66,15 @@ if (!_ServerDataExtractor.default.checkForData()) {
 
   _CustomLogger.default.info('Lazily updating cached player profiles.', DOMAIN);
 
-  _MojangApi.default.lazyProfileUpdate();
+  _MojangApi.default.lazyProfileUpdate(); // log.info('Starting log file processing.', DOMAIN);
+  // LogsParser.prepareLogFiles();
+  // LogsParser.parseLogFiles();
 
-  _CustomLogger.default.info('Starting log file processing.', DOMAIN);
 
-  _LogsParser.default.prepareLogFiles();
+  _DatParser.default.parsePlayerdata();
 
-  _LogsParser.default.parseLogFiles();
+  for (var _i = 0; _i < Object.keys(_Configuration.default.PLAYERS).length; _i++) {
+    _PlayerDataCombiner.default.combinePlayerData(Object.keys(_Configuration.default.PLAYERS)[_i]);
+  }
 } // log.info('Starting JSON file processing (advancements, stats)', DOMAIN);
 // log.info('Starting NBT data processing (level.dat, playerdata)', DOMAIN);
