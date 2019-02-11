@@ -14,6 +14,7 @@ let rundir = path.dirname(process.argv[1]),
     defaultOpts = {
         'minecraft': rundir,
         'outputdir': path.join(rundir, 'output'),
+        'workdir': path.join(rundir, 'mcdata_cache'),
         'loglevel': 'info',
         'help': false,
         'use-env': false
@@ -21,6 +22,7 @@ let rundir = path.dirname(process.argv[1]),
     knownOpts = {
         'minecraft': path,
         'outputdir': path,
+        'workdir': path,
         'loglevel': loglevels,
         'help': Boolean,
         'use-env': Boolean
@@ -41,6 +43,7 @@ let rundir = path.dirname(process.argv[1]),
     --help, -h                      Show this help message and exit.
     --minecraft=path                The minecraft folder containing server.properties and world.
     --outputdir=path                The directory to save the generated JSON files into.
+    --workdir=path                  The directory to cache data used by this program
     --use-env                       Load configuration values from ENV:
                                         env.MINECRAFT_DIR and env.OUTPUT_DIR
     --loglevel=<level>              How verbose to log to the console. Also you can use one of
@@ -53,112 +56,184 @@ let rundir = path.dirname(process.argv[1]),
     helpMessage = `mcdata-to-json ${ version.version }
     A node.js module to turn the data from your minecraft server or world into json.`;
 
+let isValidPath = function(testpath, description) {
+    const fileOrDirName = path.basename(testpath);
+
+    try {
+        fs.statSync(testpath);
+    } catch (err) {
+        if (err.code === 'ENOENT') {
+            log.warn(`No ${ fileOrDirName } found! (${description})`, DOMAIN);
+            return false;
+        } else {
+            throw err;
+        }
+    }
+    log.debug(`✔ ${fileOrDirName} exists.`, DOMAIN);
+    return true;
+};
+
 const LOGLEVEL = (loglevels.indexOf(parsedOpts.loglevel));
 
 log.setLevel(LOGLEVEL);
-
-log.debug('Process.env vars:', DOMAIN);
-log.debug(`MINECRAFT_DIR: ${ process.env.MINECRAFT_DIR }`, DOMAIN);
-log.debug(`OUTPUT_DIR: ${ process.env.OUTPUT_DIR }`, DOMAIN);
+log.debug(`current working dir ${ rundir}`, DOMAIN);
 
 if (parsedOpts.help) {
     console.log(helpMessage); // eslint-disable-line no-console
     console.log(usage); // eslint-disable-line no-console
     process.exit(0);
 }
+
 if (parsedOpts['use-env']) {
-    log.debug('Trying to load values from environment.', DOMAIN);
+    log.debug('use-env flag set, loading config from environment.', DOMAIN);
+    log.debug('Process.env vars:', DOMAIN);
+    log.debug(`MINECRAFT_DIR: ${ process.env.MINECRAFT_DIR }`, DOMAIN);
+    log.debug(`OUTPUT_DIR: ${ process.env.OUTPUT_DIR }`, DOMAIN);
+    log.debug(`WORK_DIR: ${ process.env.WORK_DIR }`, DOMAIN);
     if (parsedOpts.minecraft === defaultOpts.minecraft && process.env.MINECRAFT_DIR) {
         parsedOpts.minecraft = process.env.MINECRAFT_DIR;
     }
     if (!parsedOpts.outputdir === defaultOpts.outputdir && process.env.OUTPUT_DIR) {
         parsedOpts.outputdir = process.env.OUTPUT_DIR;
     }
+    if (!parsedOpts.workdir === defaultOpts.workdir && process.env.OUTPUT_DIR) {
+        parsedOpts.workdir = process.env.WORK_DIR;
+    }
 }
 
-
-log.debug(`current working dir ${ rundir}`, DOMAIN);
-
-const MC_DIR = parsedOpts.minecraft,
-    PROPERTIES_FILE = path.join(MC_DIR, 'server.properties'),
-    LOGS_DIR = path.join(MC_DIR, 'logs'),
-    WORLD_DIR = path.join(MC_DIR, 'world'),
-    STATS_DIR = path.join(WORLD_DIR, 'stats'),
-    ADVANCEMENTS_DIR = path.join(WORLD_DIR, 'advancements'),
-    PLAYERDATA_DIR = path.join(WORLD_DIR, 'playerdata'),
-    OUTPUT_DIR = parsedOpts.outputdir,
-    TEMP_DIR = path.join(OUTPUT_DIR, 'temp'),
-    DATA_DIR = path.join(OUTPUT_DIR, 'data'),
-    ASSETS_DIR = path.join(OUTPUT_DIR, 'assets');
-
-if (!MC_DIR) {
+// Check minecraft dir is set..
+if (!parsedOpts.minecraft) {
     log.error('No minecraft directory set!', DOMAIN);
     process.exit(1);
 }
-log.info(`Set Minecraft dir: ${ MC_DIR }`, DOMAIN);
+log.debug(`Checking Minecraft dir: ${ parsedOpts.minecraft }`, DOMAIN);
 // Check for server.properties, to validate minecraft folder..
-try {
-    fs.statSync(PROPERTIES_FILE);
-    fs.statSync(WORLD_DIR);
-    fs.statSync(LOGS_DIR);
-} catch (err) {
-    if (err.code === 'ENOENT') {
-        let testedPath = path.basename(err.path);
-
-        log.error(`No ${ testedPath } found in Minecraft dir!`, DOMAIN);
-        process.exit(1);
-    } else {
-        throw err;
-    }
+if (isValidPath(path.join(parsedOpts.minecraft, 'server.properties'), 'Minecraft server configuration file')) {
+    parsedOpts.serverproprties = path.join(parsedOpts.minecraft, 'server.properties');
 }
-// Check for items with the world directory
-try {
-    fs.statSync(STATS_DIR);
-    fs.statSync(ADVANCEMENTS_DIR);
-    fs.statSync(PLAYERDATA_DIR);
-} catch (err) {
-    if (err.code === 'ENOENT') {
-        let testedPath = path.basename(err.path);
-
-        log.error(`No ${ testedPath } found in Minecraft world dir!`, DOMAIN);
-        process.exit(1);
-    } else {
-        throw err;
-    }
+if (isValidPath(path.join(parsedOpts.minecraft, 'minecraft.jar'), 'Minecraft client jar')) {
+    parsedOpts.mcjar = path.join(parsedOpts.minecraft, 'minecraft.jar');
+} else if (isValidPath(path.join(parsedOpts.minecraft, 'server.jar'), 'Minecraft server jar')) {
+    parsedOpts.mcjar = path.join(parsedOpts.minecraft, 'server.jar');
+} else {
+    log.error('Couldn\'t locate a server.jar or minecraft.jar. Please download and put it in the minecraft directory.', DOMAIN);
 }
-log.info('Minecraft dir passed validation checks.', DOMAIN);
+if (isValidPath(path.join(parsedOpts.minecraft, 'world'), 'Minecraft world directory')) {
+    parsedOpts.worlddir = path.join(parsedOpts.minecraft, 'world');
+}
+if (isValidPath(path.join(parsedOpts.minecraft, 'logs'), 'Minecraft log file directory')) {
+    parsedOpts.logdir = path.join(parsedOpts.minecraft, 'logs');
+}
+if (isValidPath(path.join(parsedOpts.minecraft, 'ops.json'), 'List of OPs on the server.')) {
+    parsedOpts.opsjson = path.join(parsedOpts.minecraft, 'ops.json');
+}
+if (isValidPath(path.join(parsedOpts.minecraft, 'usercache.json'), 'Cache connecting UUIDs to player names.')) {
+    parsedOpts.usercachejson = path.join(parsedOpts.minecraft, 'usercache.json');
+}
+// Check for valid paths inside world dir
+if (isValidPath(path.join(parsedOpts.worlddir, 'level.dat'), 'World data file. Found in world directory.')) {
+    parsedOpts.leveldat = path.join(parsedOpts.worlddir, 'level.dat');
+}
+if (isValidPath(path.join(parsedOpts.worlddir, 'advancements'), 'Player advancement progress. Found in world directory.')) {
+    parsedOpts.advancements = path.join(parsedOpts.worlddir, 'advancements');
+}
+if (isValidPath(path.join(parsedOpts.worlddir, 'data'), 'Additional world data files. Found in world directory.')) {
+    parsedOpts.worlddata = path.join(parsedOpts.worlddir, 'data');
+}
+if (isValidPath(path.join(parsedOpts.worlddir, 'datapacks'), 'Found in world directory.')) {
+    parsedOpts.datapacks = path.join(parsedOpts.worlddir, 'datapacks');
+}
+if (isValidPath(path.join(parsedOpts.worlddir, 'playerdata'), 'Contains player info. Found in world directory.')) {
+    parsedOpts.playerdata = path.join(parsedOpts.worlddir, 'playerdata');
+}
+if (isValidPath(path.join(parsedOpts.worlddir, 'stats'), 'Contains player stats. Found in world directory.')) {
+    parsedOpts.stats = path.join(parsedOpts.worlddir, 'stats');
+}
+if (isValidPath(path.join(parsedOpts.worlddir, 'region'), 'Overworld region files. Found in world directory.')) {
+    parsedOpts.overworld = path.join(parsedOpts.worlddir, 'region');
+}
+if (isValidPath(path.join(parsedOpts.worlddir, 'DIM1'), 'The End region files. Found in world directory.')) {
+    parsedOpts.end = path.join(parsedOpts.worlddir, 'DIM1');
+}
+if (isValidPath(path.join(parsedOpts.worlddir, 'DIM-1'), 'Nether region files. Found in world directory.')) {
+    parsedOpts.nether = path.join(parsedOpts.worlddir, 'DIM-1');
+}
+
+const MC_DIR = parsedOpts.minecraft,
+    PROPERTIES_FILE = parsedOpts.serverproprties,
+    USERCACHE_FILE = parsedOpts.usercachejson,
+    OPSLIST_FILE = parsedOpts.opsjson,
+    MCJAR_FILE = parsedOpts.mcjar,
+    LOGS_DIR = parsedOpts.logdir,
+    WORLD_DIR = parsedOpts.worlddir,
+    WORLDDATA_DIR = parsedOpts.worlddata,
+    STATS_DIR = parsedOpts.stats,
+    ADVANCEMENTS_DIR = parsedOpts.advancements,
+    PLAYERDATA_DIR = parsedOpts.playerdata,
+    LEVELDAT_FILE = parsedOpts.leveldat,
+    OVERWORLD_DIR = parsedOpts.end,
+    NETHER_DIR = parsedOpts.nether,
+    END_DIR = parsedOpts.logdir,
+    OUTPUT_DIR = parsedOpts.outputdir,
+    WORK_DIR = parsedOpts.workdir,
+    TEMP_DIR = path.join(WORK_DIR, '.temp'),
+    EXTRACTED_DIR = path.join(WORK_DIR, 'extracted'),
+    DATA_DIR = path.join(EXTRACTED_DIR, 'data'),
+    ASSETS_DIR = path.join(EXTRACTED_DIR, 'assets');
 
 fs.ensureDirSync(OUTPUT_DIR);
+fs.ensureDirSync(WORK_DIR);
+fs.ensureDirSync(EXTRACTED_DIR);
 fs.ensureDirSync(TEMP_DIR);
 fs.ensureDirSync(DATA_DIR);
 fs.ensureDirSync(ASSETS_DIR);
-log.info(`Set output dir: ${OUTPUT_DIR}`, DOMAIN);
+log.debug(`Set output dir: ${OUTPUT_DIR}`, DOMAIN);
 
 let playerdatFiles = fs.readdirSync(PLAYERDATA_DIR),
-    players = [];
+    players = {};
+
+if (USERCACHE_FILE) {
+    for (let p of fs.readJSONSync(USERCACHE_FILE)) {
+        log.debug(`Discovered cached player: ${p.name} ${p.uuid}`, DOMAIN);
+        players[p.uuid] = p.name;
+    }
+}
 
 for (let f of playerdatFiles) {
     if (f.indexOf('.dat') > -1) {
-        players.push(f.split('.dat')[0]);
-        log.debug(`Discovered player UUID: ${f.split('.dat')[0]}`, DOMAIN);
+        let uuid = (f.split('.dat')[0]);
+
+        if (!players[uuid]) {
+            players[uuid] = `no-name${f.substr(f.length - 5, 1)}`;
+            log.debug(`Discovered un-cached player UUID: ${uuid}`, DOMAIN);
+        }
     }
 }
 const PLAYERS = players;
 
-log.info(`Registered ${PLAYERS.length} players.`, DOMAIN);
+log.info(`Registered ${Object.keys(PLAYERS).length} players.`, DOMAIN);
 
 export default {
     MC_DIR,
     PROPERTIES_FILE,
+    USERCACHE_FILE,
+    OPSLIST_FILE,
+    MCJAR_FILE,
     LOGS_DIR,
     WORLD_DIR,
-    ADVANCEMENTS_DIR,
+    WORLDDATA_DIR,
     STATS_DIR,
+    ADVANCEMENTS_DIR,
     PLAYERDATA_DIR,
+    LEVELDAT_FILE,
+    OVERWORLD_DIR,
+    NETHER_DIR,
+    END_DIR,
     OUTPUT_DIR,
+    WORK_DIR,
     TEMP_DIR,
+    EXTRACTED_DIR,
     DATA_DIR,
     ASSETS_DIR,
-    LOGLEVEL,
     PLAYERS
 };
