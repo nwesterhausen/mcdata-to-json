@@ -10,12 +10,13 @@ import config from './lib/Configuration';
 const DOMAIN = 'LogParser';
 let logfiles = [],
     unzippedFiles = [],
-    logfiledir = '',
-    workdir = '',
-    tmplogPath = '',
-    latestlogDate = '',
-    rawlogJSON = [];
+    rawlogJSON = [],
+    logfiledir = config.LOGS_DIR,
+    latestlogDate = fs.statSync(path.join(logfiledir, 'latest.log')).mtime.toISOString(),
+    workdir = config.TEMP_DIR,
+    tmplogPath = path.join(workdir, 'all_logs.json');
 
+log.debug(`latest.log date: ${ latestlogDate }`, DOMAIN);
 
 let getDateFromFilename = function(filename) {
         // Expects YYYY-MM-DD-#.log
@@ -177,13 +178,6 @@ let getDateFromFilename = function(filename) {
     };
 
 export default {
-    'setConfig': function(config1) {
-        logfiledir = config.LOGS_DIR;
-        latestlogDate = fs.statSync(path.join(logfiledir, 'latest.log')).mtime.toISOString();
-        log.debug(`latest.log date: ${ latestlogDate }`, DOMAIN);
-        workdir = config.TEMP_DIR;
-        tmplogPath = path.join(workdir, 'all_logs.json');
-    },
     'prepareLogFiles': function() {
         let rawLogFiles = fs.readdirSync(logfiledir);
 

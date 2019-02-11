@@ -24,13 +24,16 @@ var _Configuration = _interopRequireDefault(require("./lib/Configuration"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var DOMAIN = 'LogParser';
+
 var logfiles = [],
     unzippedFiles = [],
-    logfiledir = '',
-    workdir = '',
-    tmplogPath = '',
-    latestlogDate = '',
-    rawlogJSON = [];
+    rawlogJSON = [],
+    logfiledir = _Configuration.default.LOGS_DIR,
+    latestlogDate = _fs.default.statSync(_path.default.join(logfiledir, 'latest.log')).mtime.toISOString(),
+    workdir = _Configuration.default.TEMP_DIR,
+    tmplogPath = _path.default.join(workdir, 'all_logs.json');
+
+_CustomLogger.default.debug("latest.log date: ".concat(latestlogDate), DOMAIN);
 
 var getDateFromFilename = function getDateFromFilename(filename) {
   // Expects YYYY-MM-DD-#.log
@@ -197,15 +200,6 @@ var getDateFromFilename = function getDateFromFilename(filename) {
 };
 
 var _default = {
-  'setConfig': function setConfig(config1) {
-    logfiledir = _Configuration.default.LOGS_DIR;
-    latestlogDate = _fs.default.statSync(_path.default.join(logfiledir, 'latest.log')).mtime.toISOString();
-
-    _CustomLogger.default.debug("latest.log date: ".concat(latestlogDate), DOMAIN);
-
-    workdir = _Configuration.default.TEMP_DIR;
-    tmplogPath = _path.default.join(workdir, 'all_logs.json');
-  },
   'prepareLogFiles': function prepareLogFiles() {
     var rawLogFiles = _fs.default.readdirSync(logfiledir);
 
