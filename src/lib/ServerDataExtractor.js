@@ -6,7 +6,7 @@ import fs from 'fs-extra';
 import path from 'path';
 import log from './CustomLogger';
 import config from './Configuration';
-import Progress from 'cli-progress';
+// import Progress from 'cli-progress';
 
 const StreamZip = require('node-stream-zip');
 const DOMAIN = 'DataExtractor';
@@ -23,7 +23,7 @@ let advancementsExported = false,
 
 let extractPromise = function(zippath, outpath, shortname = '', entryprefix = '') {
 
-        const bar = new Progress.Bar({ 'format': `[{bar}] {percentage}% | {value}/{total} | ${shortname === '' ? path.basename(zippath) : shortname}` }, Progress.Presets.rect);
+        // const bar = new Progress.Bar({ 'format': `[{bar}] {percentage}% | {value}/{total} | ${shortname === '' ? path.basename(zippath) : shortname}` }, Progress.Presets.rect);
         const zip = new StreamZip({
             'file': zippath,
             'storeEntries': true
@@ -33,15 +33,15 @@ let extractPromise = function(zippath, outpath, shortname = '', entryprefix = ''
             ZIPFILE_PATH = zippath;
 
         return new Promise( (resolve, reject) => {
-            let entriesExtracted = 1;
+            // let entriesExtracted = 1;
 
             zip.on('error', (err) => {
                 log.error(`Zip failed to open. ${err}`, DOMAIN);
                 reject(err);
             });
-            zip.on('extract', (entry, file) => {
-                bar.update(entriesExtracted++);
-            });
+            // zip.on('extract', (entry, file) => {
+            //     bar.update(entriesExtracted++);
+            // });
             zip.on('ready', () => {
                 log.debug(`Entries read: ${zip.entriesCount}`, DOMAIN);
                 let totalEntries = 0;
@@ -52,7 +52,7 @@ let extractPromise = function(zippath, outpath, shortname = '', entryprefix = ''
                     }
                 }
                 log.debug(`${totalEntries} entries under '${ENTRY_PREFIX}'`, DOMAIN);
-                bar.start(totalEntries, 0);
+                // bar.start(totalEntries, 0);
                 zip.extract(ENTRY_PREFIX, OUTPUT_PATH, (err, count) => {
                     if (err) {
                         log.error(`Error extracting data from zip: ${err}`);
@@ -60,10 +60,10 @@ let extractPromise = function(zippath, outpath, shortname = '', entryprefix = ''
                         reject(err);
                     } else {
                         log.debug(`Extracted ${count} items from ${ZIPFILE_PATH}`, DOMAIN);
-                        bar.update(bar.getTotal());
-                        bar.stop();
+                        // bar.update(bar.getTotal());
+                        // bar.stop();
                         zip.close();
-                        resolve(`Extracted ${count} items from ${ZIPFILE_PATH}`);
+                        resolve(`Extracted ${count} items from ${path.basename(ZIPFILE_PATH)}`);
                     }
                 });
             });

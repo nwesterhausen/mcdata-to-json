@@ -13,14 +13,13 @@ var _CustomLogger = _interopRequireDefault(require("./CustomLogger"));
 
 var _Configuration = _interopRequireDefault(require("./Configuration"));
 
-var _cliProgress = _interopRequireDefault(require("cli-progress"));
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /**
  * Tool to create JSON files with minecraft server data:
  * blocks, items, advancements are all used by scripts.
  */
+// import Progress from 'cli-progress';
 var StreamZip = require('node-stream-zip');
 
 var DOMAIN = 'DataExtractor';
@@ -39,9 +38,7 @@ var advancementsExported = false,
 var extractPromise = function extractPromise(zippath, outpath) {
   var shortname = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : '';
   var entryprefix = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : '';
-  var bar = new _cliProgress.default.Bar({
-    'format': "[{bar}] {percentage}% | {value}/{total} | ".concat(shortname === '' ? _path.default.basename(zippath) : shortname)
-  }, _cliProgress.default.Presets.rect);
+  // const bar = new Progress.Bar({ 'format': `[{bar}] {percentage}% | {value}/{total} | ${shortname === '' ? path.basename(zippath) : shortname}` }, Progress.Presets.rect);
   var zip = new StreamZip({
     'file': zippath,
     'storeEntries': true
@@ -50,15 +47,15 @@ var extractPromise = function extractPromise(zippath, outpath) {
       OUTPUT_PATH = outpath,
       ZIPFILE_PATH = zippath;
   return new Promise(function (resolve, reject) {
-    var entriesExtracted = 1;
+    // let entriesExtracted = 1;
     zip.on('error', function (err) {
       _CustomLogger.default.error("Zip failed to open. ".concat(err), DOMAIN);
 
       reject(err);
-    });
-    zip.on('extract', function (entry, file) {
-      bar.update(entriesExtracted++);
-    });
+    }); // zip.on('extract', (entry, file) => {
+    //     bar.update(entriesExtracted++);
+    // });
+
     zip.on('ready', function () {
       _CustomLogger.default.debug("Entries read: ".concat(zip.entriesCount), DOMAIN);
 
@@ -74,9 +71,9 @@ var extractPromise = function extractPromise(zippath, outpath) {
         }
       }
 
-      _CustomLogger.default.debug("".concat(totalEntries, " entries under '").concat(ENTRY_PREFIX, "'"), DOMAIN);
+      _CustomLogger.default.debug("".concat(totalEntries, " entries under '").concat(ENTRY_PREFIX, "'"), DOMAIN); // bar.start(totalEntries, 0);
 
-      bar.start(totalEntries, 0);
+
       zip.extract(ENTRY_PREFIX, OUTPUT_PATH, function (err, count) {
         if (err) {
           _CustomLogger.default.error("Error extracting data from zip: ".concat(err));
@@ -84,12 +81,12 @@ var extractPromise = function extractPromise(zippath, outpath) {
           zip.close();
           reject(err);
         } else {
-          _CustomLogger.default.debug("Extracted ".concat(count, " items from ").concat(ZIPFILE_PATH), DOMAIN);
+          _CustomLogger.default.debug("Extracted ".concat(count, " items from ").concat(ZIPFILE_PATH), DOMAIN); // bar.update(bar.getTotal());
+          // bar.stop();
 
-          bar.update(bar.getTotal());
-          bar.stop();
+
           zip.close();
-          resolve("Extracted ".concat(count, " items from ").concat(ZIPFILE_PATH));
+          resolve("Extracted ".concat(count, " items from ").concat(_path.default.basename(ZIPFILE_PATH)));
         }
       });
     });
