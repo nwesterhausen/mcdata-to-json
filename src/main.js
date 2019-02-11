@@ -26,8 +26,9 @@ if (!ServerDataExtractor.checkForData()) {
     ServerDataExtractor.extractMinecraftDataPromise()
         .then((val) => {
             log.debug(`Data export promise returned ${val}`, DOMAIN);
-            log.info('Completed export of minecraft data.', DOMAIN);
-            process.exit(0);
+            ServerDataExtractor.extractMinecraftAssetsPromise();
+        }).then((val) => {
+            log.debug(`Asset export promise returned ${val}`, DOMAIN);
         }).catch( (val) => {
             log.error(val, DOMAIN);
         });

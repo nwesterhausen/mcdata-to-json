@@ -21,65 +21,69 @@ let advancementsExported = false,
     structuresOutputPath = path.join(config.DATA_DIR, 'minecraft', 'structures'),
     tagsOutputPath = path.join(config.DATA_DIR, 'minecraft', 'tags');
 
-let extractMinecraftDataPromise = function() {
-        let serverzipPath = path.join(config.TEMP_DIR, 'server.zip');
-        const bar = new Progress.Bar({}, Progress.Presets.shades_classic);
+let extractPromise = function(zippath, outpath, shortname = '', entryprefix = '') {
 
-        log.debug(`Trying to extract from ${config.MCJAR_FILE} by copying to ${serverzipPath}`, DOMAIN);
-        fs.copyFileSync(config.MCJAR_FILE, serverzipPath);
+        const bar = new Progress.Bar({ 'format': `[{bar}] {percentage}% | {value}/{total} | ${shortname === '' ? path.basename(zippath) : shortname}` }, Progress.Presets.rect);
         const zip = new StreamZip({
-            'file': serverzipPath,
+            'file': zippath,
             'storeEntries': true
         });
+        const ENTRY_PREFIX = entryprefix,
+            OUTPUT_PATH = outpath,
+            ZIPFILE_PATH = zippath;
 
         return new Promise( (resolve, reject) => {
             let entriesExtracted = 1;
 
             zip.on('error', (err) => {
                 log.error(`Zip failed to open. ${err}`, DOMAIN);
-                reject();
+                reject(err);
             });
             zip.on('extract', (entry, file) => {
                 bar.update(entriesExtracted++);
             });
             zip.on('ready', () => {
                 log.debug(`Entries read: ${zip.entriesCount}`, DOMAIN);
-                let dataEntries = 0, assetsEntries = 0;
+                let totalEntries = 0;
 
                 for (const entry of Object.values(zip.entries())) {
-                    if (entry.name.startsWith('data/')) {
-                        dataEntries++;
-                    } else if (entry.name.startsWith('assets/')) {
-                        assetsEntries++;
+                    if (entry.name.startsWith(ENTRY_PREFIX)) {
+                        totalEntries++;
                     }
                 }
-                log.debug(`${dataEntries} entries under 'data/'`);
-                log.debug(`${assetsEntries} entries under 'assets/'`);
-                bar.start(dataEntries + assetsEntries, 0);
-                zip.extract('data', config.DATA_DIR, (err, count) => {
+                log.debug(`${totalEntries} entries under '${ENTRY_PREFIX}'`, DOMAIN);
+                bar.start(totalEntries, 0);
+                zip.extract(ENTRY_PREFIX, OUTPUT_PATH, (err, count) => {
                     if (err) {
                         log.error(`Error extracting data from zip: ${err}`);
                         zip.close();
                         reject(err);
                     } else {
-                        log.debug(`Extracted ${count} items from ${serverzipPath}`, DOMAIN);
-                        zip.extract('assets', config.ASSETS_DIR, (err1, count1) => {
-                            if (err) {
-                                log.error(`Error extracting lang from zip: ${err1}`, DOMAIN);
-                                zip.close();
-                                reject(err1);
-                            } else {
-                                bar.update(bar.getTotal());
-                                bar.stop();
-                                log.debug(`Extracted ${count1} items from ${serverzipPath}`, DOMAIN);
-                                zip.close();
-                                resolve();
-                            }
-                        });
+                        log.debug(`Extracted ${count} items from ${ZIPFILE_PATH}`, DOMAIN);
+                        bar.update(bar.getTotal());
+                        bar.stop();
+                        zip.close();
+                        resolve(`Extracted ${count} items from ${ZIPFILE_PATH}`);
                     }
                 });
             });
         });
+    },
+    extractMinecraftDataPromise = function() {
+        let serverzipPath = path.join(config.TEMP_DIR, 'server.zip');
+
+        log.debug(`Trying to extract from ${config.MCJAR_FILE} by copying to ${serverzipPath}`, DOMAIN);
+        fs.copyFileSync(config.MCJAR_FILE, serverzipPath);
+
+        return extractPromise(serverzipPath, config.DATA_DIR, `${path.basename(config.MCJAR_FILE)} data`, 'data/');
+    },
+    extractMinecraftAssetsPromise = function() {
+        let serverzipPath = path.join(config.TEMP_DIR, 'server.zip');
+
+        log.debug(`Trying to extract from ${config.MCJAR_FILE} by copying to ${serverzipPath}`, DOMAIN);
+        fs.copyFileSync(config.MCJAR_FILE, serverzipPath);
+
+        return extractPromise(serverzipPath, config.ASSETS_DIR, `${path.basename(config.MCJAR_FILE)} assets`, 'assets/');
     },
     runDataGenerator = function() {
         log.info('Extracting data from server.jar (unzipping).', DOMAIN);
@@ -134,5 +138,7 @@ export default {
     recipesExported,
     tagsExported,
     checkForData,
-    extractMinecraftDataPromise
+    extractMinecraftDataPromise,
+    extractMinecraftAssetsPromise,
+    extractPromise
 };

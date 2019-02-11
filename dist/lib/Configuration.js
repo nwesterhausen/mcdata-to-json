@@ -130,8 +130,8 @@ if (isValidPath(_path.default.join(parsedOpts.minecraft, 'server.properties'), '
   parsedOpts.serverproprties = _path.default.join(parsedOpts.minecraft, 'server.properties');
 }
 
-if (isValidPath(_path.default.join(parsedOpts.minecraft, 'minecraft.jar'), 'Minecraft client jar')) {
-  parsedOpts.mcjar = _path.default.join(parsedOpts.minecraft, 'minecraft.jar');
+if (isValidPath(_path.default.join(parsedOpts.minecraft, 'client.jar'), 'Minecraft client jar')) {
+  parsedOpts.mcjar = _path.default.join(parsedOpts.minecraft, 'client.jar');
 } else if (isValidPath(_path.default.join(parsedOpts.minecraft, 'server.jar'), 'Minecraft server jar')) {
   parsedOpts.mcjar = _path.default.join(parsedOpts.minecraft, 'server.jar');
 } else {

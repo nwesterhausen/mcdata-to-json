@@ -39,9 +39,9 @@ if (!_ServerDataExtractor.default.checkForData()) {
   _ServerDataExtractor.default.extractMinecraftDataPromise().then(function (val) {
     _CustomLogger.default.debug("Data export promise returned ".concat(val), DOMAIN);
 
-    _CustomLogger.default.info('Completed export of minecraft data.', DOMAIN);
-
-    process.exit(0);
+    _ServerDataExtractor.default.extractMinecraftAssetsPromise();
+  }).then(function (val) {
+    _CustomLogger.default.debug("Asset export promise returned ".concat(val), DOMAIN);
   }).catch(function (val) {
     _CustomLogger.default.error(val, DOMAIN);
   });

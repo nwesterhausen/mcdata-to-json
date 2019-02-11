@@ -111,8 +111,8 @@ log.debug(`Checking Minecraft dir: ${ parsedOpts.minecraft }`, DOMAIN);
 if (isValidPath(path.join(parsedOpts.minecraft, 'server.properties'), 'Minecraft server configuration file')) {
     parsedOpts.serverproprties = path.join(parsedOpts.minecraft, 'server.properties');
 }
-if (isValidPath(path.join(parsedOpts.minecraft, 'minecraft.jar'), 'Minecraft client jar')) {
-    parsedOpts.mcjar = path.join(parsedOpts.minecraft, 'minecraft.jar');
+if (isValidPath(path.join(parsedOpts.minecraft, 'client.jar'), 'Minecraft client jar')) {
+    parsedOpts.mcjar = path.join(parsedOpts.minecraft, 'client.jar');
 } else if (isValidPath(path.join(parsedOpts.minecraft, 'server.jar'), 'Minecraft server jar')) {
     parsedOpts.mcjar = path.join(parsedOpts.minecraft, 'server.jar');
 } else {
