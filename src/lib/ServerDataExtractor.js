@@ -5,59 +5,47 @@
 import fs from 'fs-extra';
 import path from 'path';
 import log from './CustomLogger';
+import config from './Configuration';
 
 const StreamZip = require('node-stream-zip');
 const DOMAIN = 'DataExtractor';
-let minecraftRoot = 'unset',
-    tempRoot = 'unset',
-    serverjarPath = 'unset',
-    dataOutputPath = 'unset',
-    assetsOutputPath = 'unset',
-    advancementsExported = false,
+let advancementsExported = false,
     loottablesExported = false,
     recipesExported = false,
     tagsExported = false,
     structuresExported = false,
-    advancementsOutputPath = 'unset',
-    loottablesOutputPath = 'unset',
-    recipesOutputPath = 'unset',
-    structuresOutputPath = 'unset',
-    tagsOutputPath = 'unset',
-    busy = false;
+    advancementsOutputPath = path.join(config.DATA_DIR, 'minecraft', 'advancements'),
+    loottablesOutputPath = path.join(config.DATA_DIR, 'minecraft', 'loot_tables'),
+    recipesOutputPath = path.join(config.DATA_DIR, 'minecraft', 'recipes'),
+    structuresOutputPath = path.join(config.DATA_DIR, 'minecraft', 'structures'),
+    tagsOutputPath = path.join(config.DATA_DIR, 'minecraft', 'tags');
 
-let getBusy = function() {
-        return busy;
-    },
-    extractMinecraftDataPromise = function() {
-        let serverzipPath = path.join(tempRoot, 'server.zip');
+let extractMinecraftDataPromise = function() {
+        let serverzipPath = path.join(config.TEMP_DIR, 'server.zip');
 
-        log.debug(`Trying to extract from ${serverjarPath} by copying to ${serverzipPath}`, DOMAIN);
-        fs.copyFileSync(serverjarPath, serverzipPath);
+        log.debug(`Trying to extract from ${config.MCJAR_FILE} by copying to ${serverzipPath}`, DOMAIN);
+        fs.copyFileSync(config.MCJAR_FILE, serverzipPath);
         const zip = new StreamZip({
             'file': serverzipPath
         });
-        const datadir = dataOutputPath;
-        const assetsdir = path.join(tempRoot, 'assets');
 
-        fs.ensureDirSync(datadir);
-        fs.ensureDirSync(assetsdir);
         return new Promise( (resolve, reject) => {
             zip.on('error', (err) => {
                 log.error(`Zip failed to open. ${err}`, DOMAIN);
                 reject();
             });
-            zip.on('extract', (entry, file) => {
-                log.debug(`Extracted ${entry.name} to ${file}`, DOMAIN);
-            });
+            // zip.on('extract', (entry, file) => {
+            //     log.debug(`Extracted ${entry.name} to ${file}`, DOMAIN);
+            // });
             zip.on('ready', () => {
-                zip.extract('data', datadir, (err, count) => {
+                zip.extract('data', config.DATA_DIR, (err, count) => {
                     if (err) {
                         log.error(`Error extracting data from zip: ${err}`);
                         zip.close();
                         reject(err);
                     } else {
                         log.debug(`Extracted ${count} items from ${serverzipPath}`, DOMAIN);
-                        zip.extract('assets', assetsdir, (err1, count1) => {
+                        zip.extract('assets', config.ASSETS_DIR, (err1, count1) => {
                             if (err) {
                                 log.error(`Error extracting lang from zip: ${err1}`, DOMAIN);
                                 zip.close();
@@ -74,14 +62,11 @@ let getBusy = function() {
         });
     },
     runDataGenerator = function() {
-        busy = true;
         log.info('Extracting data from server.jar (unzipping).', DOMAIN);
         extractMinecraftDataPromise().then( (val) => {
             log.debug(val, DOMAIN);
-            busy = false;
         }).catch( (val) => {
             log.error(val, DOMAIN);
-            busy = false;
         });
     },
     checkForData = function() {
@@ -94,8 +79,8 @@ let getBusy = function() {
         // blocklistExported = false;
         // commandlistExported = false;
         // registriesExported = false;
-        if (fs.existsSync(dataOutputPath)) {
-            if (fs.existsSync(path.join(dataOutputPath, 'minecraft'))) {
+        if (fs.existsSync(config.DATA_DIR)) {
+            if (fs.existsSync(path.join(config.DATA_DIR, 'minecraft'))) {
                 advancementsExported = fs.existsSync(advancementsOutputPath);
                 loottablesExported = fs.existsSync(loottablesOutputPath);
                 recipesExported = fs.existsSync(recipesOutputPath);
@@ -107,18 +92,6 @@ let getBusy = function() {
             //     commandlistExported = fs.existsSync(path.join(tempRoot, 'data', 'reports', 'commands.json'));
             //     registriesExported = fs.existsSync(path.join(tempRoot, 'data', 'reports', 'registries.json'));
             // }
-        } else {
-            busy = true;
-            extractMinecraftDataPromise()
-                .then((val) => {
-                    log.debug(`Data export promise returned ${val}`, DOMAIN);
-                    log.info('Completed export of minecraft data.', DOMAIN);
-                    checkForData();
-                    busy = false;
-                }).catch( (val) => {
-                    log.error(val, DOMAIN);
-                    busy = false;
-                });
         }
         log.debug(`advancements data is cached: ${advancementsExported}`, DOMAIN);
         log.debug(`loottables data is cached: ${loottablesExported}`, DOMAIN);
@@ -128,24 +101,18 @@ let getBusy = function() {
         // log.debug(`blocklist data is cached: ${blocklistExported}`, DOMAIN);
         // log.debug(`commandlist data is cached: ${commandlistExported}`, DOMAIN);
         // log.debug(`registries data is cached: ${registriesExported}`, DOMAIN);
+        let retval = advancementsExported & loottablesExported & recipesExported & structuresExported & tagsExported;
+
+        log.debug(`checkForData returning ${retval}`, DOMAIN);
+        return retval;
     };
 
 export default {
-    'setConfig': function(config) {
-        minecraftRoot = config.MC_DIR;
-        dataOutputPath = config.DATA_DIR;
-        advancementsOutputPath = path.join(config.DATA_DIR, 'advancements');
-        loottablesOutputPath = path.join(config.DATA_DIR, 'loot_tables');
-        recipesOutputPath = path.join(config.DATA_DIR, 'recipes');
-        structuresOutputPath = path.join(config.DATA_DIR, 'structures');
-        tagsOutputPath = path.join(config.DATA_DIR, 'tags');
-        serverjarPath = path.join(minecraftRoot, 'server.jar');
-        checkForData();
-    },
     runDataGenerator,
     advancementsExported,
     loottablesExported,
     recipesExported,
     tagsExported,
-    getBusy
+    checkForData,
+    extractMinecraftDataPromise
 };

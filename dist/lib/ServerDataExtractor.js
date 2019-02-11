@@ -11,6 +11,8 @@ var _path = _interopRequireDefault(require("path"));
 
 var _CustomLogger = _interopRequireDefault(require("./CustomLogger"));
 
+var _Configuration = _interopRequireDefault(require("./Configuration"));
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /**
@@ -20,55 +22,39 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 var StreamZip = require('node-stream-zip');
 
 var DOMAIN = 'DataExtractor';
-var minecraftRoot = 'unset',
-    tempRoot = 'unset',
-    serverjarPath = 'unset',
-    dataOutputPath = 'unset',
-    assetsOutputPath = 'unset',
-    advancementsExported = false,
+
+var advancementsExported = false,
     loottablesExported = false,
     recipesExported = false,
     tagsExported = false,
     structuresExported = false,
-    advancementsOutputPath = 'unset',
-    loottablesOutputPath = 'unset',
-    recipesOutputPath = 'unset',
-    structuresOutputPath = 'unset',
-    tagsOutputPath = 'unset',
-    busy = false;
+    advancementsOutputPath = _path.default.join(_Configuration.default.DATA_DIR, 'minecraft', 'advancements'),
+    loottablesOutputPath = _path.default.join(_Configuration.default.DATA_DIR, 'minecraft', 'loot_tables'),
+    recipesOutputPath = _path.default.join(_Configuration.default.DATA_DIR, 'minecraft', 'recipes'),
+    structuresOutputPath = _path.default.join(_Configuration.default.DATA_DIR, 'minecraft', 'structures'),
+    tagsOutputPath = _path.default.join(_Configuration.default.DATA_DIR, 'minecraft', 'tags');
 
-var getBusy = function getBusy() {
-  return busy;
-},
-    extractMinecraftDataPromise = function extractMinecraftDataPromise() {
-  var serverzipPath = _path.default.join(tempRoot, 'server.zip');
+var extractMinecraftDataPromise = function extractMinecraftDataPromise() {
+  var serverzipPath = _path.default.join(_Configuration.default.TEMP_DIR, 'server.zip');
 
-  _CustomLogger.default.debug("Trying to extract from ".concat(serverjarPath, " by copying to ").concat(serverzipPath), DOMAIN);
+  _CustomLogger.default.debug("Trying to extract from ".concat(_Configuration.default.MCJAR_FILE, " by copying to ").concat(serverzipPath), DOMAIN);
 
-  _fsExtra.default.copyFileSync(serverjarPath, serverzipPath);
+  _fsExtra.default.copyFileSync(_Configuration.default.MCJAR_FILE, serverzipPath);
 
   var zip = new StreamZip({
     'file': serverzipPath
   });
-  var datadir = dataOutputPath;
-
-  var assetsdir = _path.default.join(tempRoot, 'assets');
-
-  _fsExtra.default.ensureDirSync(datadir);
-
-  _fsExtra.default.ensureDirSync(assetsdir);
-
   return new Promise(function (resolve, reject) {
     zip.on('error', function (err) {
       _CustomLogger.default.error("Zip failed to open. ".concat(err), DOMAIN);
 
       reject();
-    });
-    zip.on('extract', function (entry, file) {
-      _CustomLogger.default.debug("Extracted ".concat(entry.name, " to ").concat(file), DOMAIN);
-    });
+    }); // zip.on('extract', (entry, file) => {
+    //     log.debug(`Extracted ${entry.name} to ${file}`, DOMAIN);
+    // });
+
     zip.on('ready', function () {
-      zip.extract('data', datadir, function (err, count) {
+      zip.extract('data', _Configuration.default.DATA_DIR, function (err, count) {
         if (err) {
           _CustomLogger.default.error("Error extracting data from zip: ".concat(err));
 
@@ -77,7 +63,7 @@ var getBusy = function getBusy() {
         } else {
           _CustomLogger.default.debug("Extracted ".concat(count, " items from ").concat(serverzipPath), DOMAIN);
 
-          zip.extract('assets', assetsdir, function (err1, count1) {
+          zip.extract('assets', _Configuration.default.ASSETS_DIR, function (err1, count1) {
             if (err) {
               _CustomLogger.default.error("Error extracting lang from zip: ".concat(err1), DOMAIN);
 
@@ -96,18 +82,12 @@ var getBusy = function getBusy() {
   });
 },
     runDataGenerator = function runDataGenerator() {
-  busy = true;
-
   _CustomLogger.default.info('Extracting data from server.jar (unzipping).', DOMAIN);
 
   extractMinecraftDataPromise().then(function (val) {
     _CustomLogger.default.debug(val, DOMAIN);
-
-    busy = false;
   }).catch(function (val) {
     _CustomLogger.default.error(val, DOMAIN);
-
-    busy = false;
   });
 },
     checkForData = function checkForData() {
@@ -121,8 +101,8 @@ var getBusy = function getBusy() {
   // commandlistExported = false;
   // registriesExported = false;
 
-  if (_fsExtra.default.existsSync(dataOutputPath)) {
-    if (_fsExtra.default.existsSync(_path.default.join(dataOutputPath, 'minecraft'))) {
+  if (_fsExtra.default.existsSync(_Configuration.default.DATA_DIR)) {
+    if (_fsExtra.default.existsSync(_path.default.join(_Configuration.default.DATA_DIR, 'minecraft'))) {
       advancementsExported = _fsExtra.default.existsSync(advancementsOutputPath);
       loottablesExported = _fsExtra.default.existsSync(loottablesOutputPath);
       recipesExported = _fsExtra.default.existsSync(recipesOutputPath);
@@ -134,20 +114,6 @@ var getBusy = function getBusy() {
     //     registriesExported = fs.existsSync(path.join(tempRoot, 'data', 'reports', 'registries.json'));
     // }
 
-  } else {
-    busy = true;
-    extractMinecraftDataPromise().then(function (val) {
-      _CustomLogger.default.debug("Data export promise returned ".concat(val), DOMAIN);
-
-      _CustomLogger.default.info('Completed export of minecraft data.', DOMAIN);
-
-      checkForData();
-      busy = false;
-    }).catch(function (val) {
-      _CustomLogger.default.error(val, DOMAIN);
-
-      busy = false;
-    });
   }
 
   _CustomLogger.default.debug("advancements data is cached: ".concat(advancementsExported), DOMAIN);
@@ -162,25 +128,21 @@ var getBusy = function getBusy() {
   // log.debug(`commandlist data is cached: ${commandlistExported}`, DOMAIN);
   // log.debug(`registries data is cached: ${registriesExported}`, DOMAIN);
 
+
+  var retval = advancementsExported & loottablesExported & recipesExported & structuresExported & tagsExported;
+
+  _CustomLogger.default.debug("checkForData returning ".concat(retval), DOMAIN);
+
+  return retval;
 };
 
 var _default = {
-  'setConfig': function setConfig(config) {
-    minecraftRoot = config.MC_DIR;
-    dataOutputPath = config.DATA_DIR;
-    advancementsOutputPath = _path.default.join(config.DATA_DIR, 'advancements');
-    loottablesOutputPath = _path.default.join(config.DATA_DIR, 'loot_tables');
-    recipesOutputPath = _path.default.join(config.DATA_DIR, 'recipes');
-    structuresOutputPath = _path.default.join(config.DATA_DIR, 'structures');
-    tagsOutputPath = _path.default.join(config.DATA_DIR, 'tags');
-    serverjarPath = _path.default.join(minecraftRoot, 'server.jar');
-    checkForData();
-  },
   runDataGenerator: runDataGenerator,
   advancementsExported: advancementsExported,
   loottablesExported: loottablesExported,
   recipesExported: recipesExported,
   tagsExported: tagsExported,
-  getBusy: getBusy
+  checkForData: checkForData,
+  extractMinecraftDataPromise: extractMinecraftDataPromise
 };
 exports.default = _default;
