@@ -12,6 +12,10 @@ var _AdvancementParser = _interopRequireDefault(require("./AdvancementParser"));
 
 var _MojangApi = _interopRequireDefault(require("./lib/MojangApi"));
 
+var _fsExtra = _interopRequireDefault(require("fs-extra"));
+
+var _path = _interopRequireDefault(require("path"));
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /**
@@ -36,12 +40,20 @@ if (!_ServerDataExtractor.default.checkForData()) {
 
   _CustomLogger.default.warn('Quitting after data extracted.', DOMAIN);
 
-  _ServerDataExtractor.default.extractMinecraftDataPromise().then(function (val) {
-    _CustomLogger.default.debug("Data export promise returned ".concat(val), DOMAIN);
+  var promises = [];
+  promises.push(_ServerDataExtractor.default.extractMinecraftAssetsPromise());
+  promises.push(_ServerDataExtractor.default.extractMinecraftDataPromise());
 
-    _ServerDataExtractor.default.extractMinecraftAssetsPromise();
-  }).then(function (val) {
-    _CustomLogger.default.debug("Asset export promise returned ".concat(val), DOMAIN);
+  if (_Configuration.default.DATAPACKS_DIR) {
+    var possibleDPs = _fsExtra.default.readdirSync(_Configuration.default.DATAPACKS_DIR);
+
+    for (var i = 0; i < possibleDPs.length; i++) {
+      promises.push(_ServerDataExtractor.default.extractPromise(_path.default.join(_Configuration.default.DATAPACKS_DIR, possibleDPs[i]), _Configuration.default.EXTRACTED_DIR));
+    }
+  }
+
+  Promise.all(promises).then(function (val) {
+    _CustomLogger.default.debug("Promise returned ".concat(val), DOMAIN);
   }).catch(function (val) {
     _CustomLogger.default.error(val, DOMAIN);
   });
