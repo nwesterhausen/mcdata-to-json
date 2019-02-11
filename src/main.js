@@ -14,6 +14,11 @@ import MojangApi from './lib/MojangApi';
 
 const DOMAIN = 'Main';
 
+if (!config.MCJAR_FILE) {
+    log.error('We expect to have a Minecraft server or client jar in the Minecraft directory.', DOMAIN);
+    process.exit(1);
+}
+
 log.info('Check for cache of Minecraft data.', DOMAIN);
 if (!ServerDataExtractor.checkForData()) {
     log.info('No cached data exists.', DOMAIN);
@@ -31,17 +36,9 @@ if (!ServerDataExtractor.checkForData()) {
     log.info('Lazily updating cached player profiles.', DOMAIN);
     MojangApi.lazyProfileUpdate();
     log.info('Starting log file processing.', DOMAIN);
+    LogsParser.prepareLogFiles();
+    LogsParser.parseLogFiles();
 }
-// log.info('Starting Log Processing', DOMAIN);
-// LogsParser.prepareLogFiles();
-// LogsParser.parseLogFiles();
-// log.debug(`ServerDataExtractor.getBusy(): ${ServerDataExtractor.getBusy()}`, DOMAIN);
-// if (ServerDataExtractor.getBusy()) {
-//     log.info('Waiting for minecraft data extraction to complete.', DOMAIN);
-//     while (ServerDataExtractor.getBusy()) {
-//         sleep(1000);
-//     }
-// }
 // log.info('Starting JSON file processing (advancements, stats)', DOMAIN);
 
 // log.info('Starting NBT data processing (level.dat, playerdata)', DOMAIN);

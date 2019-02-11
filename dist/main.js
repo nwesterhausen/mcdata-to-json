@@ -23,6 +23,12 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  */
 var DOMAIN = 'Main';
 
+if (!_Configuration.default.MCJAR_FILE) {
+  _CustomLogger.default.error('We expect to have a Minecraft server or client jar in the Minecraft directory.', DOMAIN);
+
+  process.exit(1);
+}
+
 _CustomLogger.default.info('Check for cache of Minecraft data.', DOMAIN);
 
 if (!_ServerDataExtractor.default.checkForData()) {
@@ -47,15 +53,9 @@ if (!_ServerDataExtractor.default.checkForData()) {
   _MojangApi.default.lazyProfileUpdate();
 
   _CustomLogger.default.info('Starting log file processing.', DOMAIN);
-} // log.info('Starting Log Processing', DOMAIN);
-// LogsParser.prepareLogFiles();
-// LogsParser.parseLogFiles();
-// log.debug(`ServerDataExtractor.getBusy(): ${ServerDataExtractor.getBusy()}`, DOMAIN);
-// if (ServerDataExtractor.getBusy()) {
-//     log.info('Waiting for minecraft data extraction to complete.', DOMAIN);
-//     while (ServerDataExtractor.getBusy()) {
-//         sleep(1000);
-//     }
-// }
-// log.info('Starting JSON file processing (advancements, stats)', DOMAIN);
+
+  _LogsParser.default.prepareLogFiles();
+
+  _LogsParser.default.parseLogFiles();
+} // log.info('Starting JSON file processing (advancements, stats)', DOMAIN);
 // log.info('Starting NBT data processing (level.dat, playerdata)', DOMAIN);
