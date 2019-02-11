@@ -6,6 +6,7 @@ import fs from 'fs-extra';
 import path from 'path';
 import log from './CustomLogger';
 import config from './Configuration';
+import Progress from 'cli-progress';
 
 const StreamZip = require('node-stream-zip');
 const DOMAIN = 'DataExtractor';
@@ -22,22 +23,39 @@ let advancementsExported = false,
 
 let extractMinecraftDataPromise = function() {
         let serverzipPath = path.join(config.TEMP_DIR, 'server.zip');
+        const bar = new Progress.Bar({}, Progress.Presets.shades_classic);
 
         log.debug(`Trying to extract from ${config.MCJAR_FILE} by copying to ${serverzipPath}`, DOMAIN);
         fs.copyFileSync(config.MCJAR_FILE, serverzipPath);
         const zip = new StreamZip({
-            'file': serverzipPath
+            'file': serverzipPath,
+            'storeEntries': true
         });
 
         return new Promise( (resolve, reject) => {
+            let entriesExtracted = 1;
+
             zip.on('error', (err) => {
                 log.error(`Zip failed to open. ${err}`, DOMAIN);
                 reject();
             });
-            // zip.on('extract', (entry, file) => {
-            //     log.debug(`Extracted ${entry.name} to ${file}`, DOMAIN);
-            // });
+            zip.on('extract', (entry, file) => {
+                bar.update(entriesExtracted++);
+            });
             zip.on('ready', () => {
+                log.debug(`Entries read: ${zip.entriesCount}`, DOMAIN);
+                let dataEntries = 0, assetsEntries = 0;
+
+                for (const entry of Object.values(zip.entries())) {
+                    if (entry.name.startsWith('data/')) {
+                        dataEntries++;
+                    } else if (entry.name.startsWith('assets/')) {
+                        assetsEntries++;
+                    }
+                }
+                log.debug(`${dataEntries} entries under 'data/'`);
+                log.debug(`${assetsEntries} entries under 'assets/'`);
+                bar.start(dataEntries + assetsEntries, 0);
                 zip.extract('data', config.DATA_DIR, (err, count) => {
                     if (err) {
                         log.error(`Error extracting data from zip: ${err}`);
@@ -51,6 +69,8 @@ let extractMinecraftDataPromise = function() {
                                 zip.close();
                                 reject(err1);
                             } else {
+                                bar.update(bar.getTotal());
+                                bar.stop();
                                 log.debug(`Extracted ${count1} items from ${serverzipPath}`, DOMAIN);
                                 zip.close();
                                 resolve();

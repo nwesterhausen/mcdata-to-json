@@ -13,6 +13,8 @@ var _CustomLogger = _interopRequireDefault(require("./CustomLogger"));
 
 var _Configuration = _interopRequireDefault(require("./Configuration"));
 
+var _cliProgress = _interopRequireDefault(require("cli-progress"));
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /**
@@ -37,23 +39,49 @@ var advancementsExported = false,
 var extractMinecraftDataPromise = function extractMinecraftDataPromise() {
   var serverzipPath = _path.default.join(_Configuration.default.TEMP_DIR, 'server.zip');
 
+  var bar = new _cliProgress.default.Bar({}, _cliProgress.default.Presets.shades_classic);
+
   _CustomLogger.default.debug("Trying to extract from ".concat(_Configuration.default.MCJAR_FILE, " by copying to ").concat(serverzipPath), DOMAIN);
 
   _fsExtra.default.copyFileSync(_Configuration.default.MCJAR_FILE, serverzipPath);
 
   var zip = new StreamZip({
-    'file': serverzipPath
+    'file': serverzipPath,
+    'storeEntries': true
   });
   return new Promise(function (resolve, reject) {
+    var entriesExtracted = 1;
     zip.on('error', function (err) {
       _CustomLogger.default.error("Zip failed to open. ".concat(err), DOMAIN);
 
       reject();
-    }); // zip.on('extract', (entry, file) => {
-    //     log.debug(`Extracted ${entry.name} to ${file}`, DOMAIN);
-    // });
-
+    });
+    zip.on('extract', function (entry, file) {
+      bar.update(entriesExtracted++);
+    });
     zip.on('ready', function () {
+      _CustomLogger.default.debug("Entries read: ".concat(zip.entriesCount), DOMAIN);
+
+      var dataEntries = 0,
+          assetsEntries = 0;
+
+      var _arr = Object.values(zip.entries());
+
+      for (var _i = 0; _i < _arr.length; _i++) {
+        var entry = _arr[_i];
+
+        if (entry.name.startsWith('data/')) {
+          dataEntries++;
+        } else if (entry.name.startsWith('assets/')) {
+          assetsEntries++;
+        }
+      }
+
+      _CustomLogger.default.debug("".concat(dataEntries, " entries under 'data/'"));
+
+      _CustomLogger.default.debug("".concat(assetsEntries, " entries under 'assets/'"));
+
+      bar.start(dataEntries + assetsEntries, 0);
       zip.extract('data', _Configuration.default.DATA_DIR, function (err, count) {
         if (err) {
           _CustomLogger.default.error("Error extracting data from zip: ".concat(err));
@@ -70,6 +98,9 @@ var extractMinecraftDataPromise = function extractMinecraftDataPromise() {
               zip.close();
               reject(err1);
             } else {
+              bar.update(bar.getTotal());
+              bar.stop();
+
               _CustomLogger.default.debug("Extracted ".concat(count1, " items from ").concat(serverzipPath), DOMAIN);
 
               zip.close();
