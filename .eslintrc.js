@@ -118,7 +118,6 @@ module.exports = {
     "new-parens": 2,
     "newline-after-var": [2, "always"],
     "no-array-constructor": 2,
-    "no-bitwise": 2,
     "no-continue": 2,
     "no-lonely-if": 2,
     "no-mixed-spaces-and-tabs": 2,

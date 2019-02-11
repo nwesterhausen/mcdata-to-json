@@ -10,6 +10,8 @@ var _ServerDataExtractor = _interopRequireDefault(require("./lib/ServerDataExtra
 
 var _AdvancementParser = _interopRequireDefault(require("./AdvancementParser"));
 
+var _MojangApi = _interopRequireDefault(require("./lib/MojangApi"));
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /**
@@ -21,32 +23,39 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  */
 var DOMAIN = 'Main';
 
-var sleep = require('system-sleep');
+_CustomLogger.default.info('Check for cache of Minecraft data.', DOMAIN);
 
-_CustomLogger.default.debug('Passing configuration to components.', DOMAIN);
+if (!_ServerDataExtractor.default.checkForData()) {
+  _CustomLogger.default.info('No cached data exists.', DOMAIN);
 
-_ServerDataExtractor.default.setConfig(_Configuration.default);
+  _CustomLogger.default.warn('Quitting after data extracted.', DOMAIN);
 
-_LogsParser.default.setConfig(_Configuration.default);
+  _ServerDataExtractor.default.extractMinecraftDataPromise().then(function (val) {
+    _CustomLogger.default.debug("Data export promise returned ".concat(val), DOMAIN);
 
-_AdvancementParser.default.setConfig(_Configuration.default);
+    _CustomLogger.default.info('Completed export of minecraft data.', DOMAIN);
 
-_CustomLogger.default.info('Starting Log Processing', DOMAIN);
+    process.exit(0);
+  }).catch(function (val) {
+    _CustomLogger.default.error(val, DOMAIN);
+  });
+} else {
+  _CustomLogger.default.info('Cached data exists.', DOMAIN);
 
-_LogsParser.default.prepareLogFiles();
+  _CustomLogger.default.info('Lazily updating cached player profiles.', DOMAIN);
 
-_LogsParser.default.parseLogFiles();
+  _MojangApi.default.lazyProfileUpdate();
 
-_CustomLogger.default.debug("ServerDataExtractor.getBusy(): ".concat(_ServerDataExtractor.default.getBusy()), DOMAIN);
-
-if (_ServerDataExtractor.default.getBusy()) {
-  _CustomLogger.default.info('Waiting for minecraft data extraction to complete.', DOMAIN);
-
-  while (_ServerDataExtractor.default.getBusy()) {
-    sleep(1000);
-  }
-}
-
-_CustomLogger.default.info('Starting JSON file processing (advancements, stats)', DOMAIN);
-
-_CustomLogger.default.info('Starting NBT data processing (level.dat, playerdata)', DOMAIN);
+  _CustomLogger.default.info('Starting log file processing.', DOMAIN);
+} // log.info('Starting Log Processing', DOMAIN);
+// LogsParser.prepareLogFiles();
+// LogsParser.parseLogFiles();
+// log.debug(`ServerDataExtractor.getBusy(): ${ServerDataExtractor.getBusy()}`, DOMAIN);
+// if (ServerDataExtractor.getBusy()) {
+//     log.info('Waiting for minecraft data extraction to complete.', DOMAIN);
+//     while (ServerDataExtractor.getBusy()) {
+//         sleep(1000);
+//     }
+// }
+// log.info('Starting JSON file processing (advancements, stats)', DOMAIN);
+// log.info('Starting NBT data processing (level.dat, playerdata)', DOMAIN);
