@@ -10,6 +10,7 @@ import config from './lib/Configuration';
 import PlayerDataCombiner from './lib/PlayerDataCombiner';
 import LogsParser from './LogsParser';
 import ServerDataExtractor from './lib/ServerDataExtractor';
+import MCAConverter from './lib/MCAConverter';
 import AdvancementParser from './AdvancementParser';
 import DatParser from './DatParser';
 import MojangApi from './lib/MojangApi';
@@ -54,9 +55,23 @@ if (!ServerDataExtractor.checkForData()) {
     LogsParser.prepareLogFiles();
     LogsParser.parseLogFiles();
     DatParser.parsePlayerdata();
-    for (let i=0; i<Object.keys(config.PLAYERS).length; i++) {
+    for (let i = 0; i < Object.keys(config.PLAYERS).length; i++) {
         PlayerDataCombiner.combinePlayerData(Object.keys(config.PLAYERS)[i]);
     }
+    let mcaReadingPromises = [],
+        overworldRegionFiles = fs.readdirSync(config.OVERWORLD_DIR);
+    
+    for (let i in overworldRegionFiles) {
+        let regionFile = overworldRegionFiles[i];
+        
+        mcaReadingPromises.push(MCAConverter.parseMCAPromise(path.join(config.OVERWORLD_DIR, regionFile)));
+    }
+    log.info(`Beginning parse of ${mcaReadingPromises.length} overworld region files. This may take a while!`);
+    Promise.all(mcaReadingPromises).then((val) => {
+        fs.writeJSON('te-out.json', MCAConverter.tileEntities);
+    }).catch((err) => {
+        log.error(err, DOMAIN);
+    });
 }
 // log.info('Starting JSON file processing (advancements, stats)', DOMAIN);
 

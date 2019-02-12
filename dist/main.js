@@ -10,6 +10,8 @@ var _LogsParser = _interopRequireDefault(require("./LogsParser"));
 
 var _ServerDataExtractor = _interopRequireDefault(require("./lib/ServerDataExtractor"));
 
+var _MCAConverter = _interopRequireDefault(require("./lib/MCAConverter"));
+
 var _AdvancementParser = _interopRequireDefault(require("./AdvancementParser"));
 
 var _DatParser = _interopRequireDefault(require("./DatParser"));
@@ -79,5 +81,21 @@ if (!_ServerDataExtractor.default.checkForData()) {
   for (var _i = 0; _i < Object.keys(_Configuration.default.PLAYERS).length; _i++) {
     _PlayerDataCombiner.default.combinePlayerData(Object.keys(_Configuration.default.PLAYERS)[_i]);
   }
+
+  var mcaReadingPromises = [],
+      overworldRegionFiles = _fsExtra.default.readdirSync(_Configuration.default.OVERWORLD_DIR);
+
+  for (var _i2 in overworldRegionFiles) {
+    var regionFile = overworldRegionFiles[_i2];
+    mcaReadingPromises.push(_MCAConverter.default.parseMCAPromise(_path.default.join(_Configuration.default.OVERWORLD_DIR, regionFile)));
+  }
+
+  _CustomLogger.default.info("Beginning parse of ".concat(mcaReadingPromises.length, " overworld region files. This may take a while!"));
+
+  Promise.all(mcaReadingPromises).then(function (val) {
+    _fsExtra.default.writeJSON('te-out.json', _MCAConverter.default.tileEntities);
+  }).catch(function (err) {
+    _CustomLogger.default.error(err, DOMAIN);
+  });
 } // log.info('Starting JSON file processing (advancements, stats)', DOMAIN);
 // log.info('Starting NBT data processing (level.dat, playerdata)', DOMAIN);

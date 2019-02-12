@@ -38,8 +38,6 @@ var parseDeaths = function parseDeaths(uuid) {
     combinePlayerData = function combinePlayerData(uuid) {
   var readjsonPromises = [_fsExtra.default.readJSON(_path.default.join(_Configuration.default.STATS_DIR, "".concat(uuid, ".json"))), _fsExtra.default.readJSON(_path.default.join(_Configuration.default.ADVANCEMENTS_DIR, "".concat(uuid, ".json"))), _fsExtra.default.readJSON(_path.default.join(_Configuration.default.TEMP_DIR, 'playerdata', "".concat(uuid, ".json"))), _fsExtra.default.readJSON(_path.default.join(_Configuration.default.TEMP_DIR, 'profiles', "".concat(uuid, ".json"))), parseDeaths(uuid)];
   Promise.all(readjsonPromises).then(function (val) {
-    _CustomLogger.default.warn("val length ".concat(val.length), DOMAIN);
-
     _fsExtra.default.writeJSON(_path.default.join(_Configuration.default.OUTPUT_DIR, "".concat(uuid, ".json")), {
       'uuid': uuid,
       'name': _Configuration.default.PLAYERS[uuid],

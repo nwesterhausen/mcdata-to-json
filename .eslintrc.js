@@ -80,7 +80,6 @@ module.exports = {
 
     "strict": [2, "function"],
 
-    "no-catch-shadow": 2,
     "no-delete-var": 2,
     "no-shadow-restricted-names": 2,
     "no-shadow": 2,
