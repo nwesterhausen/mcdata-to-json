@@ -57,7 +57,6 @@ if (!ServerDataExtractor.checkForData()) {
     for (let i = 0; i < Object.keys(Config.PLAYERS).length; i++) {
         PlayerDataCombiner.combinePlayerData(Object.keys(Config.PLAYERS)[i]);
     }
-    
 
     // REGION FILE PARSING
     let mcaReadingPromises = [], mcaNetherReadingPromises = [],
