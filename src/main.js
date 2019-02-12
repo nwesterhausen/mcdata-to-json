@@ -50,9 +50,9 @@ if (!ServerDataExtractor.checkForData()) {
     log.info('Cached data exists.', DOMAIN);
     log.info('Lazily updating cached player profiles.', DOMAIN);
     MojangApi.lazyProfileUpdate();
-    // log.info('Starting log file processing.', DOMAIN);
-    // LogsParser.prepareLogFiles();
-    // LogsParser.parseLogFiles();
+    log.info('Starting log file processing.', DOMAIN);
+    LogsParser.prepareLogFiles();
+    LogsParser.parseLogFiles();
     DatParser.parsePlayerdata();
     for (let i=0; i<Object.keys(config.PLAYERS).length; i++) {
         PlayerDataCombiner.combinePlayerData(Object.keys(config.PLAYERS)[i]);

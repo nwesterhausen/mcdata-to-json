@@ -66,10 +66,13 @@ if (!_ServerDataExtractor.default.checkForData()) {
 
   _CustomLogger.default.info('Lazily updating cached player profiles.', DOMAIN);
 
-  _MojangApi.default.lazyProfileUpdate(); // log.info('Starting log file processing.', DOMAIN);
-  // LogsParser.prepareLogFiles();
-  // LogsParser.parseLogFiles();
+  _MojangApi.default.lazyProfileUpdate();
 
+  _CustomLogger.default.info('Starting log file processing.', DOMAIN);
+
+  _LogsParser.default.prepareLogFiles();
+
+  _LogsParser.default.parseLogFiles();
 
   _DatParser.default.parsePlayerdata();
 

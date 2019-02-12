@@ -72,6 +72,8 @@ let getDateFromFilename = function(filename) {
                 return [timestamp, logconst.TYPE_LOGOFF, logline.match(logregx.playerleftRE)[1], sev];
             } else if (logline.match(logregx.advancementRE)) {
                 return [timestamp, logconst.TYPE_ADVANCEMENT, logline.match(logregx.advancementRE)[1], sev];
+            } else if (logline.match(logregx.keepentityRE)) {
+                return [timestamp, logconst.TYPE_KEEPENTITY, logline.substr(logline.indexOf(']: ') + 3), sev];
             } else if (logline.match(logregx.playerchatRE)) {
                 return [timestamp, logconst.TYPE_CHAT, {
                     'player': logline.match(logregx.playerchatRE)[1],
@@ -129,8 +131,6 @@ let getDateFromFilename = function(filename) {
                 return [timestamp, logconst.TYPE_SERVERSTOP, logline.substr(logline.indexOf(']: ') + 3), sev];
             } else if (logline.match(logregx.overloadedRE)) {
                 return [timestamp, logconst.TYPE_OVERLOADED, logline.substr(logline.indexOf(']: ') + 3), sev];
-            } else if (logline.match(logregx.keepentityRE)) {
-                return [timestamp, logconst.TYPE_KEEPENTITY, logline.substr(logline.indexOf(']: ') + 3), sev];
             } else if (logline.match(logregx.movedquicklyRE)) {
                 return [timestamp, logconst.TYPE_MOVEDQUICKLY, logline.substr(logline.indexOf(']: ') + 3), sev];
             } else if (logline.match(logregx.preparingspawnRE)) {
@@ -266,6 +266,14 @@ export default {
 
             fs.writeFileSync(path.join(workdir, 'command.json'), JSON.stringify(commandJSON));
             log.debug(`Wrote 'command' JSON file to ${path.join(workdir, 'command.json')} (${commandJSON.length} records)`, DOMAIN);
+
+            // Only command messages
+            let deathJSON = cleanedJSON.filter((obj) => {
+                return obj.type <= 20;
+            });
+
+            fs.writeFileSync(path.join(workdir, 'deaths.json'), JSON.stringify(deathJSON));
+            log.debug(`Wrote 'command' JSON file to ${path.join(workdir, 'deaths.json')} (${deathJSON.length} records)`, DOMAIN);
         });
     },
     rawlogJSON,

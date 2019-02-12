@@ -90,6 +90,8 @@ var getDateFromFilename = function getDateFromFilename(filename) {
       return [timestamp, _LogConst.default.TYPE_LOGOFF, logline.match(_LogsRegex.default.playerleftRE)[1], sev];
     } else if (logline.match(_LogsRegex.default.advancementRE)) {
       return [timestamp, _LogConst.default.TYPE_ADVANCEMENT, logline.match(_LogsRegex.default.advancementRE)[1], sev];
+    } else if (logline.match(_LogsRegex.default.keepentityRE)) {
+      return [timestamp, _LogConst.default.TYPE_KEEPENTITY, logline.substr(logline.indexOf(']: ') + 3), sev];
     } else if (logline.match(_LogsRegex.default.playerchatRE)) {
       return [timestamp, _LogConst.default.TYPE_CHAT, {
         'player': logline.match(_LogsRegex.default.playerchatRE)[1],
@@ -147,8 +149,6 @@ var getDateFromFilename = function getDateFromFilename(filename) {
       return [timestamp, _LogConst.default.TYPE_SERVERSTOP, logline.substr(logline.indexOf(']: ') + 3), sev];
     } else if (logline.match(_LogsRegex.default.overloadedRE)) {
       return [timestamp, _LogConst.default.TYPE_OVERLOADED, logline.substr(logline.indexOf(']: ') + 3), sev];
-    } else if (logline.match(_LogsRegex.default.keepentityRE)) {
-      return [timestamp, _LogConst.default.TYPE_KEEPENTITY, logline.substr(logline.indexOf(']: ') + 3), sev];
     } else if (logline.match(_LogsRegex.default.movedquicklyRE)) {
       return [timestamp, _LogConst.default.TYPE_MOVEDQUICKLY, logline.substr(logline.indexOf(']: ') + 3), sev];
     } else if (logline.match(_LogsRegex.default.preparingspawnRE)) {
@@ -308,7 +308,16 @@ var _default = {
 
       _fsExtra.default.writeFileSync(_path.default.join(workdir, 'command.json'), JSON.stringify(commandJSON));
 
-      _CustomLogger.default.debug("Wrote 'command' JSON file to ".concat(_path.default.join(workdir, 'command.json'), " (").concat(commandJSON.length, " records)"), DOMAIN);
+      _CustomLogger.default.debug("Wrote 'command' JSON file to ".concat(_path.default.join(workdir, 'command.json'), " (").concat(commandJSON.length, " records)"), DOMAIN); // Only command messages
+
+
+      var deathJSON = cleanedJSON.filter(function (obj) {
+        return obj.type <= 20;
+      });
+
+      _fsExtra.default.writeFileSync(_path.default.join(workdir, 'deaths.json'), JSON.stringify(deathJSON));
+
+      _CustomLogger.default.debug("Wrote 'command' JSON file to ".concat(_path.default.join(workdir, 'deaths.json'), " (").concat(deathJSON.length, " records)"), DOMAIN);
     });
   },
   rawlogJSON: rawlogJSON,
