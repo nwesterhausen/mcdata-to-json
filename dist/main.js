@@ -12,8 +12,6 @@ var _ServerDataExtractor = _interopRequireDefault(require("./lib/ServerDataExtra
 
 var _MCAConverter = _interopRequireDefault(require("./lib/MCAConverter"));
 
-var _AdvancementParser = _interopRequireDefault(require("./AdvancementParser"));
-
 var _DatParser = _interopRequireDefault(require("./DatParser"));
 
 var _MojangApi = _interopRequireDefault(require("./lib/MojangApi"));
@@ -31,6 +29,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * By default will output in the current directory, or the OUTPUT_DIR env
  * variable, OR the --outdir="" parameter.
  */
+// import AdvancementParser from './AdvancementParser';
 var DOMAIN = 'Main';
 
 if (!_Configuration.default.MCJAR_FILE) {
@@ -93,7 +92,27 @@ if (!_ServerDataExtractor.default.checkForData()) {
   _CustomLogger.default.info("Beginning parse of ".concat(mcaReadingPromises.length, " overworld region files. This may take a while!"));
 
   Promise.all(mcaReadingPromises).then(function (val) {
-    _fsExtra.default.writeJSON('te-out.json', _MCAConverter.default.tileEntities);
+    _CustomLogger.default.info('Completed parse of overworld region files', DOMAIN);
+
+    _CustomLogger.default.debug("Promise returned ".concat(val, "."), DOMAIN);
+  }).catch(function (err) {
+    _CustomLogger.default.error(err, DOMAIN);
+  });
+
+  var mcaNetherReadingPromises = [],
+      netherRegionFiles = _fsExtra.default.readdirSync(_Configuration.default.NETHER_DIR);
+
+  for (var _i3 in netherRegionFiles) {
+    var _regionFile = netherRegionFiles[_i3];
+    mcaNetherReadingPromises.push(_MCAConverter.default.parseMCAPromise(_path.default.join(_Configuration.default.NETHER_DIR, _regionFile)));
+  }
+
+  _CustomLogger.default.info("Beginning parse of ".concat(mcaNetherReadingPromises.length, " nether region files. This may take a while!"));
+
+  Promise.all(mcaNetherReadingPromises).then(function (val) {
+    _CustomLogger.default.info('Completed parse of nether region files', DOMAIN);
+
+    _CustomLogger.default.debug("Promise returned ".concat(val, "."), DOMAIN);
   }).catch(function (err) {
     _CustomLogger.default.error(err, DOMAIN);
   });

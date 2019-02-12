@@ -7,6 +7,8 @@ exports.default = void 0;
 
 var _NBTHelper = _interopRequireDefault(require("./NBTHelper"));
 
+var _Configuration = _interopRequireDefault(require("./Configuration"));
+
 var _CustomLogger = _interopRequireDefault(require("./CustomLogger"));
 
 var _fsExtra = _interopRequireDefault(require("fs-extra"));
@@ -15,12 +17,14 @@ var _path = _interopRequireDefault(require("path"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-// const fs = require('fs-extra');
 var mca = require('mca-js');
 
 var nbt = require('nbt');
 
 var DOMAIN = 'MCA Parser';
+
+_fsExtra.default.ensureDirSync(_path.default.join(_Configuration.default.TEMP_DIR), 'mcajson');
+
 var masterTileEntityStore = {};
 
 var recordTileEntity = function recordTileEntity(tejson, storageObject) {
@@ -38,11 +42,23 @@ var recordTileEntity = function recordTileEntity(tejson, storageObject) {
   storageObject[id].push(te);
 },
     parseMCAPromise = function parseMCAPromise(mcaFilepath) {
-  var fname = _path.default.basename(mcaFilepath);
+  if (_fsExtra.default.lstatSync(mcaFilepath).isDirectory()) {
+    _CustomLogger.default.warn("Was given a directory to parse ".concat(mcaFilepath), DOMAIN);
+
+    return;
+  }
+
+  var discoveredworldname = _path.default.basename(_path.default.dirname(_path.default.dirname(mcaFilepath))) === _path.default.basename(_Configuration.default.WORLD_DIR) ? 'overworld' : _path.default.basename(_path.default.dirname(_path.default.dirname(mcaFilepath)));
+
+  var fname = _path.default.basename(mcaFilepath),
+      worldregion = discoveredworldname;
+
+  _fsExtra.default.ensureDirSync(_path.default.join(_Configuration.default.TEMP_DIR, 'mcajson', worldregion));
 
   _CustomLogger.default.debug("Starting ".concat(mcaFilepath), DOMAIN);
 
-  masterTileEntityStore[fname] = {};
+  masterTileEntityStore[fname] = {}; // eslint-disable-next-line no-unused-vars
+
   return new Promise(function (resolve, reject) {
     _fsExtra.default.readFile(mcaFilepath, function (err, data) {
       if (err) {
@@ -52,9 +68,11 @@ var recordTileEntity = function recordTileEntity(tejson, storageObject) {
       }
 
       var tileEntityData = [];
+      /**
+       * 32 x 32 chunks in each region. We loop over each chunk.
+       */
 
       for (var i = 0; i < 32; i++) {
-        // var j will increment the Y pos. Note that the actual chunk is regionY * 32 + id
         for (var j = 0; j < 32; j++) {
           var nbtdata = mca.getData(data, i, j);
 
@@ -73,9 +91,9 @@ var recordTileEntity = function recordTileEntity(tejson, storageObject) {
             });
           } catch (nbterror) {
             if (nbterror.message === 'Argument "data" is falsy') {
-              _CustomLogger.default.debug("Caught an empty chunk ".concat(i, ",").concat(j, " in ").concat(fname, "."), DOMAIN);
+              _CustomLogger.default.silly("Caught an empty chunk ".concat(i, ",").concat(j, " in ").concat(fname, "."), DOMAIN);
             } else {
-              _CustomLogger.default.error("NBT ERROR THROWN:".concat(i, ",").concat(j, ":").concat(fname, "::").concat(nbterror), DOMAIN);
+              _CustomLogger.default.warn("NBT ERROR THROWN:".concat(i, ",").concat(j, ":").concat(fname, "::").concat(nbterror), DOMAIN);
             }
           }
         }
@@ -91,9 +109,13 @@ var recordTileEntity = function recordTileEntity(tejson, storageObject) {
         _CustomLogger.default.debug("Found ".concat(masterTileEntityStore[fname][key].length, " ").concat(key, " in ").concat(fname), DOMAIN);
       }
 
-      _CustomLogger.default.debug("Finished ".concat(mcaFilepath), DOMAIN);
+      _fsExtra.default.writeJSON(_path.default.join(_Configuration.default.TEMP_DIR, 'mcajson', worldregion, "".concat(fname.replace(/.mca/, ''), ".json")), masterTileEntityStore[fname]).then(function (val) {
+        _CustomLogger.default.debug("Finished ".concat(mcaFilepath), DOMAIN);
 
-      resolve(masterTileEntityStore[fname]);
+        _CustomLogger.default.debug("JSON Write returned ".concat(val), DOMAIN);
+
+        resolve(fname);
+      });
     });
   });
 };

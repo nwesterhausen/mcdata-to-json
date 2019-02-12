@@ -152,11 +152,22 @@ if (isValidPath(path.join(parsedOpts.worlddir, 'stats'), 'Contains player stats.
 if (isValidPath(path.join(parsedOpts.worlddir, 'region'), 'Overworld region files. Found in world directory.')) {
     parsedOpts.overworld = path.join(parsedOpts.worlddir, 'region');
 }
-if (isValidPath(path.join(parsedOpts.worlddir, 'DIM1'), 'The End region files. Found in world directory.')) {
-    parsedOpts.end = path.join(parsedOpts.worlddir, 'DIM1');
+if (isValidPath(path.join(parsedOpts.worlddir, 'DIM1'), 'The End dir. Found in world directory.')) {
+    if (isValidPath(path.join(parsedOpts.worlddir, 'DIM1', 'region'), 'The End region files. Found in world directory.')) {
+        parsedOpts.end = path.join(parsedOpts.worlddir, 'DIM1', 'region');
+    }
+    if (isValidPath(path.join(parsedOpts.worlddir, 'DIM1', 'data'), 'The End data files. Found in world directory.')) {
+        parsedOpts.enddata = path.join(parsedOpts.worlddir, 'DIM1', 'data');
+    }
 }
-if (isValidPath(path.join(parsedOpts.worlddir, 'DIM-1'), 'Nether region files. Found in world directory.')) {
-    parsedOpts.nether = path.join(parsedOpts.worlddir, 'DIM-1');
+if (isValidPath(path.join(parsedOpts.worlddir, 'DIM-1'), 'Nether dir. Found in world directory.')) {
+    
+    if (isValidPath(path.join(parsedOpts.worlddir, 'DIM-1', 'region'), 'Nether region files. Found in world directory.')) {
+        parsedOpts.nether = path.join(parsedOpts.worlddir, 'DIM-1', 'region');
+    }
+    if (isValidPath(path.join(parsedOpts.worlddir, 'DIM-1', 'data'), 'Nether data files. Found in world directory.')) {
+        parsedOpts.netherdata = path.join(parsedOpts.worlddir, 'DIM-1', 'data');
+    }
 }
 log.info('Validated minecraft directory.', DOMAIN);
 
@@ -175,7 +186,9 @@ const MC_DIR = parsedOpts.minecraft,
     LEVELDAT_FILE = parsedOpts.leveldat,
     OVERWORLD_DIR = parsedOpts.overworld,
     NETHER_DIR = parsedOpts.nether,
+    NETHERDATA_DIR = parsedOpts.netherdata,
     END_DIR = parsedOpts.end,
+    ENDDATA_DIR = parsedOpts.enddata,
     OUTPUT_DIR = parsedOpts.outputdir,
     WORK_DIR = parsedOpts.workdir,
     TEMP_DIR = path.join(WORK_DIR, '.temp'),
@@ -231,7 +244,9 @@ export default {
     LEVELDAT_FILE,
     OVERWORLD_DIR,
     NETHER_DIR,
+    NETHERDATA_DIR,
     END_DIR,
+    ENDDATA_DIR,
     OUTPUT_DIR,
     WORK_DIR,
     TEMP_DIR,

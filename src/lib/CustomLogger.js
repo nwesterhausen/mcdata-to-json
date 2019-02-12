@@ -7,7 +7,9 @@ import {
     bgYellow,
     yellow,
     bgRed,
-    red
+    red,
+    bgMagenta,
+    magenta
 } from 'colors/safe';
 
 let loglevel = 1;
@@ -15,6 +17,11 @@ let loglevel = 1;
 export default {
     'setLevel': function(newlevel) {
         loglevel = newlevel;
+    },
+    'silly': function(msg, domain = 'Undefined') {
+        if (loglevel >= 4) {
+            console.debug(bgMagenta.black(' SILLY '), magenta(`[${domain}] ${msg}`));
+        }
     },
     'debug': function(msg, domain = 'Undefined') {
         if (loglevel >= 3) {

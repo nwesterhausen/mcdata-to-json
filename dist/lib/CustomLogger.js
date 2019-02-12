@@ -13,6 +13,13 @@ var _default = {
   'setLevel': function setLevel(newlevel) {
     loglevel = newlevel;
   },
+  'silly': function silly(msg) {
+    var domain = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'Undefined';
+
+    if (loglevel >= 4) {
+      console.debug(_safe.bgMagenta.black(' SILLY '), (0, _safe.magenta)("[".concat(domain, "] ").concat(msg)));
+    }
+  },
   'debug': function debug(msg) {
     var domain = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'Undefined';
 

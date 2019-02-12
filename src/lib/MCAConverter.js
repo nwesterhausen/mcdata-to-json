@@ -1,13 +1,15 @@
 import NBTHelper from './NBTHelper';
+import Config from './Configuration';
 import log from './CustomLogger';
 import fs from 'fs-extra';
 import path from 'path';
 
-// const fs = require('fs-extra');
 const mca = require('mca-js');
 const nbt = require('nbt');
 
 const DOMAIN = 'MCA Parser';
+
+fs.ensureDirSync(path.join(Config.TEMP_DIR), 'mcajson');
 
 let masterTileEntityStore = {};
 let recordTileEntity = function(tejson, storageObject) {
@@ -23,11 +25,22 @@ let recordTileEntity = function(tejson, storageObject) {
         storageObject[id].push(te);
     },
     parseMCAPromise = function(mcaFilepath) {
-        const fname = path.basename(mcaFilepath);
+        if (fs.lstatSync(mcaFilepath).isDirectory()) {
+            log.warn(`Was given a directory to parse ${mcaFilepath}`, DOMAIN);
+            return;
+        }
+
+        let discoveredworldname = path.basename(path.dirname(path.dirname(mcaFilepath))) === path.basename(Config.WORLD_DIR) ? 'overworld' : path.basename(path.dirname(path.dirname(mcaFilepath)));
+
+        const fname = path.basename(mcaFilepath),
+            worldregion = discoveredworldname;
+
+        fs.ensureDirSync(path.join(Config.TEMP_DIR, 'mcajson', worldregion));
 
         log.debug(`Starting ${mcaFilepath}`, DOMAIN);
 
         masterTileEntityStore[fname] = {};
+        // eslint-disable-next-line no-unused-vars
         return new Promise( (resolve, reject) => {
             fs.readFile(mcaFilepath, (err, data) => {
                 if (err) {
@@ -36,8 +49,10 @@ let recordTileEntity = function(tejson, storageObject) {
                 }
                 let tileEntityData = [];
         
+                /**
+                 * 32 x 32 chunks in each region. We loop over each chunk.
+                 */
                 for (let i = 0; i < 32; i++) {
-                // var j will increment the Y pos. Note that the actual chunk is regionY * 32 + id
                     for (let j = 0; j < 32; j++) {
                         let nbtdata = mca.getData(data, i, j);
         
@@ -54,9 +69,9 @@ let recordTileEntity = function(tejson, storageObject) {
                             });
                         } catch (nbterror) {
                             if (nbterror.message === 'Argument "data" is falsy') {
-                                log.debug(`Caught an empty chunk ${i},${j} in ${fname}.`, DOMAIN);
+                                log.silly(`Caught an empty chunk ${i},${j} in ${fname}.`, DOMAIN);
                             } else {
-                                log.error(`NBT ERROR THROWN:${i},${j}:${fname}::${nbterror}`, DOMAIN);
+                                log.warn(`NBT ERROR THROWN:${i},${j}:${fname}::${nbterror}`, DOMAIN);
                             }
                         }
                     }
@@ -70,9 +85,11 @@ let recordTileEntity = function(tejson, storageObject) {
                 for (let key in masterTileEntityStore[fname]) {
                     log.debug(`Found ${masterTileEntityStore[fname][key].length} ${key} in ${fname}`, DOMAIN);
                 }
-            
-                log.debug(`Finished ${mcaFilepath}`, DOMAIN);
-                resolve(masterTileEntityStore[fname]);
+                fs.writeJSON(path.join(Config.TEMP_DIR, 'mcajson', worldregion, `${fname.replace(/.mca/, '')}.json`), masterTileEntityStore[fname]).then((val) => {
+                    log.debug(`Finished ${mcaFilepath}`, DOMAIN);
+                    log.debug(`JSON Write returned ${val}`, DOMAIN);
+                    resolve(fname);
+                });
             });
 
     
