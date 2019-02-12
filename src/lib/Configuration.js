@@ -10,7 +10,7 @@ import { defaults } from 'lodash';
 
 const DOMAIN = 'Configuration';
 let rundir = path.dirname(process.argv[1]),
-    loglevels = ['error', 'warn', 'info', 'debug'],
+    loglevels = ['error', 'warn', 'info', 'debug', 'silly'],
     defaultOpts = {
         'minecraft': rundir,
         'outputdir': path.join(rundir, 'output'),
@@ -32,6 +32,7 @@ let rundir = path.dirname(process.argv[1]),
         'quiet': ['--loglevel=warn'],
         'verbose': ['--loglevel=info'],
         'debug': ['--loglevel=debug'],
+        'silly': ['--loglevel=silly'],
         's': ['--loglevel=error'],
         'q': ['--loglevel=warn'],
         'v': ['--loglevel=info'],

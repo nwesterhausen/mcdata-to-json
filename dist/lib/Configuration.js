@@ -25,7 +25,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 var DOMAIN = 'Configuration';
 
 var rundir = _path.default.dirname(process.argv[1]),
-    loglevels = ['error', 'warn', 'info', 'debug'],
+    loglevels = ['error', 'warn', 'info', 'debug', 'silly'],
     defaultOpts = {
   'minecraft': rundir,
   'outputdir': _path.default.join(rundir, 'output'),
@@ -47,6 +47,7 @@ var rundir = _path.default.dirname(process.argv[1]),
   'quiet': ['--loglevel=warn'],
   'verbose': ['--loglevel=info'],
   'debug': ['--loglevel=debug'],
+  'silly': ['--loglevel=silly'],
   's': ['--loglevel=error'],
   'q': ['--loglevel=warn'],
   'v': ['--loglevel=info'],

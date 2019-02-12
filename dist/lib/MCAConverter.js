@@ -11,6 +11,8 @@ var _Configuration = _interopRequireDefault(require("./Configuration"));
 
 var _CustomLogger = _interopRequireDefault(require("./CustomLogger"));
 
+var _cliProgress = _interopRequireDefault(require("cli-progress"));
+
 var _fsExtra = _interopRequireDefault(require("fs-extra"));
 
 var _path = _interopRequireDefault(require("path"));
@@ -23,7 +25,18 @@ var nbt = require('nbt');
 
 var DOMAIN = 'MCA Parser';
 
-_fsExtra.default.ensureDirSync(_path.default.join(_Configuration.default.TEMP_DIR), 'mcajson');
+var PARSED_MCA_CACHE_DIR = _path.default.join(_Configuration.default.DATA_DIR, 'mcajson'),
+    OVERWORLD = 'overworld',
+    NETHER = 'DIM-1',
+    END = 'DIM1';
+
+_fsExtra.default.ensureDirSync(PARSED_MCA_CACHE_DIR);
+
+_fsExtra.default.ensureDirSync(_path.default.join(PARSED_MCA_CACHE_DIR, OVERWORLD));
+
+_fsExtra.default.ensureDirSync(_path.default.join(PARSED_MCA_CACHE_DIR, NETHER));
+
+_fsExtra.default.ensureDirSync(_path.default.join(PARSED_MCA_CACHE_DIR, END));
 
 var masterTileEntityStore = {};
 
@@ -41,7 +54,7 @@ var recordTileEntity = function recordTileEntity(tejson, storageObject) {
 
   storageObject[id].push(te);
 },
-    parseMCAPromise = function parseMCAPromise(mcaFilepath) {
+    parseMCAPromise = function parseMCAPromise(mcaFilepath, progressBar) {
   if (_fsExtra.default.lstatSync(mcaFilepath).isDirectory()) {
     _CustomLogger.default.warn("Was given a directory to parse ".concat(mcaFilepath), DOMAIN);
 
@@ -51,15 +64,19 @@ var recordTileEntity = function recordTileEntity(tejson, storageObject) {
   var discoveredworldname = _path.default.basename(_path.default.dirname(_path.default.dirname(mcaFilepath))) === _path.default.basename(_Configuration.default.WORLD_DIR) ? 'overworld' : _path.default.basename(_path.default.dirname(_path.default.dirname(mcaFilepath)));
 
   var fname = _path.default.basename(mcaFilepath),
-      worldregion = discoveredworldname;
-
-  _fsExtra.default.ensureDirSync(_path.default.join(_Configuration.default.TEMP_DIR, 'mcajson', worldregion));
+      JSON_OUT_PATH = _path.default.join(PARSED_MCA_CACHE_DIR, discoveredworldname, fname.replace(/.mca/, '.json'));
 
   _CustomLogger.default.debug("Starting ".concat(mcaFilepath), DOMAIN);
 
   masterTileEntityStore[fname] = {}; // eslint-disable-next-line no-unused-vars
 
   return new Promise(function (resolve, reject) {
+    var PROGRESS_BAR = new _cliProgress.default.Bar({
+      'hideCursor': true,
+      'format': "[{bar}] {percentage}% ({duration}s) {value}/{total} chunks in ".concat(discoveredworldname, " / ").concat(fname)
+    }, _cliProgress.default.Presets.rect);
+    PROGRESS_BAR.start(1024, 0);
+
     _fsExtra.default.readFile(mcaFilepath, function (err, data) {
       if (err) {
         _CustomLogger.default.error("Problem reading ".concat(fname, ": ").concat(err), DOMAIN);
@@ -75,8 +92,11 @@ var recordTileEntity = function recordTileEntity(tejson, storageObject) {
       for (var i = 0; i < 32; i++) {
         for (var j = 0; j < 32; j++) {
           var nbtdata = mca.getData(data, i, j);
+          PROGRESS_BAR.increment();
 
-          try {
+          if (!nbtdata) {
+            _CustomLogger.default.silly("Ignoring empty chunk ".concat(i, ",").concat(j, " in ").concat(fname, "."), DOMAIN);
+          } else {
             nbt.parse(nbtdata, function (error, jsdata) {
               if (error) {
                 _CustomLogger.default.error("Problem parsing NBT in ".concat(fname, ": ").concat(err), DOMAIN);
@@ -89,16 +109,11 @@ var recordTileEntity = function recordTileEntity(tejson, storageObject) {
                 tileEntityData.push(jsdata.value.Level.value.TileEntities.value.value);
               }
             });
-          } catch (nbterror) {
-            if (nbterror.message === 'Argument "data" is falsy') {
-              _CustomLogger.default.silly("Caught an empty chunk ".concat(i, ",").concat(j, " in ").concat(fname, "."), DOMAIN);
-            } else {
-              _CustomLogger.default.warn("NBT ERROR THROWN:".concat(i, ",").concat(j, ":").concat(fname, "::").concat(nbterror), DOMAIN);
-            }
           }
         }
       }
 
+      PROGRESS_BAR.stop();
       var flatTEdata = tileEntityData.flat();
 
       for (var _i = 0; _i < flatTEdata.length; _i++) {
@@ -109,7 +124,7 @@ var recordTileEntity = function recordTileEntity(tejson, storageObject) {
         _CustomLogger.default.debug("Found ".concat(masterTileEntityStore[fname][key].length, " ").concat(key, " in ").concat(fname), DOMAIN);
       }
 
-      _fsExtra.default.writeJSON(_path.default.join(_Configuration.default.TEMP_DIR, 'mcajson', worldregion, "".concat(fname.replace(/.mca/, ''), ".json")), masterTileEntityStore[fname]).then(function (val) {
+      _fsExtra.default.writeJSON(JSON_OUT_PATH, masterTileEntityStore[fname]).then(function (val) {
         _CustomLogger.default.debug("Finished ".concat(mcaFilepath), DOMAIN);
 
         _CustomLogger.default.debug("JSON Write returned ".concat(val), DOMAIN);
@@ -118,12 +133,13 @@ var recordTileEntity = function recordTileEntity(tejson, storageObject) {
       });
     });
   });
+},
+    getTileEntitites = function getTileEntitites() {
+  return masterTileEntityStore;
 };
 
 var _default = {
   parseMCAPromise: parseMCAPromise,
-  'tileEntities': function tileEntities() {
-    return masterTileEntityStore;
-  }
+  getTileEntitites: getTileEntitites
 };
 exports.default = _default;

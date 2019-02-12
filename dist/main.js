@@ -79,14 +79,22 @@ if (!_ServerDataExtractor.default.checkForData()) {
 
   for (var _i = 0; _i < Object.keys(_Configuration.default.PLAYERS).length; _i++) {
     _PlayerDataCombiner.default.combinePlayerData(Object.keys(_Configuration.default.PLAYERS)[_i]);
-  }
+  } // REGION FILE PARSING
+
 
   var mcaReadingPromises = [],
+      mcaNetherReadingPromises = [],
+      netherRegionFiles = _fsExtra.default.readdirSync(_Configuration.default.NETHER_DIR),
       overworldRegionFiles = _fsExtra.default.readdirSync(_Configuration.default.OVERWORLD_DIR);
 
   for (var _i2 in overworldRegionFiles) {
     var regionFile = overworldRegionFiles[_i2];
     mcaReadingPromises.push(_MCAConverter.default.parseMCAPromise(_path.default.join(_Configuration.default.OVERWORLD_DIR, regionFile)));
+  }
+
+  for (var _i3 in netherRegionFiles) {
+    var _regionFile = netherRegionFiles[_i3];
+    mcaReadingPromises.push(_MCAConverter.default.parseMCAPromise(_path.default.join(_Configuration.default.NETHER_DIR, _regionFile)));
   }
 
   _CustomLogger.default.info("Beginning parse of ".concat(mcaReadingPromises.length, " overworld region files. This may take a while!"));
@@ -95,24 +103,14 @@ if (!_ServerDataExtractor.default.checkForData()) {
     _CustomLogger.default.info('Completed parse of overworld region files', DOMAIN);
 
     _CustomLogger.default.debug("Promise returned ".concat(val, "."), DOMAIN);
-  }).catch(function (err) {
-    _CustomLogger.default.error(err, DOMAIN);
   });
-
-  var mcaNetherReadingPromises = [],
-      netherRegionFiles = _fsExtra.default.readdirSync(_Configuration.default.NETHER_DIR);
-
-  for (var _i3 in netherRegionFiles) {
-    var _regionFile = netherRegionFiles[_i3];
-    mcaNetherReadingPromises.push(_MCAConverter.default.parseMCAPromise(_path.default.join(_Configuration.default.NETHER_DIR, _regionFile)));
-  }
 
   _CustomLogger.default.info("Beginning parse of ".concat(mcaNetherReadingPromises.length, " nether region files. This may take a while!"));
 
-  Promise.all(mcaNetherReadingPromises).then(function (val) {
+  Promise.all(mcaNetherReadingPromises).then(function (val1) {
     _CustomLogger.default.info('Completed parse of nether region files', DOMAIN);
 
-    _CustomLogger.default.debug("Promise returned ".concat(val, "."), DOMAIN);
+    _CustomLogger.default.debug("Promise returned ".concat(val1, "."), DOMAIN);
   }).catch(function (err) {
     _CustomLogger.default.error(err, DOMAIN);
   });
