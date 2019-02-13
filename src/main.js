@@ -58,33 +58,33 @@ if (!ServerDataExtractor.checkForData()) {
         PlayerDataCombiner.combinePlayerData(Object.keys(Config.PLAYERS)[i]);
     }
 
-    // REGION FILE PARSING
-    let mcaReadingPromises = [], mcaNetherReadingPromises = [],
-        netherRegionFiles = fs.readdirSync(Config.NETHER_DIR),
-        overworldRegionFiles = fs.readdirSync(Config.OVERWORLD_DIR);
+    // // REGION FILE PARSING
+    // let mcaReadingPromises = [], mcaNetherReadingPromises = [],
+    //     netherRegionFiles = fs.readdirSync(Config.NETHER_DIR),
+    //     overworldRegionFiles = fs.readdirSync(Config.OVERWORLD_DIR);
 
-    for (let i in overworldRegionFiles) {
-        let regionFile = overworldRegionFiles[i];
+    // for (let i in overworldRegionFiles) {
+    //     let regionFile = overworldRegionFiles[i];
     
-        mcaReadingPromises.push(MCAConverter.parseMCAPromise(path.join(Config.OVERWORLD_DIR, regionFile)));
-    }
-    for (let i in netherRegionFiles) {
-        let regionFile = netherRegionFiles[i];
+    //     mcaReadingPromises.push(MCAConverter.parseMCAPromise(path.join(Config.OVERWORLD_DIR, regionFile)));
+    // }
+    // for (let i in netherRegionFiles) {
+    //     let regionFile = netherRegionFiles[i];
     
-        mcaReadingPromises.push(MCAConverter.parseMCAPromise(path.join(Config.NETHER_DIR, regionFile)));
-    }
-    log.info(`Beginning parse of ${mcaReadingPromises.length} overworld region files. This may take a while!`);
-    Promise.all(mcaReadingPromises).then((val) => {
-        log.info('Completed parse of overworld region files', DOMAIN);
-        log.debug(`Promise returned ${val}.`, DOMAIN);
-    });
-    log.info(`Beginning parse of ${mcaNetherReadingPromises.length} nether region files. This may take a while!`);
-    Promise.all(mcaNetherReadingPromises).then((val1) => {
-        log.info('Completed parse of nether region files', DOMAIN);
-        log.debug(`Promise returned ${val1}.`, DOMAIN);
-    }).catch((err) => {
-        log.error(err, DOMAIN);
-    });
+    //     mcaReadingPromises.push(MCAConverter.parseMCAPromise(path.join(Config.NETHER_DIR, regionFile)));
+    // }
+    // log.info(`Beginning parse of ${mcaReadingPromises.length} overworld region files. This may take a while!`);
+    // Promise.all(mcaReadingPromises).then((val) => {
+    //     log.info('Completed parse of overworld region files', DOMAIN);
+    //     log.debug(`Promise returned ${val}.`, DOMAIN);
+    // });
+    // log.info(`Beginning parse of ${mcaNetherReadingPromises.length} nether region files. This may take a while!`);
+    // Promise.all(mcaNetherReadingPromises).then((val1) => {
+    //     log.info('Completed parse of nether region files', DOMAIN);
+    //     log.debug(`Promise returned ${val1}.`, DOMAIN);
+    // }).catch((err) => {
+    //     log.error(err, DOMAIN);
+    // });
 }
 // log.info('Starting JSON file processing (advancements, stats)', DOMAIN);
 

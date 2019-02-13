@@ -17,8 +17,10 @@ var condenseNBT = function condenseNBT(nbtjson) {
       case 'list':
         condensed[key] = [];
 
-        for (var n in nbtjson[key].value.value) {
-          condensed[key].push(condenseNBT(n));
+        if (nbtjson[key].value.type !== 'end') {
+          for (var i in nbtjson[key].value.value) {
+            condensed[key].push(condenseNBT(nbtjson[key].value.value[i]));
+          }
         }
 
         break;

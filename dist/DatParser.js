@@ -7,6 +7,8 @@ exports.default = void 0;
 
 var _Configuration = _interopRequireDefault(require("./lib/Configuration"));
 
+var _NBTHelper = _interopRequireDefault(require("./lib/NBTHelper"));
+
 var _fsExtra = _interopRequireDefault(require("fs-extra"));
 
 var _path = _interopRequireDefault(require("path"));
@@ -39,7 +41,9 @@ var parsePlayerdata = function parsePlayerdata() {
           throw error;
         }
 
-        _fsExtra.default.writeJSON(_path.default.join(PLAYERDATAJSON_DIR, "".concat(uuid, ".json")), nbtdata);
+        _fsExtra.default.writeJSON(_path.default.join(PLAYERDATAJSON_DIR, "".concat(uuid, ".json")), _NBTHelper.default.condenseNBT(nbtdata.value), {
+          'spaces': 2
+        });
       });
     });
   };

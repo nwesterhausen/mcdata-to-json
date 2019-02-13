@@ -8,8 +8,10 @@ let condenseNBT = function(nbtjson) {
                 break;
             case 'list':
                 condensed[key] = [];
-                for (let n in nbtjson[key].value.value) {
-                    condensed[key].push(condenseNBT(n));
+                if (nbtjson[key].value.type !== 'end') {
+                    for (let i in nbtjson[key].value.value) {
+                        condensed[key].push(condenseNBT(nbtjson[key].value.value[i]));
+                    }
                 }
                 break;
             default:

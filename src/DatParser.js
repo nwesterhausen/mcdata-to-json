@@ -1,4 +1,5 @@
 import Config from './lib/Configuration';
+import NBTHelper from './lib/NBTHelper';
 import fs from 'fs-extra';
 import path from 'path';
 import nbt from 'nbt';
@@ -24,7 +25,8 @@ let parsePlayerdata = function() {
                 if (error) {
                     throw error;
                 }
-                fs.writeJSON(path.join(PLAYERDATAJSON_DIR, `${uuid}.json`), nbtdata);
+
+                fs.writeJSON(path.join(PLAYERDATAJSON_DIR, `${uuid}.json`), NBTHelper.condenseNBT(nbtdata.value), { 'spaces': 2 });
             });
         });
     }

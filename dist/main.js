@@ -79,40 +79,30 @@ if (!_ServerDataExtractor.default.checkForData()) {
 
   for (var _i = 0; _i < Object.keys(_Configuration.default.PLAYERS).length; _i++) {
     _PlayerDataCombiner.default.combinePlayerData(Object.keys(_Configuration.default.PLAYERS)[_i]);
-  } // REGION FILE PARSING
+  } // // REGION FILE PARSING
+  // let mcaReadingPromises = [], mcaNetherReadingPromises = [],
+  //     netherRegionFiles = fs.readdirSync(Config.NETHER_DIR),
+  //     overworldRegionFiles = fs.readdirSync(Config.OVERWORLD_DIR);
+  // for (let i in overworldRegionFiles) {
+  //     let regionFile = overworldRegionFiles[i];
+  //     mcaReadingPromises.push(MCAConverter.parseMCAPromise(path.join(Config.OVERWORLD_DIR, regionFile)));
+  // }
+  // for (let i in netherRegionFiles) {
+  //     let regionFile = netherRegionFiles[i];
+  //     mcaReadingPromises.push(MCAConverter.parseMCAPromise(path.join(Config.NETHER_DIR, regionFile)));
+  // }
+  // log.info(`Beginning parse of ${mcaReadingPromises.length} overworld region files. This may take a while!`);
+  // Promise.all(mcaReadingPromises).then((val) => {
+  //     log.info('Completed parse of overworld region files', DOMAIN);
+  //     log.debug(`Promise returned ${val}.`, DOMAIN);
+  // });
+  // log.info(`Beginning parse of ${mcaNetherReadingPromises.length} nether region files. This may take a while!`);
+  // Promise.all(mcaNetherReadingPromises).then((val1) => {
+  //     log.info('Completed parse of nether region files', DOMAIN);
+  //     log.debug(`Promise returned ${val1}.`, DOMAIN);
+  // }).catch((err) => {
+  //     log.error(err, DOMAIN);
+  // });
 
-
-  var mcaReadingPromises = [],
-      mcaNetherReadingPromises = [],
-      netherRegionFiles = _fsExtra.default.readdirSync(_Configuration.default.NETHER_DIR),
-      overworldRegionFiles = _fsExtra.default.readdirSync(_Configuration.default.OVERWORLD_DIR);
-
-  for (var _i2 in overworldRegionFiles) {
-    var regionFile = overworldRegionFiles[_i2];
-    mcaReadingPromises.push(_MCAConverter.default.parseMCAPromise(_path.default.join(_Configuration.default.OVERWORLD_DIR, regionFile)));
-  }
-
-  for (var _i3 in netherRegionFiles) {
-    var _regionFile = netherRegionFiles[_i3];
-    mcaReadingPromises.push(_MCAConverter.default.parseMCAPromise(_path.default.join(_Configuration.default.NETHER_DIR, _regionFile)));
-  }
-
-  _CustomLogger.default.info("Beginning parse of ".concat(mcaReadingPromises.length, " overworld region files. This may take a while!"));
-
-  Promise.all(mcaReadingPromises).then(function (val) {
-    _CustomLogger.default.info('Completed parse of overworld region files', DOMAIN);
-
-    _CustomLogger.default.debug("Promise returned ".concat(val, "."), DOMAIN);
-  });
-
-  _CustomLogger.default.info("Beginning parse of ".concat(mcaNetherReadingPromises.length, " nether region files. This may take a while!"));
-
-  Promise.all(mcaNetherReadingPromises).then(function (val1) {
-    _CustomLogger.default.info('Completed parse of nether region files', DOMAIN);
-
-    _CustomLogger.default.debug("Promise returned ".concat(val1, "."), DOMAIN);
-  }).catch(function (err) {
-    _CustomLogger.default.error(err, DOMAIN);
-  });
 } // log.info('Starting JSON file processing (advancements, stats)', DOMAIN);
 // log.info('Starting NBT data processing (level.dat, playerdata)', DOMAIN);

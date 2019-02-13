@@ -10,7 +10,7 @@ const nbt = require('nbt');
 
 const DOMAIN = 'MCA Parser';
 
-const PARSED_MCA_CACHE_DIR = path.join(Config.DATA_DIR, 'mcajson'),
+const PARSED_MCA_CACHE_DIR = path.join(Config.WORK_DIR, 'mcajson'),
     OVERWORLD = 'overworld',
     NETHER = 'DIM-1',
     END = 'DIM1';
@@ -33,7 +33,7 @@ let recordTileEntity = function(tejson, storageObject) {
         }
         storageObject[id].push(te);
     },
-    parseMCAPromise = function(mcaFilepath, progressBar) {
+    parseMCAPromise = function(mcaFilepath) {
         if (fs.lstatSync(mcaFilepath).isDirectory()) {
             log.warn(`Was given a directory to parse ${mcaFilepath}`, DOMAIN);
             return;
@@ -49,7 +49,7 @@ let recordTileEntity = function(tejson, storageObject) {
         masterTileEntityStore[fname] = {};
         // eslint-disable-next-line no-unused-vars
         return new Promise( (resolve, reject) => {
-            const PROGRESS_BAR = new ProgressCLI.Bar({ 'hideCursor': true, 'format': `[{bar}] {percentage}% ({duration}s) {value}/{total} chunks in ${discoveredworldname} / ${fname}` }, ProgressCLI.Presets.rect);
+            const PROGRESS_BAR = new ProgressCLI.Bar({ 'hideCursor': true, 'format': `[{bar}] {percentage}% {value}/{total} chunks in ${fname}. Total time on ${discoveredworldname}: {duration}s` }, ProgressCLI.Presets.rect);
 
             PROGRESS_BAR.start(1024, 0);
             fs.readFile(mcaFilepath, (err, data) => {
@@ -93,7 +93,7 @@ let recordTileEntity = function(tejson, storageObject) {
                 for (let key in masterTileEntityStore[fname]) {
                     log.debug(`Found ${masterTileEntityStore[fname][key].length} ${key} in ${fname}`, DOMAIN);
                 }
-                fs.writeJSON(JSON_OUT_PATH, masterTileEntityStore[fname]).then((val) => {
+                fs.writeJSON(JSON_OUT_PATH, masterTileEntityStore[fname], { 'spaces': 2 }).then((val) => {
                     log.debug(`Finished ${mcaFilepath}`, DOMAIN);
                     log.debug(`JSON Write returned ${val}`, DOMAIN);
                     resolve(fname);

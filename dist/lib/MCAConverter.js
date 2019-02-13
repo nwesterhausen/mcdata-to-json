@@ -25,7 +25,7 @@ var nbt = require('nbt');
 
 var DOMAIN = 'MCA Parser';
 
-var PARSED_MCA_CACHE_DIR = _path.default.join(_Configuration.default.DATA_DIR, 'mcajson'),
+var PARSED_MCA_CACHE_DIR = _path.default.join(_Configuration.default.WORK_DIR, 'mcajson'),
     OVERWORLD = 'overworld',
     NETHER = 'DIM-1',
     END = 'DIM1';
@@ -54,7 +54,7 @@ var recordTileEntity = function recordTileEntity(tejson, storageObject) {
 
   storageObject[id].push(te);
 },
-    parseMCAPromise = function parseMCAPromise(mcaFilepath, progressBar) {
+    parseMCAPromise = function parseMCAPromise(mcaFilepath) {
   if (_fsExtra.default.lstatSync(mcaFilepath).isDirectory()) {
     _CustomLogger.default.warn("Was given a directory to parse ".concat(mcaFilepath), DOMAIN);
 
@@ -73,7 +73,7 @@ var recordTileEntity = function recordTileEntity(tejson, storageObject) {
   return new Promise(function (resolve, reject) {
     var PROGRESS_BAR = new _cliProgress.default.Bar({
       'hideCursor': true,
-      'format': "[{bar}] {percentage}% ({duration}s) {value}/{total} chunks in ".concat(discoveredworldname, " / ").concat(fname)
+      'format': "[{bar}] {percentage}% {value}/{total} chunks in ".concat(fname, ". Total time on ").concat(discoveredworldname, ": {duration}s")
     }, _cliProgress.default.Presets.rect);
     PROGRESS_BAR.start(1024, 0);
 
@@ -124,7 +124,9 @@ var recordTileEntity = function recordTileEntity(tejson, storageObject) {
         _CustomLogger.default.debug("Found ".concat(masterTileEntityStore[fname][key].length, " ").concat(key, " in ").concat(fname), DOMAIN);
       }
 
-      _fsExtra.default.writeJSON(JSON_OUT_PATH, masterTileEntityStore[fname]).then(function (val) {
+      _fsExtra.default.writeJSON(JSON_OUT_PATH, masterTileEntityStore[fname], {
+        'spaces': 2
+      }).then(function (val) {
         _CustomLogger.default.debug("Finished ".concat(mcaFilepath), DOMAIN);
 
         _CustomLogger.default.debug("JSON Write returned ".concat(val), DOMAIN);
