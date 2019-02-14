@@ -19,7 +19,17 @@ function chunkToJSON(filehandle, chunkX, chunkZ) {
     return new Promise((resolve, reject) => {
         let chunkdata = mca.getData(filehandle, chunkX, chunkZ)
         if (!chunkdata) {
-            return resolve('empty');
+            return resolve({
+                zPos: 0,
+                xPos: 0,
+                LastUpdate: [],
+                Biomes: [], //.filter(onlyUnique),
+                InhabitedTime: [],
+                TileEntities: [],
+                Entities: [],
+                Status: 'empty',
+                Structures: {}
+            });
         }
         NbtTools.nbtToJson(chunkdata)
             .then((chunkjson) => {

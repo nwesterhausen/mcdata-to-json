@@ -111,6 +111,40 @@ function combinePlayerData(uuid) {
     });
 }
 
+function buildTileEntityList(mcaJsonDir) {
+    let jsonregionFiles = fs.readdirSync(mcaJsonDir);
+
+    return new Promise((resolve, reject) => {
+        Promise.all(jsonregionFiles.map((filename) => {
+                console.log(filename);
+                return fs.readJSON(path.join(mcaJsonDir, filename))
+            }))
+            .then((chunklistJson) => {
+                let tileEntities = {};
+                chunklistJson.map((regionjson) => {
+                    regionjson.map((chunkjson) => {
+                        if (chunkjson.hasOwnProperty('TileEntities')) {
+                            chunkjson.TileEntities.map((te) => {
+                                if (!tileEntities.hasOwnProperty(te.id)) {
+                                    tileEntities[te.id] = [];
+                                }
+                                tileEntities[te.id].push(te);
+                            })
+                        }
+                    });
+                });
+                return resolve(tileEntities);
+            })
+            .catch((err) => {
+                return reject(err);
+            })
+    });
+}
+
+
+
+///// MAIN ///////
+
 updateProfiles().then((val) => { // GET PLAYER INFORMATION FROM MOJANG
         return createJsonForAllRegionDirs()
     }).then((val) => {
@@ -122,9 +156,64 @@ updateProfiles().then((val) => { // GET PLAYER INFORMATION FROM MOJANG
         return performLogOperations() // CONVERT LOG FILES
     }).then((logopResp) => {
         Log.info('All log operations completed', DOMAIN);
+        fs.writeJsonSync(path.join(Config.OUTPUT_DIR, 'uuids.json'), Config.PLAYERS);
         return Promise.all(Object.keys(Config.PLAYERS).map((uuid) => {
             return combinePlayerData(uuid)
         }));
     }).then((val) => {
         Log.info('Copied player info to output directory', DOMAIN);
+        return buildTileEntityList(path.join(Config.WORK_DIR, 'mcajson', 'overworld'));
+    }).then((overworldTEJson) => {
+        let teWithItems = [],
+            mobSpawners = [],
+            lootables = {};
+        Object.keys(overworldTEJson).map((tilentid) => {
+            overworldTEJson[tilentid].map((tileent) => {
+                if (tileent.id === 'minecraft:mob_spawner') {
+                    mobSpawners.push({
+                        SpawnData: tileent.SpawnData,
+                        pos: [
+                            tileent.x,
+                            tileent.y,
+                            tileent.z
+                        ]
+                    });
+                } else if (tileent.hasOwnProperty('Items')) {
+                    if (tileent.Items.length > 0) {
+                        teWithItems.push({
+                            Items: tileent.Items,
+                            pos: [
+                                tileent.x,
+                                tileent.y,
+                                tileent.z
+                            ],
+                            id: tileent.id
+                        })
+                    }
+                } else if (tileent.hasOwnProperty('LootTable')) {
+                    let loottype = tileent.LootTable.split('/')[1];
+                    if (!lootables.hasOwnProperty(loottype)) {
+                        lootables[loottype] = [];
+                    }
+                    lootables[loottype].push({
+                        type: loottype,
+                        pos: [
+                            tileent.x,
+                            tileent.y,
+                            tileent.z
+                        ],
+                        id: tileent.id
+                    })
+                }
+            })
+        })
+        fs.writeJSONSync(path.join(Config.OUTPUT_DIR, 'overworld-spawners.json'), mobSpawners);
+        fs.writeJSONSync(path.join(Config.OUTPUT_DIR, 'overworld-inventories.json'), teWithItems);
+        fs.writeJSONSync(path.join(Config.OUTPUT_DIR, 'overworld-loot.json'), lootables);
+        return fs.writeJSON(path.join(Config.OUTPUT_DIR, 'overworld-te.json'),
+            overworldTEJson);
+    }).then((val) => {
+        Log.info('Wrote all TileEntity details to json.', DOMAIN);
+    }).catch((err) => {
+        console.log(err)
     });

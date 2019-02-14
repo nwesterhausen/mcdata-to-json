@@ -124,6 +124,36 @@ function combinePlayerData(uuid) {
   });
 }
 
+function buildTileEntityList(mcaJsonDir) {
+  var jsonregionFiles = _fsExtra.default.readdirSync(mcaJsonDir);
+
+  return new Promise(function (resolve, reject) {
+    Promise.all(jsonregionFiles.map(function (filename) {
+      console.log(filename);
+      return _fsExtra.default.readJSON(_path.default.join(mcaJsonDir, filename));
+    })).then(function (chunklistJson) {
+      var tileEntities = {};
+      chunklistJson.map(function (regionjson) {
+        regionjson.map(function (chunkjson) {
+          if (chunkjson.hasOwnProperty('TileEntities')) {
+            chunkjson.TileEntities.map(function (te) {
+              if (!tileEntities.hasOwnProperty(te.id)) {
+                tileEntities[te.id] = [];
+              }
+
+              tileEntities[te.id].push(te);
+            });
+          }
+        });
+      });
+      return resolve(tileEntities);
+    }).catch(function (err) {
+      return reject(err);
+    });
+  });
+} ///// MAIN ///////
+
+
 updateProfiles().then(function (val) {
   // GET PLAYER INFORMATION FROM MOJANG
   return createJsonForAllRegionDirs();
@@ -136,9 +166,59 @@ updateProfiles().then(function (val) {
 }).then(function (logopResp) {
   _CustomLogger.default.info('All log operations completed', DOMAIN);
 
+  _fsExtra.default.writeJsonSync(_path.default.join(_Configuration.default.OUTPUT_DIR, 'uuids.json'), _Configuration.default.PLAYERS);
+
   return Promise.all(Object.keys(_Configuration.default.PLAYERS).map(function (uuid) {
     return combinePlayerData(uuid);
   }));
 }).then(function (val) {
   _CustomLogger.default.info('Copied player info to output directory', DOMAIN);
+
+  return buildTileEntityList(_path.default.join(_Configuration.default.WORK_DIR, 'mcajson', 'overworld'));
+}).then(function (overworldTEJson) {
+  var teWithItems = [],
+      mobSpawners = [],
+      lootables = {};
+  Object.keys(overworldTEJson).map(function (tilentid) {
+    overworldTEJson[tilentid].map(function (tileent) {
+      if (tileent.id === 'minecraft:mob_spawner') {
+        mobSpawners.push({
+          SpawnData: tileent.SpawnData,
+          pos: [tileent.x, tileent.y, tileent.z]
+        });
+      } else if (tileent.hasOwnProperty('Items')) {
+        if (tileent.Items.length > 0) {
+          teWithItems.push({
+            Items: tileent.Items,
+            pos: [tileent.x, tileent.y, tileent.z],
+            id: tileent.id
+          });
+        }
+      } else if (tileent.hasOwnProperty('LootTable')) {
+        var loottype = tileent.LootTable.split('/')[1];
+
+        if (!lootables.hasOwnProperty(loottype)) {
+          lootables[loottype] = [];
+        }
+
+        lootables[loottype].push({
+          type: loottype,
+          pos: [tileent.x, tileent.y, tileent.z],
+          id: tileent.id
+        });
+      }
+    });
+  });
+
+  _fsExtra.default.writeJSONSync(_path.default.join(_Configuration.default.OUTPUT_DIR, 'overworld-spawners.json'), mobSpawners);
+
+  _fsExtra.default.writeJSONSync(_path.default.join(_Configuration.default.OUTPUT_DIR, 'overworld-inventories.json'), teWithItems);
+
+  _fsExtra.default.writeJSONSync(_path.default.join(_Configuration.default.OUTPUT_DIR, 'overworld-loot.json'), lootables);
+
+  return _fsExtra.default.writeJSON(_path.default.join(_Configuration.default.OUTPUT_DIR, 'overworld-te.json'), overworldTEJson);
+}).then(function (val) {
+  _CustomLogger.default.info('Wrote all TileEntity details to json.', DOMAIN);
+}).catch(function (err) {
+  console.log(err);
 });
