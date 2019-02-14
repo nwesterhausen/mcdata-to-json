@@ -24,7 +24,22 @@ fs.ensureDirSync(LOG_JSON_CACHE_DIR);
 updateLatestLogDate();
 
 function mclogToJson(logfilename) {
-    if (path.extname(logfilename) === '.gz') {
+    const FILE_EXTENSION = path.extname(logfilename);
+    // Check if we previous created a JSON file for this region. If so, skip!
+    if (fs.existsSync(path.join(LOG_JSON_CACHE_DIR, `${logfilename.split('.')[0]}.json`))) {
+        if (fs.statSync(LOG_JSON_CACHE_DIR, `${logfilename.split('.')[0]}.json`).mtime >
+            fs.statSync(path.join(Config.LOGS_DIR, logfilename)).mtime) {
+            if (FILE_EXTENSION === '.log') {
+                Log.debug(`The JSON version of ${logfilename} is up to date.`, DOMAIN);
+                let logjs = fs.readJSONSync(path.join(LOG_JSON_CACHE_DIR,
+                    `${logfilename.split('.')[0]}.json`));
+                rawlogJSON.push(...logjs);
+            }
+            return;
+        }
+    }
+
+    if (FILE_EXTENSION === '.gz') {
         let newLogfilename = unzipLogFile(logfilename);
         return mclogToJson(newLogfilename);
     }
@@ -134,6 +149,9 @@ function buildPlayerLogfiles() {
         let pattern = `(${uuid}|${Config.PLAYERS[uuid]})`;
         let playernameRegex = new RegExp(pattern);
         thisPlayersLog = cleanedJSON.filter((logEntry) => {
+            if (!logEntry.hasOwnProperty('description')) {
+                return false;
+            }
             if (logEntry.type === Constants.TYPE_CHAT) {
                 return logEntry.description.player === Config.PLAYERS[uuid];
             }

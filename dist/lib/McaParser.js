@@ -89,6 +89,15 @@ function convertRegionDirToJSON(mcaDirectory) {
 
   files.map(function (filename) {
     if (_path.default.extname(filename) === '.mca') {
+      // Check if we previous created a JSON file for this region. If so, skip!
+      if (_fsExtra.default.existsSync(_path.default.join(OUTPUT_DIR, filename.replace(/.mca/, '.json')))) {
+        if (_fsExtra.default.statSync(OUTPUT_DIR, filename.replace(/.mca/, '.json')).mtime > _fsExtra.default.statSync(_path.default.join(mcaDirectory, filename)).mtime) {
+          _CustomLogger.default.debug("The JSON version of ".concat(filename.replace(/.mca/, ''), " is up to date."), DOMAIN);
+
+          return;
+        }
+      }
+
       _fsExtra.default.readFile(_path.default.join(mcaDirectory, filename)).then(function (data) {
         _CustomLogger.default.debug("Starting MCA \u27F6  JSON for ".concat(filename), DOMAIN);
 

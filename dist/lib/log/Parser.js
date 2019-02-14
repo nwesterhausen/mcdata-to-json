@@ -23,6 +23,14 @@ var _readline = _interopRequireDefault(require("readline"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread(); }
+
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance"); }
+
+function _iterableToArray(iter) { if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter); }
+
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } }
+
 var DOMAIN = 'Logs Parser',
     LOG_JSON_CACHE_DIR = _path.default.join(_Configuration.default.TEMP_DIR, 'logs');
 
@@ -40,7 +48,24 @@ _fsExtra.default.ensureDirSync(LOG_JSON_CACHE_DIR);
 updateLatestLogDate();
 
 function mclogToJson(logfilename) {
-  if (_path.default.extname(logfilename) === '.gz') {
+  var FILE_EXTENSION = _path.default.extname(logfilename); // Check if we previous created a JSON file for this region. If so, skip!
+
+
+  if (_fsExtra.default.existsSync(_path.default.join(LOG_JSON_CACHE_DIR, "".concat(logfilename.split('.')[0], ".json")))) {
+    if (_fsExtra.default.statSync(LOG_JSON_CACHE_DIR, "".concat(logfilename.split('.')[0], ".json")).mtime > _fsExtra.default.statSync(_path.default.join(_Configuration.default.LOGS_DIR, logfilename)).mtime) {
+      if (FILE_EXTENSION === '.log') {
+        _CustomLogger.default.debug("The JSON version of ".concat(logfilename, " is up to date."), DOMAIN);
+
+        var logjs = _fsExtra.default.readJSONSync(_path.default.join(LOG_JSON_CACHE_DIR, "".concat(logfilename.split('.')[0], ".json")));
+
+        rawlogJSON.push.apply(rawlogJSON, _toConsumableArray(logjs));
+      }
+
+      return;
+    }
+  }
+
+  if (FILE_EXTENSION === '.gz') {
     var newLogfilename = unzipLogFile(logfilename);
     return mclogToJson(newLogfilename);
   }
@@ -157,6 +182,10 @@ function buildPlayerLogfiles() {
     var pattern = "(".concat(uuid, "|").concat(_Configuration.default.PLAYERS[uuid], ")");
     var playernameRegex = new RegExp(pattern);
     thisPlayersLog = cleanedJSON.filter(function (logEntry) {
+      if (!logEntry.hasOwnProperty('description')) {
+        return false;
+      }
+
       if (logEntry.type === _Constants.default.TYPE_CHAT) {
         return logEntry.description.player === _Configuration.default.PLAYERS[uuid];
       }

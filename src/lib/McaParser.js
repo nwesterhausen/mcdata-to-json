@@ -74,6 +74,16 @@ function convertRegionDirToJSON(mcaDirectory) {
     let files = fs.readdirSync(mcaDirectory);
     files.map((filename) => {
         if (path.extname(filename) === '.mca') {
+            // Check if we previous created a JSON file for this region. If so, skip!
+            if (fs.existsSync(path.join(OUTPUT_DIR, filename.replace(/.mca/, '.json')))) {
+                if (fs.statSync(OUTPUT_DIR, filename.replace(/.mca/, '.json')).mtime >
+                    fs.statSync(path.join(mcaDirectory, filename)).mtime) {
+                    Log.debug(`The JSON version of ${filename.replace(/.mca/, '')} is up to date.`, DOMAIN);
+                    return;
+                }
+            }
+
+
             fs.readFile(path.join(mcaDirectory, filename))
                 .then((data) => {
                     Log.debug(`Starting MCA ⟶  JSON for ${filename}`, DOMAIN);

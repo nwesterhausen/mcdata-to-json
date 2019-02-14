@@ -73,9 +73,12 @@ function performLogOperations() {
 }
 
 function createJsonForAllRegionDirs() {
-    McaParser.convertRegionDirToJSON(Config.OVERWORLD_DIR);
-    McaParser.convertRegionDirToJSON(Config.NETHER_DIR);
-    McaParser.convertRegionDirToJSON(Config.END_DIR);
+    return new Promise((resolve, reject) => {
+        McaParser.convertRegionDirToJSON(Config.OVERWORLD_DIR);
+        McaParser.convertRegionDirToJSON(Config.NETHER_DIR);
+        McaParser.convertRegionDirToJSON(Config.END_DIR);
+        resolve();
+    })
 }
 
 function combinePlayerData(uuid) {
@@ -109,6 +112,10 @@ function combinePlayerData(uuid) {
 }
 
 updateProfiles().then((val) => { // GET PLAYER INFORMATION FROM MOJANG
+        return createJsonForAllRegionDirs()
+    }).then((val) => {
+        Log.info('Finished saving chunks to JSON', DOMAIN);
+    }).then((val) => {
         return PlayerData.convertPlayerdatFiles() // CONVERT PLAYER.DAT FILES
     })
     .then((val) => {
@@ -120,4 +127,4 @@ updateProfiles().then((val) => { // GET PLAYER INFORMATION FROM MOJANG
         }));
     }).then((val) => {
         Log.info('Copied player info to output directory', DOMAIN);
-    })
+    });

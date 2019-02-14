@@ -88,11 +88,15 @@ function performLogOperations() {
 }
 
 function createJsonForAllRegionDirs() {
-  _McaParser.default.convertRegionDirToJSON(_Configuration.default.OVERWORLD_DIR);
+  return new Promise(function (resolve, reject) {
+    _McaParser.default.convertRegionDirToJSON(_Configuration.default.OVERWORLD_DIR);
 
-  _McaParser.default.convertRegionDirToJSON(_Configuration.default.NETHER_DIR);
+    _McaParser.default.convertRegionDirToJSON(_Configuration.default.NETHER_DIR);
 
-  _McaParser.default.convertRegionDirToJSON(_Configuration.default.END_DIR);
+    _McaParser.default.convertRegionDirToJSON(_Configuration.default.END_DIR);
+
+    resolve();
+  });
 }
 
 function combinePlayerData(uuid) {
@@ -122,6 +126,10 @@ function combinePlayerData(uuid) {
 
 updateProfiles().then(function (val) {
   // GET PLAYER INFORMATION FROM MOJANG
+  return createJsonForAllRegionDirs();
+}).then(function (val) {
+  _CustomLogger.default.info('Finished saving chunks to JSON', DOMAIN);
+}).then(function (val) {
   return _PlayerData.default.convertPlayerdatFiles(); // CONVERT PLAYER.DAT FILES
 }).then(function (val) {
   return performLogOperations(); // CONVERT LOG FILES
