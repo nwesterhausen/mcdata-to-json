@@ -1,12 +1,13 @@
 {
   "name": "mcdata-to-json",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Node.js app to turn Minecraft .dat and .json files into unified json.",
   "main": "dist/main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "watch 'npm run build' src",
-    "build": "babel src --out-dir dist --delete-dir-on-start --presets=@babel/preset-env --copy-files"
+    "build": "babel src --out-dir dist --delete-dir-on-start --presets=@babel/preset-env --copy-files",
+    "prettier-watch": "onchange \"/**/*.js\" -- prettier --write {{changed}}"
   },
   "author": "Nicholas Westerhausen",
   "license": "MIT",
@@ -33,7 +34,11 @@
     "@babel/preset-env": "^7.3.1",
     "@babel/register": "^7.0.0",
     "eslint": "^5.13.0",
+    "eslint-config-prettier": "^4.0.0",
+    "eslint-plugin-prettier": "^3.0.1",
     "eslint-watch": "^4.0.2",
+    "onchange": "^5.2.0",
+    "prettier": "1.16.4",
     "watch": "^1.0.2"
   }
 }

@@ -1,108 +1,136 @@
 "use strict";
 
+var _Configuration = _interopRequireDefault(require("./Configuration"));
+
 var _CustomLogger = _interopRequireDefault(require("./lib/CustomLogger"));
 
-var _Configuration = _interopRequireDefault(require("./lib/Configuration"));
+var _MojangAPI = _interopRequireDefault(require("./lib/MojangAPI"));
 
-var _PlayerDataCombiner = _interopRequireDefault(require("./lib/PlayerDataCombiner"));
+var _PlayerData = _interopRequireDefault(require("./lib/PlayerData"));
 
-var _LogsParser = _interopRequireDefault(require("./LogsParser"));
+var _Parser = _interopRequireDefault(require("./lib/log/Parser"));
 
-var _ServerDataExtractor = _interopRequireDefault(require("./lib/ServerDataExtractor"));
-
-var _MCAConverter = _interopRequireDefault(require("./lib/MCAConverter"));
-
-var _DatParser = _interopRequireDefault(require("./DatParser"));
-
-var _MojangApi = _interopRequireDefault(require("./lib/MojangApi"));
-
-var _fsExtra = _interopRequireDefault(require("fs-extra"));
+var _McaParser = _interopRequireDefault(require("./lib/McaParser"));
 
 var _path = _interopRequireDefault(require("path"));
 
+var _fsExtra = _interopRequireDefault(require("fs-extra"));
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-/**
- * You need to set the minecraft folder location in the MC_DIR env variable
- * or use the --minecraft="" parameter when running.
- *
- * By default will output in the current directory, or the OUTPUT_DIR env
- * variable, OR the --outdir="" parameter.
- */
-// import AdvancementParser from './AdvancementParser';
-var DOMAIN = 'Main';
+var DOMAIN = 'Main',
+    PLAYER_PROFILE_CACHE_DIR = _path.default.join(_Configuration.default.TEMP_DIR, 'profiles'),
+    PROFILE_CACHE_ACCEPTABLE_AGE = 1000 * 60 * 60 * 4; // 4 hours
 
-if (!_Configuration.default.MCJAR_FILE) {
-  _CustomLogger.default.error('We expect to have a Minecraft server or client jar in the Minecraft directory.', DOMAIN);
 
-  process.exit(1);
+_fsExtra.default.ensureDirSync(PLAYER_PROFILE_CACHE_DIR);
+
+function updateProfiles() {
+  var honorCache = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
+  var uuid_list = Object.keys(_Configuration.default.PLAYERS);
+  return Promise.all(uuid_list.map(function (uuid) {
+    var cachedPlayerProfile = _path.default.join(PLAYER_PROFILE_CACHE_DIR, "".concat(uuid, ".json"));
+
+    var shouldQueryProfile = true;
+
+    if (_fsExtra.default.existsSync(cachedPlayerProfile)) {
+      shouldQueryProfile = Date.now() - _fsExtra.default.statSync(cachedPlayerProfile).mtime > PROFILE_CACHE_ACCEPTABLE_AGE || !honorCache;
+    }
+
+    if (shouldQueryProfile) {
+      _CustomLogger.default.debug("Updating Mojang profile on disk for ".concat(uuid), DOMAIN);
+
+      return new Promise(function (resolve, reject) {
+        _MojangAPI.default.getProfileForUUID(uuid).then(function (profileResp) {
+          _CustomLogger.default.debug("Profile for ".concat(uuid, " ").concat(profileResp.status, " ").concat(profileResp.statusText), DOMAIN);
+
+          if (profileResp.data) {
+            var cleanedProfileJSON = _MojangAPI.default.jsonFromProfileResp(profileResp.data);
+
+            return _fsExtra.default.writeJSON(cachedPlayerProfile, cleanedProfileJSON, {
+              'spaces': 2
+            });
+          }
+        }).then(function (res) {
+          _CustomLogger.default.info("Cached new profile data for ".concat(uuid), DOMAIN);
+        }).catch(function (err) {
+          if (err.message.indexOf('code 429')) {
+            _CustomLogger.default.warn('Too many requests to Mojang API.', DOMAIN);
+          } else _CustomLogger.default.warn(err, DOMAIN);
+        });
+      });
+    } else {
+      _CustomLogger.default.info("No need to update Mojang profile for ".concat(_Configuration.default.PLAYERS[uuid], ", cache is younger than 4 hours"), DOMAIN);
+    }
+  }));
 }
 
-_CustomLogger.default.info('Check for cache of Minecraft data.', DOMAIN);
+function performLogOperations() {
+  return new Promise(function (resolve, reject) {
+    Promise.all(_fsExtra.default.readdirSync(_Configuration.default.LOGS_DIR).map(function (logfile) {
+      return _Parser.default.mclogToJson(logfile);
+    })).then(function (val) {
+      _CustomLogger.default.info("Wrote ".concat(val.length, " log files to JSON."), DOMAIN);
 
-if (!_ServerDataExtractor.default.checkForData()) {
-  _CustomLogger.default.info('No cached data exists.', DOMAIN);
+      _Parser.default.sortRawlogJSON();
 
-  _CustomLogger.default.warn('Quitting after data extracted.', DOMAIN);
+      _Parser.default.buildCombinedLogfiles();
 
-  var promises = [];
-  promises.push(_ServerDataExtractor.default.extractMinecraftAssetsPromise());
-  promises.push(_ServerDataExtractor.default.extractMinecraftDataPromise());
+      _Parser.default.buildPlayerLogfiles();
 
-  if (_Configuration.default.DATAPACKS_DIR) {
-    var possibleDPs = _fsExtra.default.readdirSync(_Configuration.default.DATAPACKS_DIR);
+      return resolve('Logparsing Completed');
+    }).catch(function (err) {
+      _CustomLogger.default.warn(err, DOMAIN);
 
-    for (var i = 0; i < possibleDPs.length; i++) {
-      promises.push(_ServerDataExtractor.default.extractPromise(_path.default.join(_Configuration.default.DATAPACKS_DIR, possibleDPs[i]), _Configuration.default.EXTRACTED_DIR));
-    }
-  }
-
-  Promise.all(promises).then(function (val) {
-    _CustomLogger.default.debug("Promise returned ".concat(val), DOMAIN);
-  }).catch(function (val) {
-    _CustomLogger.default.error(val, DOMAIN);
+      return reject(err);
+    });
   });
-} else {
-  _CustomLogger.default.info('Cached data exists.', DOMAIN);
+}
 
-  _CustomLogger.default.info('Lazily updating cached player profiles.', DOMAIN);
+function createJsonForAllRegionDirs() {
+  _McaParser.default.convertRegionDirToJSON(_Configuration.default.OVERWORLD_DIR);
 
-  _MojangApi.default.lazyProfileUpdate();
+  _McaParser.default.convertRegionDirToJSON(_Configuration.default.NETHER_DIR);
 
-  _CustomLogger.default.info('Starting log file processing.', DOMAIN);
+  _McaParser.default.convertRegionDirToJSON(_Configuration.default.END_DIR);
+}
 
-  _LogsParser.default.prepareLogFiles();
+function combinePlayerData(uuid) {
+  var readjsonPromises = [_fsExtra.default.readJSON(_path.default.join(_Configuration.default.STATS_DIR, "".concat(uuid, ".json"))), _fsExtra.default.readJSON(_path.default.join(_Configuration.default.ADVANCEMENTS_DIR, "".concat(uuid, ".json"))), _fsExtra.default.readJSON(_path.default.join(_Configuration.default.TEMP_DIR, 'playerdata', "".concat(uuid, ".json"))), _fsExtra.default.readJSON(_path.default.join(PLAYER_PROFILE_CACHE_DIR, "".concat(uuid, ".json"))), _fsExtra.default.readJSON(_path.default.join(_Configuration.default.TEMP_DIR, 'logs', "".concat(uuid, ".json")))];
+  Promise.all(readjsonPromises).then(function (val) {
+    _fsExtra.default.writeJSON(_path.default.join(_Configuration.default.OUTPUT_DIR, "".concat(uuid, ".json")), {
+      'uuid': uuid,
+      'name': _Configuration.default.PLAYERS[uuid],
+      'stats': val[0],
+      'advancements': val[1],
+      'data': val[2],
+      'profile': val[3],
+      'log': val[4]
+    }).then(function (val) {
+      _CustomLogger.default.info("Wrote output JSON for ".concat(uuid, "."), DOMAIN);
 
-  _LogsParser.default.parseLogFiles();
+      if (val) {
+        _CustomLogger.default.debug(val, DOMAIN);
+      }
+    }).catch(function (err) {
+      _CustomLogger.default.warn("Failed to build output for ".concat(uuid, "."), DOMAIN);
 
-  _DatParser.default.parsePlayerdata();
+      _CustomLogger.default.warn(err, DOMAIN);
+    });
+  });
+}
 
-  for (var _i = 0; _i < Object.keys(_Configuration.default.PLAYERS).length; _i++) {
-    _PlayerDataCombiner.default.combinePlayerData(Object.keys(_Configuration.default.PLAYERS)[_i]);
-  } // // REGION FILE PARSING
-  // let mcaReadingPromises = [], mcaNetherReadingPromises = [],
-  //     netherRegionFiles = fs.readdirSync(Config.NETHER_DIR),
-  //     overworldRegionFiles = fs.readdirSync(Config.OVERWORLD_DIR);
-  // for (let i in overworldRegionFiles) {
-  //     let regionFile = overworldRegionFiles[i];
-  //     mcaReadingPromises.push(MCAConverter.parseMCAPromise(path.join(Config.OVERWORLD_DIR, regionFile)));
-  // }
-  // for (let i in netherRegionFiles) {
-  //     let regionFile = netherRegionFiles[i];
-  //     mcaReadingPromises.push(MCAConverter.parseMCAPromise(path.join(Config.NETHER_DIR, regionFile)));
-  // }
-  // log.info(`Beginning parse of ${mcaReadingPromises.length} overworld region files. This may take a while!`);
-  // Promise.all(mcaReadingPromises).then((val) => {
-  //     log.info('Completed parse of overworld region files', DOMAIN);
-  //     log.debug(`Promise returned ${val}.`, DOMAIN);
-  // });
-  // log.info(`Beginning parse of ${mcaNetherReadingPromises.length} nether region files. This may take a while!`);
-  // Promise.all(mcaNetherReadingPromises).then((val1) => {
-  //     log.info('Completed parse of nether region files', DOMAIN);
-  //     log.debug(`Promise returned ${val1}.`, DOMAIN);
-  // }).catch((err) => {
-  //     log.error(err, DOMAIN);
-  // });
+updateProfiles().then(function (val) {
+  // GET PLAYER INFORMATION FROM MOJANG
+  return _PlayerData.default.convertPlayerdatFiles(); // CONVERT PLAYER.DAT FILES
+}).then(function (val) {
+  return performLogOperations(); // CONVERT LOG FILES
+}).then(function (logopResp) {
+  _CustomLogger.default.info('All log operations completed', DOMAIN);
 
-} // log.info('Starting JSON file processing (advancements, stats)', DOMAIN);
-// log.info('Starting NBT data processing (level.dat, playerdata)', DOMAIN);
+  return Promise.all(Object.keys(_Configuration.default.PLAYERS).map(function (uuid) {
+    return combinePlayerData(uuid);
+  }));
+}).then(function (val) {
+  _CustomLogger.default.info('Copied player info to output directory', DOMAIN);
+});

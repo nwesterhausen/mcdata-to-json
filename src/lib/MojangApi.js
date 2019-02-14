@@ -1,112 +1,50 @@
-import config from './Configuration';
-import log from './CustomLogger';
-import path from 'path';
-import fs from 'fs-extra';
-import axios from 'axios';
+import Axios from "axios";
+import Log from './CustomLogger';
 
-const BASE_API = 'https://sessionserver.mojang.com/session/minecraft/profile/',
-    PLAYER_PROFILE_DIR = path.join(config.TEMP_DIR, 'profiles'),
-    DOMAIN = 'MojangAPI Runner',
-    RECENT_THRESHOLD_MS = (1000 * 60 * 60 * 4); // 4 hours
+const BASE_API_URL = 'https://sessionserver.mojang.com/session/minecraft/profile',
+    DOMAIN = 'MojangAPI Runner';
 
-fs.ensureDirSync(PLAYER_PROFILE_DIR);
-
-let undashUUID = function(uuid) {
+let uriEncodeUUID = function (uuid) {
         return uuid.replace(/-/g, '');
     },
-    redashUUID = function(uriUuid) {
-        const POS_0 = 8, POS_1 = 12, POS_2 = 16, POS_3 = 20;
+    uriDecodeUUID = function (uuid) {
+        const P1 = 8,
+            P2 = 12,
+            P3 = 16,
+            P4 = 20;
 
-        return [uriUuid.slice(0, POS_0), uriUuid.slice(POS_0, POS_1), uriUuid.slice(POS_1, POS_2), uriUuid.slice(POS_2, POS_3), uriUuid.slice(POS_3)].join('-');
+        return [
+            uuid.slice(0, P1),
+            uuid.slice(P1, P2),
+            uuid.slice(P2, P3),
+            uuid.slice(P3, P4),
+            uuid.slice(P4)
+        ].join('-');
     },
-    writeJSON = function(uuid, rawjson) {
-        let parsedJSON = {
-            'id': rawjson.id,
-            'name': rawjson.name,
-            'properties': {} };
-        
-        try {
-            for (let i = 0; i < rawjson.properties.length; i++) {
-                let propertyName = rawjson.properties[i].name;
-                let propertyValue = JSON.parse(Buffer.from(rawjson.properties[i].value, 'base64').toString());
-                
-                parsedJSON.properties[propertyName] = propertyValue;
-                log.debug(`Successfully decoded ${propertyName} property for ${parsedJSON.name}`, DOMAIN);
-            }
-        } catch (err) {
-            log.error('Unable to properly decode base64 response.', DOMAIN);
-            console.log(rawjson); // eslint-disable-line no-console
+    getProfileForUUID = function (uuid) {
+        const API_ENDPOINT = `${BASE_API_URL}/${uuid.replace(/-/g, '')}`;
+        Log.debug(`Providing Axios promise for ${API_ENDPOINT}`, DOMAIN);
+        return Axios.get(API_ENDPOINT);
+    },
+    jsonFromProfileResp = function (resp) {
+        let fulljson = {
+            'id': resp.id,
+            'name': resp.name,
+            'properties': {}
+        };
+        if (resp.properties) {
+            resp.properties.map((property) => {
+                fulljson[property['name']] = JSON.parse(
+                    Buffer.from(property['value'], 'base64')
+                );
+            });
         }
-
-        const PROPER_JSON = parsedJSON,
-            FILEPATH = path.join(PLAYER_PROFILE_DIR, `${uuid}.json`);
-        
-        fs.writeJSON(FILEPATH, PROPER_JSON).then((res) => {
-            log.info(`Saved Mojang Profile for ${PROPER_JSON.name} to ${FILEPATH}.`, DOMAIN);
-        }).catch((err) => {
-            log.error(`Failed saving ${FILEPATH}!`, DOMAIN);
-            throw err;
-        });
-
-    },
-    updateProfileWrapper = function(uuid) {
-        const UUID_TO_CHECK = uuid,
-            CLEANED_UUID = uuid.replace(/-/g, ''),
-            GETPROFILE_URL = `${BASE_API}${CLEANED_UUID}`;
-
-        axios.get(GETPROFILE_URL).then((res) => {
-            log.debug(`${res.status}: ${res.statusText} [${UUID_TO_CHECK}]`, DOMAIN);
-            if (res.data) {
-                writeJSON(UUID_TO_CHECK, res.data);
-            } else {
-                log.warn(`Unable to update Mojang Profile for ${UUID_TO_CHECK} (${res.status})`);
-            }
-        }).catch((err) => {
-            // unable to update
-            log.error(`${err} :${UUID_TO_CHECK}`, DOMAIN);
-        });
-    },
-    updateProfiles = function(force = false) {
-        for (let i in Object.keys(config.PLAYERS)) {
-            let uuid = Object.keys(config.PLAYERS)[i],
-                rightnow = (new Date());
-
-            try {
-                let jsonFileStat = fs.statSync(path.join(PLAYER_PROFILE_DIR, `${uuid}.json`));
-
-                if (rightnow - jsonFileStat.mtime < RECENT_THRESHOLD_MS && !force) {
-                    log.info(`Mojang Profile for ${config.PLAYERS[uuid]} is younger than 4 hours, not updating.`, DOMAIN);
-                    log.debug(`Age difference for ${config.PLAYERS[uuid]}: ${rightnow - jsonFileStat.mtime} (4hrs: ${RECENT_THRESHOLD_MS})`, DOMAIN);
-                } else {
-                    if (!force) {
-                        log.info(`Mojang Profile for ${config.PLAYERS[uuid]} is older than 4 hours, requesting update.`, DOMAIN);
-                        log.debug(`Age difference for ${config.PLAYERS[uuid]}: ${rightnow - jsonFileStat.mtime} (4hrs: ${RECENT_THRESHOLD_MS})`, DOMAIN);
-                    } else {
-                        log.info(`Forcing update of Mojang Profile for ${config.PLAYERS[uuid]}.`, DOMAIN);
-                    }
-                    updateProfileWrapper(uuid);
-                }
-            } catch (err) {
-                if (err.code === 'ENOENT') {
-                    log.info(`Mojang Profile for ${uuid} doesn't exist, fetching profile.`, DOMAIN);
-                    updateProfileWrapper(uuid);
-                } else {
-                    throw err;
-                }
-            }
-        }
-        
-    },
-    lazyProfileUpdate = function() {
-        updateProfiles(false);
-    },
-    forceProfileUpdate = function() {
-        updateProfiles(true);
+        return fulljson;
     };
 
 export default {
-    lazyProfileUpdate,
-    forceProfileUpdate,
-    undashUUID,
-    redashUUID
-};
+    uriDecodeUUID,
+    uriEncodeUUID,
+    getProfileForUUID,
+    jsonFromProfileResp
+}

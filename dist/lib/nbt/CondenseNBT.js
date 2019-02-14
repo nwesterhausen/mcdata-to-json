@@ -3,10 +3,10 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = void 0;
+exports.default = _default;
 
-var condenseNBT = function condenseNBT(nbtjson) {
-  var condensed = {};
+function _default(nbtjson) {
+  condensed = {};
 
   for (var key in nbtjson) {
     switch (nbtjson[key].type) {
@@ -31,14 +31,7 @@ var condenseNBT = function condenseNBT(nbtjson) {
     }
   }
 
-  if (condensed.hasOwnProperty('x') && condensed.hasOwnProperty('y') && condensed.hasOwnProperty('z')) {
-    condensed.pos = [condensed.x, condensed.y, condensed.z];
-  }
-
   return condensed;
-};
+}
 
-var _default = {
-  condenseNBT: condenseNBT
-};
-exports.default = _default;
+;

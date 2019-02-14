@@ -4,41 +4,48 @@
 import path from 'path';
 import fs from 'fs-extra';
 import nopt from 'nopt';
-import log from './CustomLogger';
-import version from '../data/Version';
-import { defaults } from 'lodash';
+import log from './lib/CustomLogger';
 
+const VERSION = require('../package.json').version;
 const DOMAIN = 'Configuration';
-let rundir = path.dirname(process.argv[1]),
+let defaults = function (arr, def) {
+        for (let key in def) {
+            if (!arr.hasOwnProperty(key)) {
+                arr[key] = def[key];
+            }
+        }
+        return arr;
+    },
+    rundir = process.cwd(),
     loglevels = ['error', 'warn', 'info', 'debug', 'silly'],
     defaultOpts = {
-        'minecraft': rundir,
-        'outputdir': path.join(rundir, 'output'),
-        'workdir': path.join(rundir, 'mcdata_cache'),
-        'loglevel': 'info',
-        'help': false,
+        minecraft: rundir,
+        outputdir: path.join(rundir, 'output'),
+        workdir: path.join(rundir, 'mcdata_cache'),
+        loglevel: 'info',
+        help: false,
         'use-env': false
     },
     knownOpts = {
-        'minecraft': path,
-        'outputdir': path,
-        'workdir': path,
-        'loglevel': loglevels,
-        'help': Boolean,
+        minecraft: path,
+        outputdir: path,
+        workdir: path,
+        loglevel: loglevels,
+        help: Boolean,
         'use-env': Boolean
     },
     shortHands = {
-        'silent': ['--loglevel=error'],
-        'quiet': ['--loglevel=warn'],
-        'verbose': ['--loglevel=info'],
-        'debug': ['--loglevel=debug'],
-        'silly': ['--loglevel=silly'],
-        's': ['--loglevel=error'],
-        'q': ['--loglevel=warn'],
-        'v': ['--loglevel=info'],
-        'vvv': ['--loglevel=debug'],
-        'e': ['--use-env'],
-        'env': ['--use-env']
+        silent: ['--loglevel=error'],
+        quiet: ['--loglevel=warn'],
+        verbose: ['--loglevel=info'],
+        debug: ['--loglevel=debug'],
+        silly: ['--loglevel=silly'],
+        s: ['--loglevel=error'],
+        q: ['--loglevel=warn'],
+        v: ['--loglevel=info'],
+        vvv: ['--loglevel=debug'],
+        e: ['--use-env'],
+        env: ['--use-env']
     },
     usage = `Usage:
     --help, -h                      Show this help message and exit.
@@ -53,18 +60,21 @@ let rundir = path.dirname(process.argv[1]),
     --quiet, -q, --loglevel=warn    Log only warnings and errors.
     -v, --loglevel=info [Default]   Log everything except for debug messages.
     -vvv, -debug, --loglevel=debug  Log everything.`,
-    parsedOpts = defaults(nopt(knownOpts, shortHands, process.argv, 2), defaultOpts),
-    helpMessage = `mcdata-to-json ${ version.version }
+    parsedOpts = defaults(
+        nopt(knownOpts, shortHands, process.argv, 2),
+        defaultOpts
+    ),
+    helpMessage = `mcdata-to-json ${VERSION}
     A node.js module to turn the data from your minecraft server or world into json.`;
 
-let isValidPath = function(testpath, description) {
+let isValidPath = function (testpath, description) {
     const fileOrDirName = path.basename(testpath);
 
     try {
         fs.statSync(testpath);
     } catch (err) {
         if (err.code === 'ENOENT') {
-            log.debug(`⚠ ${ fileOrDirName } not found! (${description})`, DOMAIN);
+            log.debug(`⚠ ${fileOrDirName} not found! (${description})`, DOMAIN);
             return false;
         } else {
             throw err;
@@ -74,10 +84,10 @@ let isValidPath = function(testpath, description) {
     return true;
 };
 
-const LOGLEVEL = (loglevels.indexOf(parsedOpts.loglevel));
+const LOGLEVEL = loglevels.indexOf(parsedOpts.loglevel);
 
 log.setLevel(LOGLEVEL);
-log.debug(`current working dir ${ rundir}`, DOMAIN);
+log.debug(`current working dir ${rundir}`, DOMAIN);
 
 if (parsedOpts.help) {
     console.log(helpMessage); // eslint-disable-line no-console
@@ -88,13 +98,19 @@ if (parsedOpts.help) {
 if (parsedOpts['use-env']) {
     log.debug('use-env flag set, loading config from environment.', DOMAIN);
     log.debug('Process.env vars:', DOMAIN);
-    log.debug(`MINECRAFT_DIR: ${ process.env.MINECRAFT_DIR }`, DOMAIN);
-    log.debug(`OUTPUT_DIR: ${ process.env.OUTPUT_DIR }`, DOMAIN);
-    log.debug(`WORK_DIR: ${ process.env.WORK_DIR }`, DOMAIN);
-    if (parsedOpts.minecraft === defaultOpts.minecraft && process.env.MINECRAFT_DIR) {
+    log.debug(`MINECRAFT_DIR: ${process.env.MINECRAFT_DIR}`, DOMAIN);
+    log.debug(`OUTPUT_DIR: ${process.env.OUTPUT_DIR}`, DOMAIN);
+    log.debug(`WORK_DIR: ${process.env.WORK_DIR}`, DOMAIN);
+    if (
+        parsedOpts.minecraft === defaultOpts.minecraft &&
+        process.env.MINECRAFT_DIR
+    ) {
         parsedOpts.minecraft = process.env.MINECRAFT_DIR;
     }
-    if (!parsedOpts.outputdir === defaultOpts.outputdir && process.env.OUTPUT_DIR) {
+    if (
+        !parsedOpts.outputdir === defaultOpts.outputdir &&
+        process.env.OUTPUT_DIR
+    ) {
         parsedOpts.outputdir = process.env.OUTPUT_DIR;
     }
     if (!parsedOpts.workdir === defaultOpts.workdir && process.env.OUTPUT_DIR) {
@@ -107,66 +123,171 @@ if (!parsedOpts.minecraft) {
     log.error('No minecraft directory set!', DOMAIN);
     process.exit(1);
 }
-log.debug(`Checking Minecraft dir: ${ parsedOpts.minecraft }`, DOMAIN);
+log.debug(`Checking Minecraft dir: ${parsedOpts.minecraft}`, DOMAIN);
 // Check for server.properties, to validate minecraft folder..
-if (isValidPath(path.join(parsedOpts.minecraft, 'server.properties'), 'Minecraft server configuration file')) {
-    parsedOpts.serverproprties = path.join(parsedOpts.minecraft, 'server.properties');
+if (
+    isValidPath(
+        path.join(parsedOpts.minecraft, 'server.properties'),
+        'Minecraft server configuration file'
+    )
+) {
+    parsedOpts.serverproprties = path.join(
+        parsedOpts.minecraft,
+        'server.properties'
+    );
 }
-if (isValidPath(path.join(parsedOpts.minecraft, 'client.jar'), 'Minecraft client jar')) {
+if (
+    isValidPath(
+        path.join(parsedOpts.minecraft, 'client.jar'),
+        'Minecraft client jar'
+    )
+) {
     parsedOpts.mcjar = path.join(parsedOpts.minecraft, 'client.jar');
-} else if (isValidPath(path.join(parsedOpts.minecraft, 'server.jar'), 'Minecraft server jar')) {
+} else if (
+    isValidPath(
+        path.join(parsedOpts.minecraft, 'server.jar'),
+        'Minecraft server jar'
+    )
+) {
     parsedOpts.mcjar = path.join(parsedOpts.minecraft, 'server.jar');
 } else {
-    log.error('Couldn\'t locate a server.jar or minecraft.jar. Please download and put it in the minecraft directory.', DOMAIN);
+    log.error(
+        "Couldn't locate a server.jar or minecraft.jar. Please download and put it in the minecraft directory.",
+        DOMAIN
+    );
 }
-if (isValidPath(path.join(parsedOpts.minecraft, 'world'), 'Minecraft world directory')) {
+if (
+    isValidPath(
+        path.join(parsedOpts.minecraft, 'world'),
+        'Minecraft world directory'
+    )
+) {
     parsedOpts.worlddir = path.join(parsedOpts.minecraft, 'world');
 }
-if (isValidPath(path.join(parsedOpts.minecraft, 'logs'), 'Minecraft log file directory')) {
+if (
+    isValidPath(
+        path.join(parsedOpts.minecraft, 'logs'),
+        'Minecraft log file directory'
+    )
+) {
     parsedOpts.logdir = path.join(parsedOpts.minecraft, 'logs');
 }
-if (isValidPath(path.join(parsedOpts.minecraft, 'ops.json'), 'List of OPs on the server.')) {
+if (
+    isValidPath(
+        path.join(parsedOpts.minecraft, 'ops.json'),
+        'List of OPs on the server.'
+    )
+) {
     parsedOpts.opsjson = path.join(parsedOpts.minecraft, 'ops.json');
 }
-if (isValidPath(path.join(parsedOpts.minecraft, 'usercache.json'), 'Cache connecting UUIDs to player names.')) {
+if (
+    isValidPath(
+        path.join(parsedOpts.minecraft, 'usercache.json'),
+        'Cache connecting UUIDs to player names.'
+    )
+) {
     parsedOpts.usercachejson = path.join(parsedOpts.minecraft, 'usercache.json');
 }
 // Check for valid paths inside world dir
-if (isValidPath(path.join(parsedOpts.worlddir, 'level.dat'), 'World data file. Found in world directory.')) {
+if (
+    isValidPath(
+        path.join(parsedOpts.worlddir, 'level.dat'),
+        'World data file. Found in world directory.'
+    )
+) {
     parsedOpts.leveldat = path.join(parsedOpts.worlddir, 'level.dat');
 }
-if (isValidPath(path.join(parsedOpts.worlddir, 'advancements'), 'Player advancement progress. Found in world directory.')) {
+if (
+    isValidPath(
+        path.join(parsedOpts.worlddir, 'advancements'),
+        'Player advancement progress. Found in world directory.'
+    )
+) {
     parsedOpts.advancements = path.join(parsedOpts.worlddir, 'advancements');
 }
-if (isValidPath(path.join(parsedOpts.worlddir, 'data'), 'Additional world data files. Found in world directory.')) {
+if (
+    isValidPath(
+        path.join(parsedOpts.worlddir, 'data'),
+        'Additional world data files. Found in world directory.'
+    )
+) {
     parsedOpts.worlddata = path.join(parsedOpts.worlddir, 'data');
 }
-if (isValidPath(path.join(parsedOpts.worlddir, 'datapacks'), 'Found in world directory.')) {
+if (
+    isValidPath(
+        path.join(parsedOpts.worlddir, 'datapacks'),
+        'Found in world directory.'
+    )
+) {
     parsedOpts.datapacks = path.join(parsedOpts.worlddir, 'datapacks');
 }
-if (isValidPath(path.join(parsedOpts.worlddir, 'playerdata'), 'Contains player info. Found in world directory.')) {
+if (
+    isValidPath(
+        path.join(parsedOpts.worlddir, 'playerdata'),
+        'Contains player info. Found in world directory.'
+    )
+) {
     parsedOpts.playerdata = path.join(parsedOpts.worlddir, 'playerdata');
 }
-if (isValidPath(path.join(parsedOpts.worlddir, 'stats'), 'Contains player stats. Found in world directory.')) {
+if (
+    isValidPath(
+        path.join(parsedOpts.worlddir, 'stats'),
+        'Contains player stats. Found in world directory.'
+    )
+) {
     parsedOpts.stats = path.join(parsedOpts.worlddir, 'stats');
 }
-if (isValidPath(path.join(parsedOpts.worlddir, 'region'), 'Overworld region files. Found in world directory.')) {
+if (
+    isValidPath(
+        path.join(parsedOpts.worlddir, 'region'),
+        'Overworld region files. Found in world directory.'
+    )
+) {
     parsedOpts.overworld = path.join(parsedOpts.worlddir, 'region');
 }
-if (isValidPath(path.join(parsedOpts.worlddir, 'DIM1'), 'The End dir. Found in world directory.')) {
-    if (isValidPath(path.join(parsedOpts.worlddir, 'DIM1', 'region'), 'The End region files. Found in world directory.')) {
+if (
+    isValidPath(
+        path.join(parsedOpts.worlddir, 'DIM1'),
+        'The End dir. Found in world directory.'
+    )
+) {
+    if (
+        isValidPath(
+            path.join(parsedOpts.worlddir, 'DIM1', 'region'),
+            'The End region files. Found in world directory.'
+        )
+    ) {
         parsedOpts.end = path.join(parsedOpts.worlddir, 'DIM1', 'region');
     }
-    if (isValidPath(path.join(parsedOpts.worlddir, 'DIM1', 'data'), 'The End data files. Found in world directory.')) {
+    if (
+        isValidPath(
+            path.join(parsedOpts.worlddir, 'DIM1', 'data'),
+            'The End data files. Found in world directory.'
+        )
+    ) {
         parsedOpts.enddata = path.join(parsedOpts.worlddir, 'DIM1', 'data');
     }
 }
-if (isValidPath(path.join(parsedOpts.worlddir, 'DIM-1'), 'Nether dir. Found in world directory.')) {
-    
-    if (isValidPath(path.join(parsedOpts.worlddir, 'DIM-1', 'region'), 'Nether region files. Found in world directory.')) {
+if (
+    isValidPath(
+        path.join(parsedOpts.worlddir, 'DIM-1'),
+        'Nether dir. Found in world directory.'
+    )
+) {
+    if (
+        isValidPath(
+            path.join(parsedOpts.worlddir, 'DIM-1', 'region'),
+            'Nether region files. Found in world directory.'
+        )
+    ) {
         parsedOpts.nether = path.join(parsedOpts.worlddir, 'DIM-1', 'region');
     }
-    if (isValidPath(path.join(parsedOpts.worlddir, 'DIM-1', 'data'), 'Nether data files. Found in world directory.')) {
+    if (
+        isValidPath(
+            path.join(parsedOpts.worlddir, 'DIM-1', 'data'),
+            'Nether data files. Found in world directory.'
+        )
+    ) {
         parsedOpts.netherdata = path.join(parsedOpts.worlddir, 'DIM-1', 'data');
     }
 }
@@ -217,7 +338,7 @@ if (USERCACHE_FILE) {
 
 for (let f of playerdatFiles) {
     if (f.indexOf('.dat') > -1) {
-        let uuid = (f.split('.dat')[0]);
+        let uuid = f.replace(/.dat/, '');
 
         if (!players[uuid]) {
             players[uuid] = `no-name${f.substr(f.length - 5, 1)}`;

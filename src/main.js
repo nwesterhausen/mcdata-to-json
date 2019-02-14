@@ -1,92 +1,123 @@
-/**
- * You need to set the minecraft folder location in the MC_DIR env variable
- * or use the --minecraft="" parameter when running.
- *
- * By default will output in the current directory, or the OUTPUT_DIR env
- * variable, OR the --outdir="" parameter.
- */
-import log from './lib/CustomLogger';
-import Config from './lib/Configuration';
-import PlayerDataCombiner from './lib/PlayerDataCombiner';
-import LogsParser from './LogsParser';
-import ServerDataExtractor from './lib/ServerDataExtractor';
-import MCAConverter from './lib/MCAConverter';
-// import AdvancementParser from './AdvancementParser';
-import DatParser from './DatParser';
-import MojangApi from './lib/MojangApi';
-import fs from 'fs-extra';
+import Config from './Configuration';
+import Log from './lib/CustomLogger';
+import MojangAPI from './lib/MojangAPI';
+import PlayerData from './lib/PlayerData';
+import LogParser from './lib/log/Parser';
+import MCAParser from './lib/McaParser';
+
 import path from 'path';
+import fs from 'fs-extra';
+import McaParser from './lib/McaParser';
 
-const DOMAIN = 'Main';
+const DOMAIN = 'Main',
+    PLAYER_PROFILE_CACHE_DIR = path.join(Config.TEMP_DIR, 'profiles'),
+    PROFILE_CACHE_ACCEPTABLE_AGE = (1000 * 60 * 60 * 4); // 4 hours
 
-if (!Config.MCJAR_FILE) {
-    log.error('We expect to have a Minecraft server or client jar in the Minecraft directory.', DOMAIN);
-    process.exit(1);
-}
+fs.ensureDirSync(PLAYER_PROFILE_CACHE_DIR);
 
-log.info('Check for cache of Minecraft data.', DOMAIN);
-if (!ServerDataExtractor.checkForData()) {
-    log.info('No cached data exists.', DOMAIN);
-    log.warn('Quitting after data extracted.', DOMAIN);
-    let promises = [];
+function updateProfiles(honorCache = true) {
+    let uuid_list = Object.keys(Config.PLAYERS);
+    return Promise.all(uuid_list.map((uuid) => {
+        const cachedPlayerProfile = path.join(PLAYER_PROFILE_CACHE_DIR, `${uuid}.json`);
+        let shouldQueryProfile = true;
 
-    promises.push(ServerDataExtractor.extractMinecraftAssetsPromise());
-    promises.push(ServerDataExtractor.extractMinecraftDataPromise());
-
-    if (Config.DATAPACKS_DIR) {
-        let possibleDPs = fs.readdirSync(Config.DATAPACKS_DIR);
-
-        for (let i = 0; i < possibleDPs.length; i++) {
-            promises.push(ServerDataExtractor.extractPromise(path.join(Config.DATAPACKS_DIR, possibleDPs[i]), Config.EXTRACTED_DIR));
+        if (fs.existsSync(cachedPlayerProfile)) {
+            shouldQueryProfile = (Date.now() - fs.statSync(cachedPlayerProfile).mtime > PROFILE_CACHE_ACCEPTABLE_AGE || !honorCache)
         }
-    }
 
-    Promise.all(promises).then((val) => {
-        log.debug(`Promise returned ${val}`, DOMAIN);
-    }).catch( (val) => {
-        log.error(val, DOMAIN);
-    });
-} else {
-    log.info('Cached data exists.', DOMAIN);
-    log.info('Lazily updating cached player profiles.', DOMAIN);
-    MojangApi.lazyProfileUpdate();
-    log.info('Starting log file processing.', DOMAIN);
-    LogsParser.prepareLogFiles();
-    LogsParser.parseLogFiles();
-    DatParser.parsePlayerdata();
-    for (let i = 0; i < Object.keys(Config.PLAYERS).length; i++) {
-        PlayerDataCombiner.combinePlayerData(Object.keys(Config.PLAYERS)[i]);
-    }
+        if (shouldQueryProfile) {
+            Log.debug(`Updating Mojang profile on disk for ${uuid}`, DOMAIN);
+            return new Promise((resolve, reject) => {
+                MojangAPI.getProfileForUUID(uuid).then((profileResp) => {
+                    Log.debug(`Profile for ${uuid} ${profileResp.status} ${profileResp.statusText}`, DOMAIN);
+                    if (profileResp.data) {
+                        let cleanedProfileJSON = MojangAPI.jsonFromProfileResp(profileResp.data);
 
-    // // REGION FILE PARSING
-    // let mcaReadingPromises = [], mcaNetherReadingPromises = [],
-    //     netherRegionFiles = fs.readdirSync(Config.NETHER_DIR),
-    //     overworldRegionFiles = fs.readdirSync(Config.OVERWORLD_DIR);
+                        return fs.writeJSON(cachedPlayerProfile, cleanedProfileJSON, {
+                            'spaces': 2
+                        });
+                    }
+                }).then((res) => {
+                    Log.info(`Cached new profile data for ${uuid}`, DOMAIN);
+                }).catch((err) => {
+                    if (err.message.indexOf('code 429')) {
+                        Log.warn('Too many requests to Mojang API.', DOMAIN);
+                    } else
+                        Log.warn(err, DOMAIN);
+                });
+            });
+        } else {
+            Log.info(`No need to update Mojang profile for ${Config.PLAYERS[uuid]}, cache is younger than 4 hours`, DOMAIN);
+        }
+    }))
 
-    // for (let i in overworldRegionFiles) {
-    //     let regionFile = overworldRegionFiles[i];
-    
-    //     mcaReadingPromises.push(MCAConverter.parseMCAPromise(path.join(Config.OVERWORLD_DIR, regionFile)));
-    // }
-    // for (let i in netherRegionFiles) {
-    //     let regionFile = netherRegionFiles[i];
-    
-    //     mcaReadingPromises.push(MCAConverter.parseMCAPromise(path.join(Config.NETHER_DIR, regionFile)));
-    // }
-    // log.info(`Beginning parse of ${mcaReadingPromises.length} overworld region files. This may take a while!`);
-    // Promise.all(mcaReadingPromises).then((val) => {
-    //     log.info('Completed parse of overworld region files', DOMAIN);
-    //     log.debug(`Promise returned ${val}.`, DOMAIN);
-    // });
-    // log.info(`Beginning parse of ${mcaNetherReadingPromises.length} nether region files. This may take a while!`);
-    // Promise.all(mcaNetherReadingPromises).then((val1) => {
-    //     log.info('Completed parse of nether region files', DOMAIN);
-    //     log.debug(`Promise returned ${val1}.`, DOMAIN);
-    // }).catch((err) => {
-    //     log.error(err, DOMAIN);
-    // });
 }
-// log.info('Starting JSON file processing (advancements, stats)', DOMAIN);
 
-// log.info('Starting NBT data processing (level.dat, playerdata)', DOMAIN);
+function performLogOperations() {
+    return new Promise((resolve, reject) => {
+        Promise.all(fs.readdirSync(Config.LOGS_DIR).map((logfile) => {
+                return LogParser.mclogToJson(logfile);
+            }))
+            .then((val) => {
+                Log.info(`Wrote ${val.length} log files to JSON.`, DOMAIN);
+                LogParser.sortRawlogJSON();
+                LogParser.buildCombinedLogfiles();
+                LogParser.buildPlayerLogfiles();
+                return resolve('Logparsing Completed');
+            })
+            .catch((err) => {
+                Log.warn(err, DOMAIN);
+                return reject(err);
+            })
+    })
+}
 
+function createJsonForAllRegionDirs() {
+    McaParser.convertRegionDirToJSON(Config.OVERWORLD_DIR);
+    McaParser.convertRegionDirToJSON(Config.NETHER_DIR);
+    McaParser.convertRegionDirToJSON(Config.END_DIR);
+}
+
+function combinePlayerData(uuid) {
+    let readjsonPromises = [
+        fs.readJSON(path.join(Config.STATS_DIR, `${uuid}.json`)),
+        fs.readJSON(path.join(Config.ADVANCEMENTS_DIR, `${uuid}.json`)),
+        fs.readJSON(path.join(Config.TEMP_DIR, 'playerdata', `${uuid}.json`)),
+        fs.readJSON(path.join(PLAYER_PROFILE_CACHE_DIR, `${uuid}.json`)),
+        fs.readJSON(path.join(Config.TEMP_DIR, 'logs', `${uuid}.json`)),
+    ];
+
+    Promise.all(readjsonPromises).then((val) => {
+        fs.writeJSON(path.join(Config.OUTPUT_DIR, `${uuid}.json`), {
+            'uuid': uuid,
+            'name': Config.PLAYERS[uuid],
+            'stats': val[0],
+            'advancements': val[1],
+            'data': val[2],
+            'profile': val[3],
+            'log': val[4]
+        }).then((val) => {
+            Log.info(`Wrote output JSON for ${uuid}.`, DOMAIN);
+            if (val) {
+                Log.debug(val, DOMAIN);
+            }
+        }).catch((err) => {
+            Log.warn(`Failed to build output for ${uuid}.`, DOMAIN);
+            Log.warn(err, DOMAIN);
+        });
+    });
+}
+
+updateProfiles().then((val) => { // GET PLAYER INFORMATION FROM MOJANG
+        return PlayerData.convertPlayerdatFiles() // CONVERT PLAYER.DAT FILES
+    })
+    .then((val) => {
+        return performLogOperations() // CONVERT LOG FILES
+    }).then((logopResp) => {
+        Log.info('All log operations completed', DOMAIN);
+        return Promise.all(Object.keys(Config.PLAYERS).map((uuid) => {
+            return combinePlayerData(uuid)
+        }));
+    }).then((val) => {
+        Log.info('Copied player info to output directory', DOMAIN);
+    })

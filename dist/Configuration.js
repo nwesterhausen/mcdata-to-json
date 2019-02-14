@@ -11,53 +11,60 @@ var _fsExtra = _interopRequireDefault(require("fs-extra"));
 
 var _nopt = _interopRequireDefault(require("nopt"));
 
-var _CustomLogger = _interopRequireDefault(require("./CustomLogger"));
-
-var _Version = _interopRequireDefault(require("../data/Version"));
-
-var _lodash = require("lodash");
+var _CustomLogger = _interopRequireDefault(require("./lib/CustomLogger"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /**
  * Handles CLI arguments and sets configuration.
  */
+var VERSION = require('../package.json').version;
+
 var DOMAIN = 'Configuration';
 
-var rundir = _path.default.dirname(process.argv[1]),
+var defaults = function defaults(arr, def) {
+  for (var key in def) {
+    if (!arr.hasOwnProperty(key)) {
+      arr[key] = def[key];
+    }
+  }
+
+  return arr;
+},
+    rundir = process.cwd(),
     loglevels = ['error', 'warn', 'info', 'debug', 'silly'],
     defaultOpts = {
-  'minecraft': rundir,
-  'outputdir': _path.default.join(rundir, 'output'),
-  'workdir': _path.default.join(rundir, 'mcdata_cache'),
-  'loglevel': 'info',
-  'help': false,
+  minecraft: rundir,
+  outputdir: _path.default.join(rundir, 'output'),
+  workdir: _path.default.join(rundir, 'mcdata_cache'),
+  loglevel: 'info',
+  help: false,
   'use-env': false
 },
     knownOpts = {
-  'minecraft': _path.default,
-  'outputdir': _path.default,
-  'workdir': _path.default,
-  'loglevel': loglevels,
-  'help': Boolean,
+  minecraft: _path.default,
+  outputdir: _path.default,
+  workdir: _path.default,
+  loglevel: loglevels,
+  help: Boolean,
   'use-env': Boolean
 },
     shortHands = {
-  'silent': ['--loglevel=error'],
-  'quiet': ['--loglevel=warn'],
-  'verbose': ['--loglevel=info'],
-  'debug': ['--loglevel=debug'],
-  'silly': ['--loglevel=silly'],
-  's': ['--loglevel=error'],
-  'q': ['--loglevel=warn'],
-  'v': ['--loglevel=info'],
-  'vvv': ['--loglevel=debug'],
-  'e': ['--use-env'],
-  'env': ['--use-env']
+  silent: ['--loglevel=error'],
+  quiet: ['--loglevel=warn'],
+  verbose: ['--loglevel=info'],
+  debug: ['--loglevel=debug'],
+  silly: ['--loglevel=silly'],
+  s: ['--loglevel=error'],
+  q: ['--loglevel=warn'],
+  v: ['--loglevel=info'],
+  vvv: ['--loglevel=debug'],
+  e: ['--use-env'],
+  env: ['--use-env']
 },
     usage = "Usage:\n    --help, -h                      Show this help message and exit.\n    --minecraft=path                The minecraft folder containing server.properties and world.\n    --outputdir=path                The directory to save the generated JSON files into.\n    --workdir=path                  The directory to cache data used by this program\n    --use-env                       Load configuration values from ENV:\n                                        env.MINECRAFT_DIR and env.OUTPUT_DIR\n    --loglevel=<level>              How verbose to log to the console. Also you can use one of\n                                    the helper functions to accomplish this to varying degrees:\n    --silent, -s, --loglevel=error  Log only errors.\n    --quiet, -q, --loglevel=warn    Log only warnings and errors.\n    -v, --loglevel=info [Default]   Log everything except for debug messages.\n    -vvv, -debug, --loglevel=debug  Log everything.",
-    parsedOpts = (0, _lodash.defaults)((0, _nopt.default)(knownOpts, shortHands, process.argv, 2), defaultOpts),
-    helpMessage = "mcdata-to-json ".concat(_Version.default.version, "\n    A node.js module to turn the data from your minecraft server or world into json.");
+    parsedOpts = defaults((0, _nopt.default)(knownOpts, shortHands, process.argv, 2), defaultOpts),
+    helpMessage = "mcdata-to-json ".concat(VERSION, "\n    A node.js module to turn the data from your minecraft server or world into json.");
 
 var isValidPath = function isValidPath(testpath, description) {
   var fileOrDirName = _path.default.basename(testpath);
@@ -136,7 +143,7 @@ if (isValidPath(_path.default.join(parsedOpts.minecraft, 'client.jar'), 'Minecra
 } else if (isValidPath(_path.default.join(parsedOpts.minecraft, 'server.jar'), 'Minecraft server jar')) {
   parsedOpts.mcjar = _path.default.join(parsedOpts.minecraft, 'server.jar');
 } else {
-  _CustomLogger.default.error('Couldn\'t locate a server.jar or minecraft.jar. Please download and put it in the minecraft directory.', DOMAIN);
+  _CustomLogger.default.error("Couldn't locate a server.jar or minecraft.jar. Please download and put it in the minecraft directory.", DOMAIN);
 }
 
 if (isValidPath(_path.default.join(parsedOpts.minecraft, 'world'), 'Minecraft world directory')) {
@@ -286,7 +293,7 @@ try {
     var f = _step2.value;
 
     if (f.indexOf('.dat') > -1) {
-      var uuid = f.split('.dat')[0];
+      var uuid = f.replace(/.dat/, '');
 
       if (!players[uuid]) {
         players[uuid] = "no-name".concat(f.substr(f.length - 5, 1));
