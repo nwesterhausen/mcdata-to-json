@@ -1,6 +1,6 @@
 import Config from './Configuration';
 import Log from './lib/CustomLogger';
-import MojangAPI from './lib/MojangAPI';
+import MojangAPI from './lib/MojangApi';
 import PlayerData from './lib/PlayerData';
 import LogParser from './lib/log/Parser';
 import MCAParser from './lib/McaParser';
@@ -19,7 +19,7 @@ function updateProfiles(honorCache = true) {
     let uuid_list = Object.keys(Config.PLAYERS);
     return Promise.all(uuid_list.map((uuid) => {
         const cachedPlayerProfile = path.join(PLAYER_PROFILE_CACHE_DIR, `${uuid}.json`);
-        let shouldQueryProfile = true;
+        let shouldQueryProfile = false;
 
         if (fs.existsSync(cachedPlayerProfile)) {
             shouldQueryProfile = (Date.now() - fs.statSync(cachedPlayerProfile).mtime > PROFILE_CACHE_ACCEPTABLE_AGE || !honorCache)

@@ -4,7 +4,7 @@ var _Configuration = _interopRequireDefault(require("./Configuration"));
 
 var _CustomLogger = _interopRequireDefault(require("./lib/CustomLogger"));
 
-var _MojangAPI = _interopRequireDefault(require("./lib/MojangAPI"));
+var _MojangApi = _interopRequireDefault(require("./lib/MojangApi"));
 
 var _PlayerData = _interopRequireDefault(require("./lib/PlayerData"));
 
@@ -31,7 +31,7 @@ function updateProfiles() {
   return Promise.all(uuid_list.map(function (uuid) {
     var cachedPlayerProfile = _path.default.join(PLAYER_PROFILE_CACHE_DIR, "".concat(uuid, ".json"));
 
-    var shouldQueryProfile = true;
+    var shouldQueryProfile = false;
 
     if (_fsExtra.default.existsSync(cachedPlayerProfile)) {
       shouldQueryProfile = Date.now() - _fsExtra.default.statSync(cachedPlayerProfile).mtime > PROFILE_CACHE_ACCEPTABLE_AGE || !honorCache;
@@ -41,11 +41,11 @@ function updateProfiles() {
       _CustomLogger.default.debug("Updating Mojang profile on disk for ".concat(uuid), DOMAIN);
 
       return new Promise(function (resolve, reject) {
-        _MojangAPI.default.getProfileForUUID(uuid).then(function (profileResp) {
+        _MojangApi.default.getProfileForUUID(uuid).then(function (profileResp) {
           _CustomLogger.default.debug("Profile for ".concat(uuid, " ").concat(profileResp.status, " ").concat(profileResp.statusText), DOMAIN);
 
           if (profileResp.data) {
-            var cleanedProfileJSON = _MojangAPI.default.jsonFromProfileResp(profileResp.data);
+            var cleanedProfileJSON = _MojangApi.default.jsonFromProfileResp(profileResp.data);
 
             return _fsExtra.default.writeJSON(cachedPlayerProfile, cleanedProfileJSON, {
               'spaces': 2

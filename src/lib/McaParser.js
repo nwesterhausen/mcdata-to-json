@@ -61,7 +61,7 @@ function readAllChunksInRegionFile(filehandle) {
     return new Promise((resolve, reject) => {
         Promise.all(chunkToJSONPromises)
             .then((val) => {
-                return resolve(val.flat());
+                return resolve(val);
             })
             .catch((err) => {
                 return reject(err);
