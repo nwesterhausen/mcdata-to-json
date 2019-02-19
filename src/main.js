@@ -166,12 +166,28 @@ updateProfiles().then((val) => { // GET PLAYER INFORMATION FROM MOJANG
     }).then((overworldTEJson) => {
         let teWithItems = [],
             mobSpawners = [],
+            signs = [],
             lootables = {};
         Object.keys(overworldTEJson).map((tilentid) => {
             overworldTEJson[tilentid].map((tileent) => {
                 if (tileent.id === 'minecraft:mob_spawner') {
                     mobSpawners.push({
                         SpawnData: tileent.SpawnData,
+                        pos: [
+                            tileent.x,
+                            tileent.y,
+                            tileent.z
+                        ]
+                    });
+                } else if (tileent.id === 'minecraft:sign') {
+                    signs.push({
+                        Text: [
+                            JSON.parse(tileent.Text1.replace(/\\"/, "'")).text,
+                            JSON.parse(tileent.Text2.replace(/\\"/, "'")).text,
+                            JSON.parse(tileent.Text3.replace(/\\"/, "'")).text,
+                            JSON.parse(tileent.Text4.replace(/\\"/, "'")).text
+                        ],
+                        Color: tileent.Color,
                         pos: [
                             tileent.x,
                             tileent.y,
@@ -210,6 +226,7 @@ updateProfiles().then((val) => { // GET PLAYER INFORMATION FROM MOJANG
         fs.writeJSONSync(path.join(Config.OUTPUT_DIR, 'overworld-spawners.json'), mobSpawners);
         fs.writeJSONSync(path.join(Config.OUTPUT_DIR, 'overworld-inventories.json'), teWithItems);
         fs.writeJSONSync(path.join(Config.OUTPUT_DIR, 'overworld-loot.json'), lootables);
+        fs.writeJSONSync(path.join(Config.OUTPUT_DIR, 'overworld-signs.json'), signs);
         return fs.writeJSON(path.join(Config.OUTPUT_DIR, 'overworld-te.json'),
             overworldTEJson);
     }).then((val) => {

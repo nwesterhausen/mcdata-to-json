@@ -178,12 +178,19 @@ updateProfiles().then(function (val) {
 }).then(function (overworldTEJson) {
   var teWithItems = [],
       mobSpawners = [],
+      signs = [],
       lootables = {};
   Object.keys(overworldTEJson).map(function (tilentid) {
     overworldTEJson[tilentid].map(function (tileent) {
       if (tileent.id === 'minecraft:mob_spawner') {
         mobSpawners.push({
           SpawnData: tileent.SpawnData,
+          pos: [tileent.x, tileent.y, tileent.z]
+        });
+      } else if (tileent.id === 'minecraft:sign') {
+        signs.push({
+          Text: [JSON.parse(tileent.Text1.replace(/\\"/, "'")).text, JSON.parse(tileent.Text2.replace(/\\"/, "'")).text, JSON.parse(tileent.Text3.replace(/\\"/, "'")).text, JSON.parse(tileent.Text4.replace(/\\"/, "'")).text],
+          Color: tileent.Color,
           pos: [tileent.x, tileent.y, tileent.z]
         });
       } else if (tileent.hasOwnProperty('Items')) {
@@ -215,6 +222,8 @@ updateProfiles().then(function (val) {
   _fsExtra.default.writeJSONSync(_path.default.join(_Configuration.default.OUTPUT_DIR, 'overworld-inventories.json'), teWithItems);
 
   _fsExtra.default.writeJSONSync(_path.default.join(_Configuration.default.OUTPUT_DIR, 'overworld-loot.json'), lootables);
+
+  _fsExtra.default.writeJSONSync(_path.default.join(_Configuration.default.OUTPUT_DIR, 'overworld-signs.json'), signs);
 
   return _fsExtra.default.writeJSON(_path.default.join(_Configuration.default.OUTPUT_DIR, 'overworld-te.json'), overworldTEJson);
 }).then(function (val) {
