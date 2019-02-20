@@ -29,6 +29,15 @@ function getTreeFromAdvancementJSON(advJsonObj) {
     var pathstr = advpath.split(':').join('/');
     return objFromPath(pathstr.split('/'), advJsonObj[advpath]);
   }));
+  advTree.recipes = merge.all(Object.keys(advTree).map(function (domain) {
+    if (advTree[domain].hasOwnProperty('recipes')) {
+      var recipejson = JSON.stringify(advTree[domain].recipes);
+      delete advTree[domain].recipes;
+      return JSON.parse(recipejson);
+    }
+
+    return {};
+  }));
   return advTree;
 } // Turn the path array into an object
 

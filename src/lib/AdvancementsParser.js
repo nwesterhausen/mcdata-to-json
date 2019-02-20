@@ -16,6 +16,14 @@ function getTreeFromAdvancementJSON(advJsonObj) {
             let pathstr = advpath.split(':').join('/');
             return objFromPath(pathstr.split('/'), advJsonObj[advpath]);
         }));
+    advTree.recipes = merge.all(Object.keys(advTree).map(domain => {
+        if (advTree[domain].hasOwnProperty('recipes')) {
+            let recipejson = JSON.stringify(advTree[domain].recipes);
+            delete(advTree[domain].recipes);
+            return JSON.parse(recipejson);
+        }
+        return {};
+    }));
     return advTree;
 }
 // Turn the path array into an object
