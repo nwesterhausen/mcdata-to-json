@@ -61,7 +61,7 @@ function createJsonForAllRegionDirs() {
 function combinePlayerData(uuid) {
   var readjsonPromises = [_fsExtra.default.readJSON(_path.default.join(_Configuration.default.STATS_DIR, "".concat(uuid, ".json"))), _fsExtra.default.readJSON(_path.default.join(_Configuration.default.TEMP_ADVANCEMENT_JSON_DIR, "".concat(uuid, ".json"))), _fsExtra.default.readJSON(_path.default.join(_Configuration.default.TEMP_PLAYERDATA_JSON_DIR, "".concat(uuid, ".json"))), _fsExtra.default.readJSON(_path.default.join(_Configuration.default.TEMP_PROFILE_JSON_DIR, "".concat(uuid, ".json"))), _fsExtra.default.readJSON(_path.default.join(_Configuration.default.TEMP_LOG_JSON_DIR, "".concat(uuid, ".json")))];
   Promise.all(readjsonPromises).then(function (val) {
-    _fsExtra.default.writeJSON(_path.default.join(_Configuration.default.OUTPUT_DIR, "".concat(uuid, ".json")), {
+    var playerJSON = {
       'uuid': uuid,
       'name': _Configuration.default.PLAYERS[uuid],
       'stats': val[0],
@@ -69,7 +69,12 @@ function combinePlayerData(uuid) {
       'data': val[2],
       'profile': val[3],
       'log': val[4]
-    }).then(function (val) {
+    };
+    delete playerJSON.advancements.DataVersion;
+    delete playerJSON.data.DataVersion;
+    delete playerJSON.stats.DataVersion;
+
+    _fsExtra.default.writeJSON(_path.default.join(_Configuration.default.OUTPUT_DIR, "".concat(uuid, ".json")), playerJSON).then(function (val) {
       _CustomLogger.default.info("Wrote output JSON for ".concat(uuid, "."), DOMAIN);
 
       if (val) {

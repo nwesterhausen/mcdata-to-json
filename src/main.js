@@ -51,7 +51,7 @@ function combinePlayerData(uuid) {
     ];
 
     Promise.all(readjsonPromises).then((val) => {
-        fs.writeJSON(path.join(Config.OUTPUT_DIR, `${uuid}.json`), {
+        let playerJSON = {
             'uuid': uuid,
             'name': Config.PLAYERS[uuid],
             'stats': val[0],
@@ -59,15 +59,20 @@ function combinePlayerData(uuid) {
             'data': val[2],
             'profile': val[3],
             'log': val[4]
-        }).then((val) => {
-            Log.info(`Wrote output JSON for ${uuid}.`, DOMAIN);
-            if (val) {
-                Log.debug(val, DOMAIN);
-            }
-        }).catch((err) => {
-            Log.warn(`Failed to build output for ${uuid}.`, DOMAIN);
-            Log.warn(err, DOMAIN);
-        });
+        };
+        delete(playerJSON.advancements.DataVersion);
+        delete(playerJSON.data.DataVersion);
+        delete(playerJSON.stats.DataVersion);
+        fs.writeJSON(path.join(Config.OUTPUT_DIR, `${uuid}.json`), playerJSON)
+            .then((val) => {
+                Log.info(`Wrote output JSON for ${uuid}.`, DOMAIN);
+                if (val) {
+                    Log.debug(val, DOMAIN);
+                }
+            }).catch((err) => {
+                Log.warn(`Failed to build output for ${uuid}.`, DOMAIN);
+                Log.warn(err, DOMAIN);
+            });
     });
 }
 
