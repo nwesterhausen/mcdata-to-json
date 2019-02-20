@@ -5,14 +5,11 @@ import Config from '../Configuration';
 import fs from 'fs-extra';
 import path from 'path';
 
-const DOMAIN = 'Player.dat Operations',
-    PLAYERDATA_JSON_CACHE_DIR = path.join(Config.TEMP_DIR, 'playerdata');
-
-fs.ensureDirSync(PLAYERDATA_JSON_CACHE_DIR);
+const DOMAIN = 'Player.dat Operations';
 
 function convertPlayerdat(datfilename) {
     const PLAYERDATA_JSON_CACHE_FILE = path.join(
-        PLAYERDATA_JSON_CACHE_DIR, datfilename.replace(/.dat/, '.json'));
+        Config.TEMP_PLAYERDATA_JSON_DIR, datfilename.replace(/.dat/, '.json'));
     return new Promise((resolve, reject) => {
         fs.readFile(path.join(Config.PLAYERDATA_DIR, datfilename))
             .then((filedata) => {

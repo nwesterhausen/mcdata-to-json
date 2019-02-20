@@ -21,10 +21,6 @@ var mca = require('mca-js');
 
 var DOMAIN = 'MCA Parser';
 
-var PARSED_MCA_CACHE_DIR = _path.default.join(_Configuration.default.WORK_DIR, 'mcajson');
-
-_fsExtra.default.ensureDirSync(PARSED_MCA_CACHE_DIR);
-
 function onlyUnique(value, index, self) {
   return self.indexOf(value) === index;
 }
@@ -92,7 +88,7 @@ function convertRegionDirToJSON(mcaDirectory) {
 
   var discoveredworldname = _path.default.basename(_path.default.dirname(mcaDirectory)) === _path.default.basename(_Configuration.default.WORLD_DIR) ? 'overworld' : _path.default.basename(_path.default.dirname(mcaDirectory));
 
-  var OUTPUT_DIR = _path.default.join(PARSED_MCA_CACHE_DIR, discoveredworldname);
+  var OUTPUT_DIR = _path.default.join(_Configuration.default.CACHED_MCA_JSON_DIR, discoveredworldname);
 
   _fsExtra.default.ensureDirSync(OUTPUT_DIR);
 

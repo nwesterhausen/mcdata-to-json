@@ -5,7 +5,7 @@ import {
 } from './Parser';
 
 const DOMAIN = 'Log Tools',
-    UNPARSABLE_LOG_LINE_CODE = 'b68ad81beeb8e3cbb174';
+    UNPARSABLE_LOG_LINE_CODE = 'b68ad81beeb8e3cbb174'; // This is a helper so we can ignore lines we don't understand.
 
 // Regular Expressions to understand what happens in the log files.
 const

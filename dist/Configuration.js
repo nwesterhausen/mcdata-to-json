@@ -21,6 +21,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 var VERSION = require('../package.json').version;
 
 var DOMAIN = 'Configuration';
+var ACCEPTABLE_PROFILE_AGE = 1000 * 60 * 60 * 4; //4 hours
 
 var defaults = function defaults(arr, def) {
   for (var key in def) {
@@ -235,8 +236,13 @@ var MC_DIR = parsedOpts.minecraft,
     WORK_DIR = parsedOpts.workdir,
     TEMP_DIR = _path.default.join(WORK_DIR, '.temp'),
     EXTRACTED_DIR = _path.default.join(WORK_DIR, 'extracted'),
+    GENERATED_DIR = _path.default.join(WORK_DIR, 'generated'),
     DATA_DIR = _path.default.join(EXTRACTED_DIR, 'data'),
-    ASSETS_DIR = _path.default.join(EXTRACTED_DIR, 'assets');
+    ASSETS_DIR = _path.default.join(EXTRACTED_DIR, 'assets'),
+    CACHED_MCA_JSON_DIR = _path.default.join(WORK_DIR, 'mcajson'),
+    TEMP_PLAYERDATA_JSON_DIR = _path.default.join(TEMP_DIR, 'playerdata'),
+    TEMP_LOG_JSON_DIR = _path.default.join(TEMP_DIR, 'logs'),
+    TEMP_PROFILE_JSON_DIR = _path.default.join(TEMP_DIR, 'profiles');
 
 _fsExtra.default.ensureDirSync(OUTPUT_DIR);
 
@@ -249,6 +255,14 @@ _fsExtra.default.ensureDirSync(TEMP_DIR);
 _fsExtra.default.ensureDirSync(DATA_DIR);
 
 _fsExtra.default.ensureDirSync(ASSETS_DIR);
+
+_fsExtra.default.ensureDirSync(CACHED_MCA_JSON_DIR);
+
+_fsExtra.default.ensureDirSync(TEMP_PLAYERDATA_JSON_DIR);
+
+_fsExtra.default.ensureDirSync(TEMP_LOG_JSON_DIR);
+
+_fsExtra.default.ensureDirSync(TEMP_PROFILE_JSON_DIR);
 
 _CustomLogger.default.debug("Set output dir: ".concat(OUTPUT_DIR), DOMAIN);
 
@@ -346,6 +360,11 @@ var _default = {
   EXTRACTED_DIR: EXTRACTED_DIR,
   DATA_DIR: DATA_DIR,
   ASSETS_DIR: ASSETS_DIR,
-  PLAYERS: PLAYERS
+  PLAYERS: PLAYERS,
+  ACCEPTABLE_PROFILE_AGE: ACCEPTABLE_PROFILE_AGE,
+  CACHED_MCA_JSON_DIR: CACHED_MCA_JSON_DIR,
+  TEMP_PLAYERDATA_JSON_DIR: TEMP_PLAYERDATA_JSON_DIR,
+  TEMP_LOG_JSON_DIR: TEMP_LOG_JSON_DIR,
+  TEMP_PROFILE_JSON_DIR: TEMP_PROFILE_JSON_DIR
 };
 exports.default = _default;

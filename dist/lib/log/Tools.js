@@ -14,7 +14,8 @@ var _Parser = require("./Parser");
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var DOMAIN = 'Log Tools',
-    UNPARSABLE_LOG_LINE_CODE = 'b68ad81beeb8e3cbb174'; // Regular Expressions to understand what happens in the log files.
+    UNPARSABLE_LOG_LINE_CODE = 'b68ad81beeb8e3cbb174'; // This is a helper so we can ignore lines we don't understand.
+// Regular Expressions to understand what happens in the log files.
 
 var timestampRE = new RegExp(/[0-9]{2}:[0-9]{2}:[0-9]{2}/),
     severityRE = new RegExp(/\[.+\/([A-Z]+)\]/),

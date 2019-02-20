@@ -1,0 +1,5 @@
+import Config from '../Configuration';
+import Path from 'path';
+
+const OUTPUT_DIR = path.join(Config.WORK_DIR, 'generated'),
+    JAVA_CMD = `java -cp ${Config.MCJAR_FILE} net.minecraft.data.Main --server --output ${OUTPUT_DIR}`;

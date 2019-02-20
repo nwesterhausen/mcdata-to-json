@@ -17,13 +17,10 @@ var _path = _interopRequireDefault(require("path"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var DOMAIN = 'Player.dat Operations',
-    PLAYERDATA_JSON_CACHE_DIR = _path.default.join(_Configuration.default.TEMP_DIR, 'playerdata');
-
-_fsExtra.default.ensureDirSync(PLAYERDATA_JSON_CACHE_DIR);
+var DOMAIN = 'Player.dat Operations';
 
 function convertPlayerdat(datfilename) {
-  var PLAYERDATA_JSON_CACHE_FILE = _path.default.join(PLAYERDATA_JSON_CACHE_DIR, datfilename.replace(/.dat/, '.json'));
+  var PLAYERDATA_JSON_CACHE_FILE = _path.default.join(_Configuration.default.TEMP_PLAYERDATA_JSON_DIR, datfilename.replace(/.dat/, '.json'));
 
   return new Promise(function (resolve, reject) {
     _fsExtra.default.readFile(_path.default.join(_Configuration.default.PLAYERDATA_DIR, datfilename)).then(function (filedata) {

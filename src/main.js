@@ -4,25 +4,22 @@ import MojangAPI from './lib/MojangApi';
 import PlayerData from './lib/PlayerData';
 import LogParser from './lib/log/Parser';
 import MCAParser from './lib/McaParser';
+import ProfileHelper from './lib/ProfileHelper';
 
 import path from 'path';
 import fs from 'fs-extra';
 import McaParser from './lib/McaParser';
 
-const DOMAIN = 'Main',
-    PLAYER_PROFILE_CACHE_DIR = path.join(Config.TEMP_DIR, 'profiles'),
-    PROFILE_CACHE_ACCEPTABLE_AGE = (1000 * 60 * 60 * 4); // 4 hours
-
-fs.ensureDirSync(PLAYER_PROFILE_CACHE_DIR);
+const DOMAIN = 'Main';
 
 function updateProfiles(honorCache = true) {
     let uuid_list = Object.keys(Config.PLAYERS);
     return Promise.all(uuid_list.map((uuid) => {
-        const cachedPlayerProfile = path.join(PLAYER_PROFILE_CACHE_DIR, `${uuid}.json`);
+        const cachedPlayerProfile = path.join(Config.TEMP_PROFILE_JSON_DIR, `${uuid}.json`);
         let shouldQueryProfile = false;
 
         if (fs.existsSync(cachedPlayerProfile)) {
-            shouldQueryProfile = (Date.now() - fs.statSync(cachedPlayerProfile).mtime > PROFILE_CACHE_ACCEPTABLE_AGE || !honorCache)
+            shouldQueryProfile = (Date.now() - fs.statSync(cachedPlayerProfile).mtime > Config.ACCEPTABLE_PROFILE_AGE || !honorCache)
         }
 
         if (shouldQueryProfile) {
@@ -85,9 +82,9 @@ function combinePlayerData(uuid) {
     let readjsonPromises = [
         fs.readJSON(path.join(Config.STATS_DIR, `${uuid}.json`)),
         fs.readJSON(path.join(Config.ADVANCEMENTS_DIR, `${uuid}.json`)),
-        fs.readJSON(path.join(Config.TEMP_DIR, 'playerdata', `${uuid}.json`)),
-        fs.readJSON(path.join(PLAYER_PROFILE_CACHE_DIR, `${uuid}.json`)),
-        fs.readJSON(path.join(Config.TEMP_DIR, 'logs', `${uuid}.json`)),
+        fs.readJSON(path.join(Config.TEMP_PLAYERDATA_JSON_DIR, `${uuid}.json`)),
+        fs.readJSON(path.join(Config.TEMP_PROFILE_JSON_DIR, `${uuid}.json`)),
+        fs.readJSON(path.join(Config.TEMP_LOG_JSON_DIR, `${uuid}.json`)),
     ];
 
     Promise.all(readjsonPromises).then((val) => {
@@ -116,7 +113,7 @@ function buildTileEntityList(mcaJsonDir) {
 
     return new Promise((resolve, reject) => {
         Promise.all(jsonregionFiles.map((filename) => {
-                console.log(filename);
+                // console.log(filename);
                 return fs.readJSON(path.join(mcaJsonDir, filename))
             }))
             .then((chunklistJson) => {
@@ -145,10 +142,11 @@ function buildTileEntityList(mcaJsonDir) {
 
 ///// MAIN ///////
 
-updateProfiles().then((val) => { // GET PLAYER INFORMATION FROM MOJANG
+ProfileHelper.updateProfiles().then((val) => { // GET PLAYER INFORMATION FROM MOJANG
         return createJsonForAllRegionDirs()
     }).then((val) => {
         Log.info('Finished saving chunks to JSON', DOMAIN);
+        return val;
     }).then((val) => {
         return PlayerData.convertPlayerdatFiles() // CONVERT PLAYER.DAT FILES
     })

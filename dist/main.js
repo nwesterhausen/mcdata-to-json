@@ -12,29 +12,26 @@ var _Parser = _interopRequireDefault(require("./lib/log/Parser"));
 
 var _McaParser = _interopRequireDefault(require("./lib/McaParser"));
 
+var _ProfileHelper = _interopRequireDefault(require("./lib/ProfileHelper"));
+
 var _path = _interopRequireDefault(require("path"));
 
 var _fsExtra = _interopRequireDefault(require("fs-extra"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var DOMAIN = 'Main',
-    PLAYER_PROFILE_CACHE_DIR = _path.default.join(_Configuration.default.TEMP_DIR, 'profiles'),
-    PROFILE_CACHE_ACCEPTABLE_AGE = 1000 * 60 * 60 * 4; // 4 hours
-
-
-_fsExtra.default.ensureDirSync(PLAYER_PROFILE_CACHE_DIR);
+var DOMAIN = 'Main';
 
 function updateProfiles() {
   var honorCache = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
   var uuid_list = Object.keys(_Configuration.default.PLAYERS);
   return Promise.all(uuid_list.map(function (uuid) {
-    var cachedPlayerProfile = _path.default.join(PLAYER_PROFILE_CACHE_DIR, "".concat(uuid, ".json"));
+    var cachedPlayerProfile = _path.default.join(_Configuration.default.TEMP_PROFILE_JSON_DIR, "".concat(uuid, ".json"));
 
     var shouldQueryProfile = false;
 
     if (_fsExtra.default.existsSync(cachedPlayerProfile)) {
-      shouldQueryProfile = Date.now() - _fsExtra.default.statSync(cachedPlayerProfile).mtime > PROFILE_CACHE_ACCEPTABLE_AGE || !honorCache;
+      shouldQueryProfile = Date.now() - _fsExtra.default.statSync(cachedPlayerProfile).mtime > _Configuration.default.ACCEPTABLE_PROFILE_AGE || !honorCache;
     }
 
     if (shouldQueryProfile) {
@@ -100,7 +97,7 @@ function createJsonForAllRegionDirs() {
 }
 
 function combinePlayerData(uuid) {
-  var readjsonPromises = [_fsExtra.default.readJSON(_path.default.join(_Configuration.default.STATS_DIR, "".concat(uuid, ".json"))), _fsExtra.default.readJSON(_path.default.join(_Configuration.default.ADVANCEMENTS_DIR, "".concat(uuid, ".json"))), _fsExtra.default.readJSON(_path.default.join(_Configuration.default.TEMP_DIR, 'playerdata', "".concat(uuid, ".json"))), _fsExtra.default.readJSON(_path.default.join(PLAYER_PROFILE_CACHE_DIR, "".concat(uuid, ".json"))), _fsExtra.default.readJSON(_path.default.join(_Configuration.default.TEMP_DIR, 'logs', "".concat(uuid, ".json")))];
+  var readjsonPromises = [_fsExtra.default.readJSON(_path.default.join(_Configuration.default.STATS_DIR, "".concat(uuid, ".json"))), _fsExtra.default.readJSON(_path.default.join(_Configuration.default.ADVANCEMENTS_DIR, "".concat(uuid, ".json"))), _fsExtra.default.readJSON(_path.default.join(_Configuration.default.TEMP_PLAYERDATA_JSON_DIR, "".concat(uuid, ".json"))), _fsExtra.default.readJSON(_path.default.join(_Configuration.default.TEMP_PROFILE_JSON_DIR, "".concat(uuid, ".json"))), _fsExtra.default.readJSON(_path.default.join(_Configuration.default.TEMP_LOG_JSON_DIR, "".concat(uuid, ".json")))];
   Promise.all(readjsonPromises).then(function (val) {
     _fsExtra.default.writeJSON(_path.default.join(_Configuration.default.OUTPUT_DIR, "".concat(uuid, ".json")), {
       'uuid': uuid,
@@ -129,7 +126,7 @@ function buildTileEntityList(mcaJsonDir) {
 
   return new Promise(function (resolve, reject) {
     Promise.all(jsonregionFiles.map(function (filename) {
-      console.log(filename);
+      // console.log(filename);
       return _fsExtra.default.readJSON(_path.default.join(mcaJsonDir, filename));
     })).then(function (chunklistJson) {
       var tileEntities = {};
@@ -154,11 +151,13 @@ function buildTileEntityList(mcaJsonDir) {
 } ///// MAIN ///////
 
 
-updateProfiles().then(function (val) {
+_ProfileHelper.default.updateProfiles().then(function (val) {
   // GET PLAYER INFORMATION FROM MOJANG
   return createJsonForAllRegionDirs();
 }).then(function (val) {
   _CustomLogger.default.info('Finished saving chunks to JSON', DOMAIN);
+
+  return val;
 }).then(function (val) {
   return _PlayerData.default.convertPlayerdatFiles(); // CONVERT PLAYER.DAT FILES
 }).then(function (val) {

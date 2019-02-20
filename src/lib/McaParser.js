@@ -7,9 +7,6 @@ import fs from 'fs-extra';
 const mca = require('mca-js');
 
 const DOMAIN = 'MCA Parser';
-const PARSED_MCA_CACHE_DIR = path.join(Config.WORK_DIR, 'mcajson');
-
-fs.ensureDirSync(PARSED_MCA_CACHE_DIR);
 
 function onlyUnique(value, index, self) {
     return self.indexOf(value) === index;
@@ -78,7 +75,7 @@ function convertRegionDirToJSON(mcaDirectory) {
         path.basename(path.dirname(mcaDirectory)) === path.basename(Config.WORLD_DIR) ?
         'overworld' : path.basename(path.dirname(mcaDirectory));
 
-    const OUTPUT_DIR = path.join(PARSED_MCA_CACHE_DIR, discoveredworldname);
+    const OUTPUT_DIR = path.join(Config.CACHED_MCA_JSON_DIR, discoveredworldname);
 
     fs.ensureDirSync(OUTPUT_DIR);
     let files = fs.readdirSync(mcaDirectory);
