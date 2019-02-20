@@ -9,6 +9,8 @@ var _Configuration = _interopRequireDefault(require("../Configuration"));
 
 var _CustomLogger = _interopRequireDefault(require("./CustomLogger"));
 
+var _MojangApi = _interopRequireDefault(require("./MojangApi"));
+
 var _path = _interopRequireDefault(require("path"));
 
 var _fsExtra = _interopRequireDefault(require("fs-extra"));
@@ -33,11 +35,12 @@ var _default = {
         _CustomLogger.default.debug("Updating Mojang profile on disk for ".concat(uuid), DOMAIN);
 
         return new Promise(function (resolve, reject) {
-          MojangAPI.getProfileForUUID(uuid).then(function (profileResp) {
+          _MojangApi.default.getProfileForUUID(uuid).then(function (profileResp) {
             _CustomLogger.default.debug("Profile for ".concat(uuid, " ").concat(profileResp.status, " ").concat(profileResp.statusText), DOMAIN);
 
             if (profileResp.data) {
-              var cleanedProfileJSON = MojangAPI.jsonFromProfileResp(profileResp.data);
+              var cleanedProfileJSON = _MojangApi.default.jsonFromProfileResp(profileResp.data);
+
               return _fsExtra.default.writeJSON(cachedPlayerProfile, cleanedProfileJSON, {
                 'spaces': 2
               });

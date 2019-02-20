@@ -1,5 +1,6 @@
 import Config from '../Configuration';
 import Log from './CustomLogger';
+import MojangAPI from './MojangApi';
 import path from 'path';
 import fs from 'fs-extra';
 
