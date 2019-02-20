@@ -322,6 +322,7 @@
      CACHED_MCA_JSON_DIR = path.join(WORK_DIR, 'mcajson'),
      TEMP_PLAYERDATA_JSON_DIR = path.join(TEMP_DIR, 'playerdata'),
      TEMP_LOG_JSON_DIR = path.join(TEMP_DIR, 'logs'),
+     TEMP_ADVANCEMENT_JSON_DIR = path.join(TEMP_DIR, 'advancements'),
      TEMP_PROFILE_JSON_DIR = path.join(TEMP_DIR, 'profiles');
 
  fs.ensureDirSync(OUTPUT_DIR);
@@ -334,6 +335,7 @@
  fs.ensureDirSync(TEMP_PLAYERDATA_JSON_DIR);
  fs.ensureDirSync(TEMP_LOG_JSON_DIR);
  fs.ensureDirSync(TEMP_PROFILE_JSON_DIR);
+ fs.ensureDirSync(TEMP_ADVANCEMENT_JSON_DIR);
  log.debug(`Set output dir: ${OUTPUT_DIR}`, DOMAIN);
 
  let playerdatFiles = fs.readdirSync(PLAYERDATA_DIR),
@@ -390,5 +392,6 @@
      CACHED_MCA_JSON_DIR,
      TEMP_PLAYERDATA_JSON_DIR,
      TEMP_LOG_JSON_DIR,
-     TEMP_PROFILE_JSON_DIR
+     TEMP_PROFILE_JSON_DIR,
+     TEMP_ADVANCEMENT_JSON_DIR
  };

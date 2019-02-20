@@ -242,6 +242,7 @@ var MC_DIR = parsedOpts.minecraft,
     CACHED_MCA_JSON_DIR = _path.default.join(WORK_DIR, 'mcajson'),
     TEMP_PLAYERDATA_JSON_DIR = _path.default.join(TEMP_DIR, 'playerdata'),
     TEMP_LOG_JSON_DIR = _path.default.join(TEMP_DIR, 'logs'),
+    TEMP_ADVANCEMENT_JSON_DIR = _path.default.join(TEMP_DIR, 'advancements'),
     TEMP_PROFILE_JSON_DIR = _path.default.join(TEMP_DIR, 'profiles');
 
 _fsExtra.default.ensureDirSync(OUTPUT_DIR);
@@ -263,6 +264,8 @@ _fsExtra.default.ensureDirSync(TEMP_PLAYERDATA_JSON_DIR);
 _fsExtra.default.ensureDirSync(TEMP_LOG_JSON_DIR);
 
 _fsExtra.default.ensureDirSync(TEMP_PROFILE_JSON_DIR);
+
+_fsExtra.default.ensureDirSync(TEMP_ADVANCEMENT_JSON_DIR);
 
 _CustomLogger.default.debug("Set output dir: ".concat(OUTPUT_DIR), DOMAIN);
 
@@ -365,6 +368,7 @@ var _default = {
   CACHED_MCA_JSON_DIR: CACHED_MCA_JSON_DIR,
   TEMP_PLAYERDATA_JSON_DIR: TEMP_PLAYERDATA_JSON_DIR,
   TEMP_LOG_JSON_DIR: TEMP_LOG_JSON_DIR,
-  TEMP_PROFILE_JSON_DIR: TEMP_PROFILE_JSON_DIR
+  TEMP_PROFILE_JSON_DIR: TEMP_PROFILE_JSON_DIR,
+  TEMP_ADVANCEMENT_JSON_DIR: TEMP_ADVANCEMENT_JSON_DIR
 };
 exports.default = _default;
