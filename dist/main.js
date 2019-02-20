@@ -14,6 +14,8 @@ var _McaParser = _interopRequireDefault(require("./lib/McaParser"));
 
 var _ProfileHelper = _interopRequireDefault(require("./lib/ProfileHelper"));
 
+var _AdvancementsParser = _interopRequireDefault(require("./lib/AdvancementsParser"));
+
 var _path = _interopRequireDefault(require("path"));
 
 var _fsExtra = _interopRequireDefault(require("fs-extra"));
@@ -21,46 +23,6 @@ var _fsExtra = _interopRequireDefault(require("fs-extra"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var DOMAIN = 'Main';
-
-function updateProfiles() {
-  var honorCache = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
-  var uuid_list = Object.keys(_Configuration.default.PLAYERS);
-  return Promise.all(uuid_list.map(function (uuid) {
-    var cachedPlayerProfile = _path.default.join(_Configuration.default.TEMP_PROFILE_JSON_DIR, "".concat(uuid, ".json"));
-
-    var shouldQueryProfile = false;
-
-    if (_fsExtra.default.existsSync(cachedPlayerProfile)) {
-      shouldQueryProfile = Date.now() - _fsExtra.default.statSync(cachedPlayerProfile).mtime > _Configuration.default.ACCEPTABLE_PROFILE_AGE || !honorCache;
-    }
-
-    if (shouldQueryProfile) {
-      _CustomLogger.default.debug("Updating Mojang profile on disk for ".concat(uuid), DOMAIN);
-
-      return new Promise(function (resolve, reject) {
-        _MojangApi.default.getProfileForUUID(uuid).then(function (profileResp) {
-          _CustomLogger.default.debug("Profile for ".concat(uuid, " ").concat(profileResp.status, " ").concat(profileResp.statusText), DOMAIN);
-
-          if (profileResp.data) {
-            var cleanedProfileJSON = _MojangApi.default.jsonFromProfileResp(profileResp.data);
-
-            return _fsExtra.default.writeJSON(cachedPlayerProfile, cleanedProfileJSON, {
-              'spaces': 2
-            });
-          }
-        }).then(function (res) {
-          _CustomLogger.default.info("Cached new profile data for ".concat(uuid), DOMAIN);
-        }).catch(function (err) {
-          if (err.message.indexOf('code 429')) {
-            _CustomLogger.default.warn('Too many requests to Mojang API.', DOMAIN);
-          } else _CustomLogger.default.warn(err, DOMAIN);
-        });
-      });
-    } else {
-      _CustomLogger.default.info("No need to update Mojang profile for ".concat(_Configuration.default.PLAYERS[uuid], ", cache is younger than 4 hours"), DOMAIN);
-    }
-  }));
-}
 
 function performLogOperations() {
   return new Promise(function (resolve, reject) {
@@ -97,7 +59,7 @@ function createJsonForAllRegionDirs() {
 }
 
 function combinePlayerData(uuid) {
-  var readjsonPromises = [_fsExtra.default.readJSON(_path.default.join(_Configuration.default.STATS_DIR, "".concat(uuid, ".json"))), _fsExtra.default.readJSON(_path.default.join(_Configuration.default.ADVANCEMENTS_DIR, "".concat(uuid, ".json"))), _fsExtra.default.readJSON(_path.default.join(_Configuration.default.TEMP_PLAYERDATA_JSON_DIR, "".concat(uuid, ".json"))), _fsExtra.default.readJSON(_path.default.join(_Configuration.default.TEMP_PROFILE_JSON_DIR, "".concat(uuid, ".json"))), _fsExtra.default.readJSON(_path.default.join(_Configuration.default.TEMP_LOG_JSON_DIR, "".concat(uuid, ".json")))];
+  var readjsonPromises = [_fsExtra.default.readJSON(_path.default.join(_Configuration.default.STATS_DIR, "".concat(uuid, ".json"))), _fsExtra.default.readJSON(_path.default.join(_Configuration.default.TEMP_ADVANCEMENT_JSON_DIR, "".concat(uuid, ".json"))), _fsExtra.default.readJSON(_path.default.join(_Configuration.default.TEMP_PLAYERDATA_JSON_DIR, "".concat(uuid, ".json"))), _fsExtra.default.readJSON(_path.default.join(_Configuration.default.TEMP_PROFILE_JSON_DIR, "".concat(uuid, ".json"))), _fsExtra.default.readJSON(_path.default.join(_Configuration.default.TEMP_LOG_JSON_DIR, "".concat(uuid, ".json")))];
   Promise.all(readjsonPromises).then(function (val) {
     _fsExtra.default.writeJSON(_path.default.join(_Configuration.default.OUTPUT_DIR, "".concat(uuid, ".json")), {
       'uuid': uuid,
@@ -160,6 +122,10 @@ _ProfileHelper.default.updateProfiles().then(function (val) {
   return val;
 }).then(function (val) {
   return _PlayerData.default.convertPlayerdatFiles(); // CONVERT PLAYER.DAT FILES
+}).then(function (val) {
+  return _AdvancementsParser.default.parseAndSaveAdvancementFiles();
+}).then(function (val) {
+  return _AdvancementsParser.default.createServerAdvancementProgress();
 }).then(function (val) {
   return performLogOperations(); // CONVERT LOG FILES
 }).then(function (logopResp) {

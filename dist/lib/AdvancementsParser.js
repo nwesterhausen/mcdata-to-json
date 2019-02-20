@@ -111,14 +111,10 @@ function createServerAdvancementProgress() {
   });
 }
 
-createServerAdvancementProgress().then(function (val) {
-  console.log(val);
-}).catch(function (err) {
-  console.log(err);
-});
 var _default = {
   getTreeFromAdvancementJSON: getTreeFromAdvancementJSON,
   parseAndSaveAdvancementFile: parseAndSaveAdvancementFile,
-  parseAndSaveAdvancementFiles: parseAndSaveAdvancementFiles
+  parseAndSaveAdvancementFiles: parseAndSaveAdvancementFiles,
+  createServerAdvancementProgress: createServerAdvancementProgress
 };
 exports.default = _default;

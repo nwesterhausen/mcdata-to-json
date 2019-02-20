@@ -5,50 +5,13 @@ import PlayerData from './lib/PlayerData';
 import LogParser from './lib/log/Parser';
 import MCAParser from './lib/McaParser';
 import ProfileHelper from './lib/ProfileHelper';
+import AdvancementsParser from './lib/AdvancementsParser';
 
 import path from 'path';
 import fs from 'fs-extra';
 import McaParser from './lib/McaParser';
 
 const DOMAIN = 'Main';
-
-function updateProfiles(honorCache = true) {
-    let uuid_list = Object.keys(Config.PLAYERS);
-    return Promise.all(uuid_list.map((uuid) => {
-        const cachedPlayerProfile = path.join(Config.TEMP_PROFILE_JSON_DIR, `${uuid}.json`);
-        let shouldQueryProfile = false;
-
-        if (fs.existsSync(cachedPlayerProfile)) {
-            shouldQueryProfile = (Date.now() - fs.statSync(cachedPlayerProfile).mtime > Config.ACCEPTABLE_PROFILE_AGE || !honorCache)
-        }
-
-        if (shouldQueryProfile) {
-            Log.debug(`Updating Mojang profile on disk for ${uuid}`, DOMAIN);
-            return new Promise((resolve, reject) => {
-                MojangAPI.getProfileForUUID(uuid).then((profileResp) => {
-                    Log.debug(`Profile for ${uuid} ${profileResp.status} ${profileResp.statusText}`, DOMAIN);
-                    if (profileResp.data) {
-                        let cleanedProfileJSON = MojangAPI.jsonFromProfileResp(profileResp.data);
-
-                        return fs.writeJSON(cachedPlayerProfile, cleanedProfileJSON, {
-                            'spaces': 2
-                        });
-                    }
-                }).then((res) => {
-                    Log.info(`Cached new profile data for ${uuid}`, DOMAIN);
-                }).catch((err) => {
-                    if (err.message.indexOf('code 429')) {
-                        Log.warn('Too many requests to Mojang API.', DOMAIN);
-                    } else
-                        Log.warn(err, DOMAIN);
-                });
-            });
-        } else {
-            Log.info(`No need to update Mojang profile for ${Config.PLAYERS[uuid]}, cache is younger than 4 hours`, DOMAIN);
-        }
-    }))
-
-}
 
 function performLogOperations() {
     return new Promise((resolve, reject) => {
@@ -81,7 +44,7 @@ function createJsonForAllRegionDirs() {
 function combinePlayerData(uuid) {
     let readjsonPromises = [
         fs.readJSON(path.join(Config.STATS_DIR, `${uuid}.json`)),
-        fs.readJSON(path.join(Config.ADVANCEMENTS_DIR, `${uuid}.json`)),
+        fs.readJSON(path.join(Config.TEMP_ADVANCEMENT_JSON_DIR, `${uuid}.json`)),
         fs.readJSON(path.join(Config.TEMP_PLAYERDATA_JSON_DIR, `${uuid}.json`)),
         fs.readJSON(path.join(Config.TEMP_PROFILE_JSON_DIR, `${uuid}.json`)),
         fs.readJSON(path.join(Config.TEMP_LOG_JSON_DIR, `${uuid}.json`)),
@@ -149,6 +112,12 @@ ProfileHelper.updateProfiles().then((val) => { // GET PLAYER INFORMATION FROM MO
         return val;
     }).then((val) => {
         return PlayerData.convertPlayerdatFiles() // CONVERT PLAYER.DAT FILES
+    })
+    .then(val => {
+        return AdvancementsParser.parseAndSaveAdvancementFiles();
+    })
+    .then(val => {
+        return AdvancementsParser.createServerAdvancementProgress();
     })
     .then((val) => {
         return performLogOperations() // CONVERT LOG FILES
