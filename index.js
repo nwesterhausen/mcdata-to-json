@@ -5,13 +5,14 @@
  * By default will output in the current directory, or the OUTPUT_DIR env
  * variable, OR the --outdir="" parameter.
  */
-import log from './lib/CustomLogger';
-import config from './lib/Configuration';
-import LogsParser from './LogsParser';
-import ServerDataExtractor from './lib/ServerDataTool';
-const DOMAIN = 'Main';
+const log = require("./lib/CustomLogger");
+const config = require("./lib/Configuration");
+const LogsParser = require("./lib/helpers/LogsParser");
+const ServerDataExtractor = require("./lib/ServerDataTool");
 
-log.debug(DOMAIN, 'Passing configuration to components.');
+const DOMAIN = "Main";
+
+log.debug(DOMAIN, "Passing configuration to components.");
 ServerDataExtractor.setConfig(config);
 LogsParser.setConfig(config);
 log.info(DOMAIN, `Starting Log Processing ${config.LOGS}`);
