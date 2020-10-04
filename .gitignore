@@ -1,7 +1,6 @@
 dist/output
-test/output
-test/snapshot
 mcdata_cache
+sample_mcdir
 output
 
 # Logs
