@@ -1,6 +1,8 @@
 output
 dist/output
 mcdata_cache
+sample_mcdir
+output
 
 # Logs
 logs
