@@ -11,9 +11,8 @@ In practice, you may need to run this like:
 ```
 git clone https://github.com/nwesterhausen/mcdata-to-json.git
 cd mcdata-to-json
-npm i
-npm run build
-node ./dist/main.js --minecraft="/opt/minecraft" --outdir="/home/nick/mcjson"
+yarn
+node ./index.js --minecraft="/opt/minecraft" --outdir="/home/nick/mcjson"
 ```
 
 ## Help Text
