@@ -3,7 +3,6 @@
   "version": "0.0.4",
   "description": "Node.js app to turn Minecraft .dat and .json files into unified json.",
   "main": "src/main.js",
-  "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint --fix index.js lib/**/*.js",
