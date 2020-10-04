@@ -1,6 +1,8 @@
 dist/output
 test/output
 test/snapshot
+mcdata_cache
+output
 
 # Logs
 logs
