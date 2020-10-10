@@ -5,8 +5,8 @@
   "main": "src/main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "lint": "eslint --fix index.js lib/**/*.js",
-    "pretty": "prettier --write index.js lib/**/*.js",
+    "lint": "eslint --fix index.js lib/*.js lib/**/*.js",
+    "pretty": "prettier --write index.js lib/*.js lib/**/*.js docs/**/*.md",
     "tidy-up": "yarn lint && yarn pretty"
   },
   "author": "Nicholas Westerhausen",
