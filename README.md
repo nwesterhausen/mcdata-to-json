@@ -17,6 +17,10 @@ yarn
 node ./index.js --minecraft="/opt/minecraft" --outdir="/home/nick/mcjson"
 ```
 
+## Generated Files
+
+See the [docs](doc/files.md) for more information.
+
 ## Help Text
 
 ```bash

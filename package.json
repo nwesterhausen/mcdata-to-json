@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint --fix index.js lib/*.js lib/**/*.js",
-    "pretty": "prettier --write index.js lib/*.js lib/**/*.js docs/**/*.md",
+    "pretty": "prettier --write index.js lib/*.js lib/**/*.js doc/**/*.md",
     "tidy-up": "yarn lint && yarn pretty"
   },
   "author": "Nicholas Westerhausen",

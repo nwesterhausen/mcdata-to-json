@@ -30,7 +30,7 @@ The stats value of the object is just an insertion of the world/advancements/uui
 
 The pattern is `player.advancments.NAMESPACE.CATEGORY.ADVANCEMENT` to get an object listing criteria and when that criteria were achieved.
 
-mcdata-to-json also parses all the possible advancements for the server and puts them into `server-advancements.json` file.
+mcdata-to-json also parses all the possible advancements for the server and puts them into `server-advancements.json` file. See the [advancement JSON doc](advancement_json.md).
 
 ## Player Data
 
@@ -42,4 +42,4 @@ This is the reply from the Mojang API for the profile/skin request. Details on t
 
 ## Player Logs
 
-When mcdata-to-json parses the log files, as it finds entries that pertain to each player, it will write them down separately and these get combined in. See the information on the [log JSON](log_json.md) for more details.
+When mcdata-to-json parses the log files, as it finds entries that pertain to each player, it will write them down separately and these get combined in. See the information on the [log JSON doc](log_json.md) for more details.
