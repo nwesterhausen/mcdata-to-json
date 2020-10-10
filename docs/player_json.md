@@ -6,15 +6,15 @@ The player data JSON will be created with the player's UUID as the filename. Alo
 
 ## Root Keys
 
-| Key          | Value                                                 |
-| ------------ | ----------------------------------------------------- |
-| uuid         | Player UUID                                           |
-| name         | Player display name                                   |
-| stats        | [Player stats](#player_stats)                         |
-| advancements | [Player advancements](#player_advancements)           |
-| data         | [Player.dat file contents](#player_data)              |
-| profile      | [Player profile from Mojang](#player_profile)         |
-| log          | (_Currently not working_) Log entries with the player |
+| Key          | Value                                                                 |
+| ------------ | --------------------------------------------------------------------- |
+| uuid         | Player UUID                                                           |
+| name         | Player display name                                                   |
+| stats        | [Player stats](#player-stats)                                         |
+| advancements | [Player advancements](#player-advancements)                           |
+| data         | [Player.dat file contents](#player-data)                              |
+| profile      | [Player profile from Mojang](#player-profile)                         |
+| log          | (_Currently not working_) [Log entries with the player](#player-logs) |
 
 ## Player Stats
 
