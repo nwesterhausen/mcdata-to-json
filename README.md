@@ -1,23 +1,22 @@
 # mcdata-to-json
 
-Node.js module to process stats, playerdata, advancements and logs and output JSON.
+[![npm version](https://badge.fury.io/js/mcdata-to-json.svg)](https://badge.fury.io/js/mcdata-to-json)
+
+Node.js binary to create JSON from stats, playerdata, advancements, logs and chunks.
 
 ## Usage
 
-To generate json files from a minecraft server at /opt/minecraft and save them to /home/nick/mcjson:
-
-`mcdata-to-json --minecraftdir="/opt/minecraft/" --outputdir="/home/nick/mcjson"`
-
-To view cli options do `mcdata-to-json -h`
-
-In practice, you may need to run this like:
+CLI is available from npmjs.org. So you can simply do this:
 
 ```bash
-git clone https://github.com/nwesterhausen/mcdata-to-json.git
-cd mcdata-to-json
-yarn
-node ./index.js --minecraftdir="/opt/minecraft" --outputdir="/home/nick/mcjson"
+~$ npx mcdata-to-json --minecraftdir=/opt/minecraft
 ```
+
+Look for an output folder with the generated JSON (unless it fails to run, and you will see warnings/errors if that's the case.)
+
+### CLI Options
+
+To view cli options do `mcdata-to-json -h`
 
 ### Environment Variables
 
