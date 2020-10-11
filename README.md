@@ -16,7 +16,16 @@ Look for an output folder with the generated JSON (unless it fails to run, and y
 
 ### CLI Options
 
-To view cli options do `mcdata-to-json -h`
+| Option             | Default Value    | Description                                                                    |
+| ------------------ | ---------------- | ------------------------------------------------------------------------------ |
+| --loglevel         | `warn`           | Specify log verbosity, one of `error`, `warn`, `info`, `debug` or `silly`      |
+| -v, --verbose      |                  | More 'v's increase log verbosity (up to -vvv or --verbose --verbose --verbose) |
+| -q, --quiet        |                  | Decrease log verbosity (changes from `warn` to `error`)                        |
+| -t, --minecraftdir | `/minecraft`     | Specify the minecraft directory (containing the server.properites)             |
+| -o, --outputdir    | `./output`       | Specify output directory for generated JSON                                    |
+| -w, --workdir      | `./mcdata_cache` | Specify a temporary directory that can be used while running                   |
+| -v, --version      |                  | Show version and exit                                                          |
+| -h, --help         |                  | Show help message and exit                                                     |
 
 ### Environment Variables
 
