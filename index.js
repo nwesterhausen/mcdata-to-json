@@ -210,6 +210,7 @@ ProfileHelper.updateProfiles()
   })
   .then((val) => {
     Log.info(DOMAIN, "Copied player info to output directory");
+    Config.ensureDirSync(path.join(Config.WORK_DIR, "mcajson", "overworld"));
     return buildTileEntityList(path.join(Config.WORK_DIR, "mcajson", "overworld"));
   })
   .then((overworldTEJson) => {
