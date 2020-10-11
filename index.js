@@ -7,7 +7,7 @@
  */
 const Log = require("./lib/CustomLogger");
 const Config = require("./lib/Configuration");
-const LogsParser = require("./lib/helpers/LogsParser");
+const LogsParser = require("./lib/LogsParser");
 const ServerDataExtractor = require("./lib/ServerDataTool");
 const PlayerData = require("./lib/PlayerData");
 const McaParser = require("./lib/McaParser");
