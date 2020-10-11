@@ -1,10 +1,5 @@
-/**
- * You need to set the minecraft folder location in the MC_DIR env variable
- * or use the --minecraft="" parameter when running.
- *
- * By default will output in the current directory, or the OUTPUT_DIR env
- * variable, OR the --outdir="" parameter.
- */
+#!/usr/bin/env node
+
 const Log = require("./lib/CustomLogger");
 const Config = require("./lib/Configuration");
 const LogsParser = require("./lib/LogsParser");
