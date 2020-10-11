@@ -19,6 +19,18 @@ yarn
 node ./index.js --minecraftdir="/opt/minecraft" --outputdir="/home/nick/mcjson"
 ```
 
+### Environment Variables
+
+You can define environment variables in lieu of using option switches. The prefix `MCTOJSON_` is needed before the defined switch (see full listing in `mcdata-to-json --help`). If you create a file `.env` in the root where you run mcdata-to-json, it will be used to populate the environment variables.
+
+#### Common Variables
+
+| Variable              | Details                                                                     |
+| --------------------- | --------------------------------------------------------------------------- |
+| MCTOJSON_LOGLEVEL     | Set the log level, choose one of: `error`, `warn`, `info`, `debug`, `silly` |
+| MCTOJSON_MINECRAFTDIR | Set the location of your minecraft folder                                   |
+| MCTOJSON_OUTPUTDIR    | Set the output folder for generated JSON                                    |
+
 ## Generated Files
 
 See the [docs](doc/files.md) for more information.
