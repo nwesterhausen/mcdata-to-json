@@ -23,11 +23,11 @@ uuids.json
 
 Some helpful JSON is created to make figuring out what files to grab if hosted on web server (not needed if you can simply ls the dir).
 
-So far only one 'helper' file gets created, **uuids.json** which is a dictionary of player uuids and names. Grab this file first, then you know what **<player-uuid>.json** are available.
+So far only one 'helper' file gets created, **uuids.json** which is a dictionary of player uuids and names. Grab this file first, then you know what **\<player-uuid\>.json** are available.
 
 ## [Player JSON](player_json.md)
 
-A **<player-uuid>.json** file is made for each player found.
+A **\<player-uuid\>.json** file is made for each player found.
 
 ## [Log JSON](log_json.md)
 
