@@ -2,7 +2,7 @@
   "name": "mcdata-to-json",
   "version": "0.2.1",
   "description": "Node.js app to turn Minecraft .dat and .json files into unified json.",
-  "main": "src/main.js",
+  "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint --fix index.js lib/*.js lib/**/*.js",
