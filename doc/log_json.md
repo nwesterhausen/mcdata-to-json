@@ -9,7 +9,7 @@ Each entry is an object, and the JSON file is an array of these objects.
 | Key         | Value                                                                          |
 | ----------- | ------------------------------------------------------------------------------ |
 | timestamp   | Epoch timestamp for when the entry occured                                     |
-| type        | [One of the log entry types](../lib/helper/LogConst.js)                        |
+| type        | [One of the log entry types](../lib/helpers/LogConst.js)                        |
 | description | The content from the log message. [Special Cases](#special-description-values) |
 | severity    | The given severity of the entry (INFO, WARN, ERROR)                            |
 
