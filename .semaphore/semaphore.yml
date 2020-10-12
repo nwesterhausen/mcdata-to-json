@@ -19,6 +19,11 @@ blocks:
             - 'cache restore node-modules-$SEMAPHORE_GIT_BRANCH-$(checksum package-lock.json),node-modules-$SEMAPHORE_GIT_BRANCH,node-modules-master'
             - pnpm install
             - cache store node-modules-$SEMAPHORE_GIT_BRANCH-$(checksum package-lock.json) node_modules
+      prologue:
+        commands:
+          - checkout
+          - sem-version node 12
+          - 'curl -L https://unpkg.com/@pnpm/self-installer | node'
     dependencies: []
   - name: Cleanliness Check
     dependencies:
@@ -33,3 +38,8 @@ blocks:
           commands:
             - 'cache restore node-modules-$SEMAPHORE_GIT_BRANCH-$(checksum package-lock.json),node-modules-$SEMAPHORE_GIT_BRANCH,node-modules-master'
             - pnpm check-pretty
+      prologue:
+        commands:
+          - checkout
+          - sem-version node 12
+          - 'curl -L https://unpkg.com/@pnpm/self-installer | node'
