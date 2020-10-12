@@ -42,12 +42,15 @@
     "yargs": "^16.0.3"
   },
   "devDependencies": {
+    "cz-conventional-changelog": "^3.3.0",
     "eslint": "^7.10.0",
     "eslint-config-google": "^0.14.0",
     "eslint-config-prettier": "^6.12.0",
     "prettier": "^2.1.2"
   },
   "release": {
-    "branches": ["master"]
+    "branches": [
+      "master"
+    ]
   }
 }
