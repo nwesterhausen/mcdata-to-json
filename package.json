@@ -8,6 +8,8 @@
     "mcdata-to-json": "./index.js"
   },
   "scripts": {
+    "check-lint": "eslint index.js lib/*.js lib/**/*.js",
+    "check-pretty": "prettier --check index.js lib/*.js lib/**/*.js README.md doc/**/*.md",
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint --fix index.js lib/*.js lib/**/*.js",
     "pretty": "prettier --write index.js lib/*.js lib/**/*.js README.md doc/**/*.md",
