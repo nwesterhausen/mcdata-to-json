@@ -13,11 +13,13 @@ blocks:
   - name: Install Deps
     task:
       jobs:
-        - name: Install
+        - name: pnpm install
           commands:
-            - cache restore
-            - yarn install --frozen-lockfile
-            - cache store
+            - curl -L https://unpkg.com/@pnpm/self-installer | node
+            - checkout
+            - cache restore node-modules-$SEMAPHORE_GIT_BRANCH-$(checksum package-lock.json),node-modules-$SEMAPHORE_GIT_BRANCH,node-modules-master
+            - pnpm install
+            - cache store node-modules-$SEMAPHORE_GIT_BRANCH-$(checksum package-lock.json) node_modules
     dependencies: []
   - name: Cleanliness Check
     dependencies:
@@ -27,8 +29,8 @@ blocks:
         - name: Lint
           commands:
             - cache restore
-            - yarn check-lint
+            - pnpm check-lint
         - name: Pretty
           commands:
             - cache restore
-            - yarn check-pretty
+            - pnpm check-pretty
