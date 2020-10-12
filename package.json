@@ -14,10 +14,10 @@
     "mcdata-to-json": "./index.js"
   },
   "scripts": {
-    "check-lint": "eslint index.js lib/*.js lib/**/*.js",
-    "check-pretty": "prettier --check index.js lib/*.js lib/**/*.js README.md doc/**/*.md",
-    "lint": "eslint --fix index.js lib/*.js lib/**/*.js",
-    "pretty": "prettier --write index.js lib/*.js lib/**/*.js README.md doc/**/*.md",
+    "check-lint": "eslint index.js lib",
+    "check-pretty": "prettier --check index.js lib README.md doc",
+    "lint": "eslint --fix index.js lib",
+    "pretty": "prettier --write index.js lib README.md doc",
     "test": "echo \"Error: no test specified\" && exit 1",
     "tidy-up": "yarn lint && yarn pretty"
   },
