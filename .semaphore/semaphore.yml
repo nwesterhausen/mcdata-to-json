@@ -24,13 +24,10 @@ blocks:
       - Install Deps
     task:
       jobs:
-        - name: check-lint
+        - name: pnpm scripts
           commands:
             - 'cache restore node-modules-$SEMAPHORE_GIT_BRANCH-$(checksum package-lock.json),node-modules-$SEMAPHORE_GIT_BRANCH,node-modules-master'
             - pnpm check-lint
-        - name: check-pretty
-          commands:
-            - 'cache restore node-modules-$SEMAPHORE_GIT_BRANCH-$(checksum package-lock.json),node-modules-$SEMAPHORE_GIT_BRANCH,node-modules-master'
             - pnpm check-pretty
       prologue:
         commands:
