@@ -75,13 +75,13 @@ function combinePlayerData(uuid) {
 
   Promise.all(readjsonPromises).then((val) => {
     const playerJSON = {
-      uuid: uuid,
-      name: Config.PLAYERS[uuid],
-      stats: {},
       advancements: {},
       data: {},
-      profile: {},
       log: {},
+      name: Config.PLAYERS[uuid],
+      profile: {},
+      stats: {},
+      uuid: uuid,
     };
     if (val[0]) {
       playerJSON.stats = JSON.parse(val[0]);
@@ -223,21 +223,21 @@ ProfileHelper.updateProfiles()
             });
           } else if (tileent.id === "minecraft:sign") {
             signs.push({
+              Color: tileent.Color,
               Text: [
                 JSON.parse(tileent.Text1.replace(/\\"/, "'")).text,
                 JSON.parse(tileent.Text2.replace(/\\"/, "'")).text,
                 JSON.parse(tileent.Text3.replace(/\\"/, "'")).text,
                 JSON.parse(tileent.Text4.replace(/\\"/, "'")).text,
               ],
-              Color: tileent.Color,
               pos: [tileent.x, tileent.y, tileent.z],
             });
           } else if (Object.prototype.hasOwnProperty.call(tileent, "Items")) {
             if (tileent.Items.length > 0) {
               teWithItems.push({
                 Items: tileent.Items,
-                pos: [tileent.x, tileent.y, tileent.z],
                 id: tileent.id,
+                pos: [tileent.x, tileent.y, tileent.z],
               });
             }
           } else if (Object.prototype.hasOwnProperty.call(tileent, "LootTable")) {
@@ -246,9 +246,9 @@ ProfileHelper.updateProfiles()
               lootables[loottype] = [];
             }
             lootables[loottype].push({
-              type: loottype,
-              pos: [tileent.x, tileent.y, tileent.z],
               id: tileent.id,
+              pos: [tileent.x, tileent.y, tileent.z],
+              type: loottype,
             });
           }
         });
