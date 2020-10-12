@@ -1,0 +1,45 @@
+language: node_js
+
+stages:
+  - Test
+  - name: Publish
+    if: branch = master
+
+jobs:
+  include:
+    - stage: Test
+      node_js:
+        - lts/*
+      cache:
+        npm: false
+        directories:
+          - "~/.pnpm-store"
+      before_install:
+        - curl -L https://unpkg.com/@pnpm/self-installer | node
+        - pnpm config set store-dir ~/.pnpm-store
+      install:
+        - pnpm install
+      before_script:
+        - pnpm check-lint
+        - pnpm check-pretty
+      script:
+        - pnpm test
+    # Define the release stage that runs semantic-release
+    - stage: Publish
+      node_js: lts/*
+      cache:
+        npm: false
+        directories:
+          - "~/.pnpm-store"
+      before_install:
+        - curl -L https://unpkg.com/@pnpm/self-installer | node
+        - pnpm config set store-dir ~/.pnpm-store
+      install:
+        - pnpm install
+      # Advanced: optionally overwrite your default `script` step to skip the tests
+      script: skip
+      deploy:
+        provider: script
+        cleanup: false
+        script:
+          - pnpx semantic-release
