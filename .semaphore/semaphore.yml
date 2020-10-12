@@ -7,6 +7,7 @@ agent:
 global_job_config:
   prologue:
     commands:
+      - checkout
       - sem-version node 12
 blocks:
   - name: Install Deps
@@ -14,8 +15,6 @@ blocks:
       jobs:
         - name: Install
           commands:
-            - checkout
-            - sem-version node 12
             - cache restore
             - yarn install --frozen-lockfile
             - cache store
