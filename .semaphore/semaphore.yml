@@ -1,0 +1,35 @@
+version: v1.0
+name: Test MyApp
+agent:
+  machine:
+    type: e1-standard-2
+    os_image: ubuntu1804
+global_job_config:
+  prologue:
+    commands:
+      - sem-version node 12
+blocks:
+  - name: Install Deps
+    task:
+      jobs:
+        - name: Install
+          commands:
+            - checkout
+            - sem-version node 12
+            - cache restore
+            - yarn install --frozen-lockfile
+            - cache store
+    dependencies: []
+  - name: Cleanliness Check
+    dependencies:
+      - Install Deps
+    task:
+      jobs:
+        - name: Lint
+          commands:
+            - cache restore
+            - yarn check-lint
+        - name: Pretty
+          commands:
+            - cache restore
+            - yarn check-pretty
