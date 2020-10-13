@@ -40,7 +40,6 @@ jobs:
       script: skip
       deploy:
         provider: script
-        cleanup: false
+        skip_cleanup: true
         script:
-          - pnpm install -g @semantic-release/changelog @semantic-release/git
           - pnpx semantic-release
