@@ -17,9 +17,10 @@
     "check-lint": "eslint index.js lib",
     "check-pretty": "prettier --check index.js lib README.md doc",
     "lint": "eslint --fix index.js lib",
+    "preinstall": "npx only-allow pnpm",
     "pretty": "prettier --write index.js lib README.md doc",
     "test": "echo \"Error: no test specified\" && exit 0",
-    "tidy-up": "yarn lint && yarn pretty"
+    "tidy-up": "pnpm lint && pnpm pretty"
   },
   "author": "Nicholas Westerhausen",
   "license": "MIT",
@@ -42,7 +43,6 @@
     "yargs": "^16.0.3"
   },
   "devDependencies": {
-    "cz-conventional-changelog": "^3.3.0",
     "eslint": "^7.10.0",
     "eslint-config-google": "^0.14.0",
     "eslint-config-prettier": "^6.12.0",

@@ -9,7 +9,7 @@ Node.js binary to create JSON from stats, playerdata, advancements, logs and chu
 CLI is available from npmjs.org. So you can simply do this:
 
 ```bash
-~$ npx mcdata-to-json --minecraftdir=/opt/minecraft
+npx mcdata-to-json --minecraftdir=/opt/minecraft
 ```
 
 Look for an output folder with the generated JSON (unless it fails to run, and you will see warnings/errors if that's the case.)
@@ -42,3 +42,7 @@ You can define environment variables in lieu of using option switches. The prefi
 ## Generated Files
 
 See the [docs](doc/files.md) for more information.
+
+## Development
+
+Use pnpm for dependency management when developing the project. If you don't have it, install it with either `npm install --global pnpm` or `yarn global add pnpm` then you can clone this repository and do `pnpm install` in the root and install dependencies.
