@@ -42,4 +42,5 @@ jobs:
         provider: script
         cleanup: false
         script:
+          - pnpm install -g @semantic-release/changelog @semantic-release/git
           - pnpx semantic-release
