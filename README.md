@@ -2,7 +2,7 @@
 
 [![npm version](https://badge.fury.io/js/mcdata-to-json.svg)](https://badge.fury.io/js/mcdata-to-json)
 
-Node.js binary to create JSON from stats, playerdata, advancements, logs and chunks.
+Node.js binary to create JSON from stats, playerdata, advancements, logs and chunks. See explanation of steps it takes to do this [here](docs/what-happens.md).
 
 ## Usage
 
@@ -41,7 +41,7 @@ You can define environment variables in lieu of using option switches. The prefi
 
 ## Generated Files
 
-See the [docs](doc/files.md) for more information.
+See the [docs](docs/created-files.md) for more information.
 
 ## Development
 
