@@ -1,6 +1,7 @@
 # mcdata-to-json
 
 [![npm version](https://badge.fury.io/js/mcdata-to-json.svg)](https://badge.fury.io/js/mcdata-to-json)
+[![Build Status](https://travis-ci.org/nwesterhausen/mcdata-to-json.svg?branch=master)](https://travis-ci.org/nwesterhausen/mcdata-to-json)
 
 Node.js binary to create JSON from stats, playerdata, advancements, logs and chunks. See explanation of steps it takes to do this [here](docs/what-happens.md).
 
