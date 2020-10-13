@@ -40,6 +40,7 @@
     "nbt": "^0.8.1",
     "node-int64": "^0.4.0",
     "node-stream-zip": "^1.8.0",
+    "winston": "^3.3.3",
     "yargs": "^16.0.3"
   },
   "devDependencies": {
