@@ -1,6 +1,6 @@
 {
   "name": "mcdata-to-json",
-  "version": "0.3.10",
+  "version": "0.4.0",
   "description": "Node.js app to turn Minecraft .dat and .json files into unified json.",
   "keywords": [
     "minecraft",
@@ -44,14 +44,37 @@
     "yargs": "^16.0.3"
   },
   "devDependencies": {
+    "@semantic-release/changelog": "^5.0.1",
+    "@semantic-release/git": "^9.0.0",
     "eslint": "^7.10.0",
     "eslint-config-google": "^0.14.0",
     "eslint-config-prettier": "^6.12.0",
-    "prettier": "^2.1.2"
+    "prettier": "^2.1.2",
+    "semantic-release": "^17.2.1"
   },
   "release": {
     "branches": [
       "master"
+    ],
+    "plugins": [
+      "@semantic-release/commit-analyzer",
+      "@semantic-release/release-notes-generator",
+      [
+        "@semantic-release/changelog",
+        {
+          "changelogFile": "docs/CHANGELOG.md"
+        }
+      ],
+      [
+        "@semantic-release/git",
+        {
+          "assets": [
+            "docs/CHANGELOG.md"
+          ]
+        }
+      ],
+      "@semantic-release/github",
+      "@semantic-release/npm"
     ]
   }
 }
