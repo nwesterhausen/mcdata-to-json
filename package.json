@@ -1,6 +1,6 @@
 {
   "name": "mcdata-to-json",
-  "version": "0.3.9",
+  "version": "0.3.10",
   "description": "Node.js app to turn Minecraft .dat and .json files into unified json.",
   "keywords": [
     "minecraft",
