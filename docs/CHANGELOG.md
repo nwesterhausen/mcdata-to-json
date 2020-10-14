@@ -1,3 +1,15 @@
+# [0.6.0](https://github.com/nwesterhausen/mcdata-to-json/compare/v0.5.0...v0.6.0) (2020-10-14)
+
+
+### Bug Fixes
+
+* create dirs if needed ([fa815df](https://github.com/nwesterhausen/mcdata-to-json/commit/fa815df4872bf2459dc9a644a8363ee594faeda3))
+
+
+### Features
+
+* **data-extraction:** extract data from server.jar ([efa9ad5](https://github.com/nwesterhausen/mcdata-to-json/commit/efa9ad5ac5e09c76a50e770ecd82dfee2e7b4d93)), closes [#11](https://github.com/nwesterhausen/mcdata-to-json/issues/11) [#11](https://github.com/nwesterhausen/mcdata-to-json/issues/11)
+
 # [0.5.0](https://github.com/nwesterhausen/mcdata-to-json/compare/v0.4.0...v0.5.0) (2020-10-14)
 
 ### Features
