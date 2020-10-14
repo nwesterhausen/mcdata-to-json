@@ -1,4 +1,5 @@
 dependencies:
+  7zip-bin: 5.0.3
   axios: 0.20.0
   cli-progress: 3.8.2
   colors: 1.4.0
@@ -11,7 +12,7 @@ dependencies:
   long: 4.0.0
   mca-js: 0.1.1
   nbt: 0.8.1
-  node-stream-zip: 1.11.3
+  node-7z: 2.1.2
   winston: 3.3.3
   yargs: 16.0.3
 devDependencies:
@@ -24,6 +25,10 @@ devDependencies:
   semantic-release: 17.2.1_semantic-release@17.2.1
 lockfileVersion: 5.1
 packages:
+  /7zip-bin/5.0.3:
+    dev: false
+    resolution:
+      integrity: sha512-GLyWIFBbGvpKPGo55JyRZAo4lVbnBiD52cKlw/0Vt+wnmKvWJkpZvsjVoaIolyBXDeAQKSicRtqFNPem9w0WYA==
   /@babel/code-frame/7.10.4:
     dependencies:
       '@babel/highlight': 7.10.4
@@ -810,7 +815,6 @@ packages:
       path-key: 3.1.1
       shebang-command: 2.0.0
       which: 2.0.2
-    dev: true
     engines:
       node: '>= 8'
     resolution:
@@ -834,7 +838,6 @@ packages:
   /debug/4.2.0:
     dependencies:
       ms: 2.1.2
-    dev: true
     engines:
       node: '>=6.0'
     peerDependencies:
@@ -1737,7 +1740,6 @@ packages:
     resolution:
       integrity: sha1-u5NdSFgsuhaMBoNJV6VKPgcSTxE=
   /isexe/2.0.0:
-    dev: true
     resolution:
       integrity: sha1-6PvzdNxVb/iUehDcsFctYz8s+hA=
   /issue-parser/6.0.0:
@@ -1859,10 +1861,26 @@ packages:
     dev: true
     resolution:
       integrity: sha1-+CbJtOKoUR2E46yinbBeGk87cqk=
+  /lodash.defaultsdeep/4.6.1:
+    dev: false
+    resolution:
+      integrity: sha512-3j8wdDzYuWO3lM3Reg03MuQR957t287Rpcxp1njpEa8oDrikb+FwGdW3n+FELh/A6qib6yPit0j/pv9G/yeAqA==
+  /lodash.defaultto/4.14.0:
+    dev: false
+    resolution:
+      integrity: sha1-OL09QlrO5zPg4ru9TkspcRzC7hE=
   /lodash.escaperegexp/4.1.2:
     dev: true
     resolution:
       integrity: sha1-ZHYsSGGAglGKw99Mz11YhtriA0c=
+  /lodash.flattendeep/4.4.0:
+    dev: false
+    resolution:
+      integrity: sha1-+wMJF/hqMTTlvJvsDWngAT3f7bI=
+  /lodash.isempty/4.4.0:
+    dev: false
+    resolution:
+      integrity: sha1-b4bL7di+TsmHvpqvM8loTbGzHn4=
   /lodash.ismatch/4.4.0:
     dev: true
     resolution:
@@ -1875,6 +1893,10 @@ packages:
     dev: true
     resolution:
       integrity: sha1-1SfftUVuynzJu5XV2ur4i6VKVFE=
+  /lodash.negate/3.0.2:
+    dev: false
+    resolution:
+      integrity: sha1-nIl7C/YQAZ4LQ7j/Pwr+89e2bzQ=
   /lodash.toarray/4.4.0:
     dev: true
     resolution:
@@ -2114,6 +2136,21 @@ packages:
     dev: true
     resolution:
       integrity: sha512-1nh45deeb5olNY7eX82BkPO7SSxR5SSYJiPTrTdFUVYwAl8CKMA5N9PjTYkHiRjisVcxcQ1HXdLhx2qxxJzLNQ==
+  /node-7z/2.1.2:
+    dependencies:
+      cross-spawn: 7.0.3
+      debug: 4.2.0
+      lodash.defaultsdeep: 4.6.1
+      lodash.defaultto: 4.14.0
+      lodash.flattendeep: 4.4.0
+      lodash.isempty: 4.4.0
+      lodash.negate: 3.0.2
+      normalize-path: 3.0.0
+    dev: false
+    engines:
+      node: '>=10'
+    resolution:
+      integrity: sha512-mSmn90OIYKYIkuRwH1YRJl2sMwB9OlYhCQS4SPTOfxlzWwomoC1G9j4tsvAsv7vJPwvK7B76Z0a2dH5Mvwo91Q==
   /node-emoji/1.10.0:
     dependencies:
       lodash.toarray: 4.4.0
@@ -2126,12 +2163,6 @@ packages:
       node: 4.x || >=6.0.0
     resolution:
       integrity: sha512-V4aYg89jEoVRxRb2fJdAg8FHvI7cEyYdVAh94HH0UIK8oJxUfkjlDQN9RbMx+bEjP7+ggMiFRprSti032Oipxw==
-  /node-stream-zip/1.11.3:
-    dev: false
-    engines:
-      node: '>=0.10.0'
-    resolution:
-      integrity: sha512-GY+9LxkQuIT3O7K8BTdHVGKFcBYBy2vAVcTBtkKpu+OlBef/NSb6VuIWSyLiVDfmLMkggHeRJZN0F3W0GWU/uw==
   /normalize-package-data/2.5.0:
     dependencies:
       hosted-git-info: 2.8.8
@@ -2141,6 +2172,12 @@ packages:
     dev: true
     resolution:
       integrity: sha512-/5CMN3T0R4XTj4DcGaexo+roZSdSFW/0AOOTROrjxzCG1wrWXEsGbRKevjlIL+ZDE4sZlJr5ED4YW0yqmkK+eA==
+  /normalize-path/3.0.0:
+    dev: false
+    engines:
+      node: '>=0.10.0'
+    resolution:
+      integrity: sha512-6eZs5Ls3WtCisHWp9S2GUy8dqkpGi4BVSz3GaqiE6ezub0512ESztXUwUB6C6IKbQkY2Pnb/mD4WYojCRwcwLA==
   /normalize-url/5.3.0:
     dev: true
     engines:
@@ -2500,7 +2537,6 @@ packages:
     resolution:
       integrity: sha1-QRyttXTFoUDTpLGRDUDYDMn0C0A=
   /path-key/3.1.1:
-    dev: true
     engines:
       node: '>=8'
     resolution:
@@ -2880,7 +2916,6 @@ packages:
   /shebang-command/2.0.0:
     dependencies:
       shebang-regex: 3.0.0
-    dev: true
     engines:
       node: '>=8'
     resolution:
@@ -2892,7 +2927,6 @@ packages:
     resolution:
       integrity: sha1-2kL0l0DAtC2yypcoVxyxkMmO/qM=
   /shebang-regex/3.0.0:
-    dev: true
     engines:
       node: '>=8'
     resolution:
@@ -3340,7 +3374,6 @@ packages:
   /which/2.0.2:
     dependencies:
       isexe: 2.0.0
-    dev: true
     engines:
       node: '>= 8'
     hasBin: true
@@ -3495,6 +3528,7 @@ packages:
     resolution:
       integrity: sha512-6+nLw8xa9uK1BOEOykaiYAJVh6/CjxWXK/q9b5FpRgNslt8s22F2xMBqVIKgCRjNgGvGPBy8Vog7WN7yh4amtA==
 specifiers:
+  7zip-bin: ^5.0.3
   '@semantic-release/changelog': ^5.0.1
   '@semantic-release/git': ^9.0.0
   axios: ^0.20.0
@@ -3512,7 +3546,7 @@ specifiers:
   long: ^4.0.0
   mca-js: ^0.1.1
   nbt: ^0.8.1
-  node-stream-zip: ^1.8.0
+  node-7z: ^2.1.2
   prettier: ^2.1.2
   semantic-release: ^17.2.1
   winston: ^3.3.3
