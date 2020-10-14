@@ -19,10 +19,10 @@ Log.verbose("Finish requiring of lib.", { domain: DOMAIN });
 const path = require("path");
 const fs = require("fs");
 
-Log.debug("Passing configuration to components.", { domain: DOMAIN });
-ServerDataExtractor.setConfig(Config);
 Log.info(`Starting Log Processing ${Config.LOGS_DIR}`, { domain: DOMAIN });
-LogsParser.parseLogFiles(Config);
+LogsParser.parseLogFiles();
+Log.verbose(`Starting jarfile data extractor`, { domain: DOMAIN });
+ServerDataExtractor.checkForData();
 
 /**
  * @return {Promise}
