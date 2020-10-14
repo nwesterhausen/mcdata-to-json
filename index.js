@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 
 const Config = require("./lib/Configuration");
-const Log = Config.logger;
+const logger = require('./lib/helpers/Logger').getLogger();
 
 const DOMAIN = "Main";
 
-Log.verbose("Begin requiring of lib.", { domain: DOMAIN });
+logger.verbose("Begin lib imports.", { domain: DOMAIN });
 
 const LogsParser = require("./lib/LogsParser");
 const ServerDataExtractor = require("./lib/ServerDataTool");
@@ -14,12 +14,12 @@ const McaParser = require("./lib/McaParser");
 const ProfileHelper = require("./lib/ProfileHelper");
 const AdvancementsParser = require("./lib/AdvancementsParser");
 
-Log.verbose("Finish requiring of lib.", { domain: DOMAIN });
+logger.verbose("Finish lib imports.", { domain: DOMAIN });
 
 const path = require("path");
 const fs = require("fs");
 
-Log.info(`Starting Log Processing ${Config.LOGS_DIR}`, { domain: DOMAIN });
+logger.info(`Starting Log Processing ${Config.LOGS_DIR}`, { domain: DOMAIN });
 LogsParser.parseLogFiles();
 ServerDataExtractor.checkForData();
 ServerDataExtractor.convertLevelDat();
@@ -54,27 +54,27 @@ function combinePlayerData(uuid) {
   if (fs.existsSync(STATS_FILE)) readjsonPromises.push(fs.promises.readFile(STATS_FILE));
   else {
     readjsonPromises.push(PROMISE_FALSE);
-    Log.warn(`No parsed stats file exists for ${Config.PLAYERS[uuid]}`, { domain: DOMAIN });
+    logger.warn(`No parsed stats file exists for ${Config.PLAYERS[uuid]}`, { domain: DOMAIN });
   }
   if (fs.existsSync(ADVANCEMENT_FILE)) readjsonPromises.push(fs.promises.readFile(ADVANCEMENT_FILE));
   else {
     readjsonPromises.push(PROMISE_FALSE);
-    Log.warn(`No parsed advancements file exists for ${Config.PLAYERS[uuid]}`, { domain: DOMAIN });
+    logger.warn(`No parsed advancements file exists for ${Config.PLAYERS[uuid]}`, { domain: DOMAIN });
   }
   if (fs.existsSync(PLAYERDATA_FILE)) readjsonPromises.push(fs.promises.readFile(PLAYERDATA_FILE));
   else {
     readjsonPromises.push(PROMISE_FALSE);
-    Log.warn(`No parsed playerdata file exists for ${Config.PLAYERS[uuid]}`, { domain: DOMAIN });
+    logger.warn(`No parsed playerdata file exists for ${Config.PLAYERS[uuid]}`, { domain: DOMAIN });
   }
   if (fs.existsSync(PROFILE_FILE)) readjsonPromises.push(fs.promises.readFile(PROFILE_FILE));
   else {
     readjsonPromises.push(PROMISE_FALSE);
-    Log.warn(`No parsed profile file exists for ${Config.PLAYERS[uuid]}`, { domain: DOMAIN });
+    logger.warn(`No parsed profile file exists for ${Config.PLAYERS[uuid]}`, { domain: DOMAIN });
   }
   if (fs.existsSync(LOG_FILE)) readjsonPromises.push(fs.promises.readFile(LOG_FILE));
   else {
     readjsonPromises.push(PROMISE_FALSE);
-    Log.warn(`No parsed log file exists for ${Config.PLAYERS[uuid]}`, { domain: DOMAIN });
+    logger.warn(`No parsed log file exists for ${Config.PLAYERS[uuid]}`, { domain: DOMAIN });
   }
 
   Promise.all(readjsonPromises).then((val) => {
@@ -111,14 +111,14 @@ function combinePlayerData(uuid) {
     fs.promises
       .writeFile(path.join(Config.OUTPUT_DIR, `${uuid}.json`), JSON.stringify(playerJSON))
       .then((val) => {
-        Log.verbose(`Wrote output JSON for ${uuid}.`, { domain: DOMAIN });
+        logger.verbose(`Wrote output JSON for ${uuid}.`, { domain: DOMAIN });
         if (val) {
-          Log.debug(val, DOMAIN);
+          logger.debug(val, DOMAIN);
         }
       })
       .catch((err) => {
-        Log.warn(`Failed to build output for ${uuid}.`, { domain: DOMAIN });
-        Log.warn(err, DOMAIN);
+        logger.warn(`Failed to build output for ${uuid}.`, { domain: DOMAIN });
+        logger.warn(err, DOMAIN);
       });
   });
 }
@@ -148,8 +148,8 @@ function parseChunkListJson(fileContent, filepath) {
       });
       return res(tileEntities);
     } catch (e) {
-      Log.warn(`Unable to parse JSON from ${filepath}`, { domain: DOMAIN });
-      Log.debug(e, { domain: DOMAIN });
+      logger.warn(`Unable to parse JSON from ${filepath}`, { domain: DOMAIN });
+      logger.debug(e, { domain: DOMAIN });
       return rej(e);
     }
   });
@@ -187,7 +187,7 @@ ProfileHelper.updateProfiles()
     return createJsonForAllRegionDirs();
   })
   .then((val) => {
-    Log.info("Finished saving chunks to JSON", { domain: DOMAIN });
+    logger.info("Finished saving chunks to JSON", { domain: DOMAIN });
     return val;
   })
   .then((val) => {
@@ -208,7 +208,7 @@ ProfileHelper.updateProfiles()
     );
   })
   .then((val) => {
-    Log.info(`Compiled player info to ${Config.OUTPUT_DIR}`, { domain: DOMAIN });
+    logger.info(`Compiled player info to ${Config.OUTPUT_DIR}`, { domain: DOMAIN });
     Config.ensureDirSync(path.join(Config.WORK_DIR, "mcajson", "overworld"));
     return buildTileEntityList(path.join(Config.WORK_DIR, "mcajson", "overworld"));
   })
@@ -277,8 +277,8 @@ ProfileHelper.updateProfiles()
     return Promise.all(writeJsonPromises);
   })
   .then((val) => {
-    Log.info("Compiled tile-entity JSON to output directory", { domain: DOMAIN });
+    logger.info("Compiled tile-entity JSON to output directory", { domain: DOMAIN });
   })
   .catch((err) => {
-    Log.error(err, { domain: DOMAIN });
+    logger.error(err, { domain: DOMAIN });
   });
