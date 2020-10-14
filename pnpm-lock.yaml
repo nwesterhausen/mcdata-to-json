@@ -6,11 +6,11 @@ dependencies:
   deepmerge: 4.2.2
   dotenv: 8.2.0
   express: 4.17.1
+  int64-napi: 1.0.1
   lodash: 4.17.20
   long: 4.0.0
   mca-js: 0.1.1
   nbt: 0.8.1
-  node-int64: 0.4.0
   node-stream-zip: 1.11.3
   winston: 3.3.3
   yargs: 16.0.3
@@ -496,6 +496,12 @@ packages:
     dev: true
     resolution:
       integrity: sha512-IWIbu7pMqyw3EAJHzzHbWa85b6oud/yfKYg5rqB5hNE8CeMi3nX+2C2sj0HswfblST86hpVEOAb9x34NZd6P7A==
+  /bindings/1.5.0:
+    dependencies:
+      file-uri-to-path: 1.0.0
+    dev: false
+    resolution:
+      integrity: sha512-p2q/t/mhvuOj/UeLlV6566GD/guowlr0hHxClI0W9m7MWYkL1F0hLo+0Aexs9HSPCtR1SXQ0TD3MMKrXZajbiQ==
   /body-parser/1.19.0:
     dependencies:
       bytes: 3.1.0
@@ -1266,6 +1272,10 @@ packages:
       node: '>=4'
     resolution:
       integrity: sha512-bCg29ictuBaKUwwArK4ouCaqDgLZcysCFLmM/Yn/FDoqndh/9vNuQfXRDvTuXKLxfD/JtZQGKFT8MGcJBK644g==
+  /file-uri-to-path/1.0.0:
+    dev: false
+    resolution:
+      integrity: sha512-0Zt+s3L7Vf1biwWZ29aARiVYLx7iMGnEUl9x33fbB/j3jR81u/O2LbqK+Bm1CDSNDKVtJ/YjwY7TUd5SkeLQLw==
   /fill-range/7.0.1:
     dependencies:
       to-regex-range: 5.0.1
@@ -1623,6 +1633,15 @@ packages:
     dev: true
     resolution:
       integrity: sha512-RZY5huIKCMRWDUqZlEi72f/lmXKMvuszcMBduliQ3nnWbx9X/ZBQO7DijMEYS9EhHBb2qacRUMtC7svLwe0lcw==
+  /int64-napi/1.0.1:
+    dependencies:
+      bindings: 1.5.0
+    dev: false
+    engines:
+      node: '>=8.6.0'
+    requiresBuild: true
+    resolution:
+      integrity: sha512-UPprIixcZdhdLobpKgHm6/HJD9VIR53JE5Fx93nJzgnX10hCxUd8nzOukxL2WDmjT2SWfz/VzDvk6qfPBLnEVg==
   /into-stream/5.1.1:
     dependencies:
       from2: 2.3.0
@@ -2107,10 +2126,6 @@ packages:
       node: 4.x || >=6.0.0
     resolution:
       integrity: sha512-V4aYg89jEoVRxRb2fJdAg8FHvI7cEyYdVAh94HH0UIK8oJxUfkjlDQN9RbMx+bEjP7+ggMiFRprSti032Oipxw==
-  /node-int64/0.4.0:
-    dev: false
-    resolution:
-      integrity: sha1-h6kGXNs1XTGC2PlM4RGIuCXGijs=
   /node-stream-zip/1.11.3:
     dev: false
     engines:
@@ -3492,11 +3507,11 @@ specifiers:
   eslint-config-google: ^0.14.0
   eslint-config-prettier: ^6.12.0
   express: ^4.16.4
+  int64-napi: ^1.0.1
   lodash: ^4.17.11
   long: ^4.0.0
   mca-js: ^0.1.1
   nbt: ^0.8.1
-  node-int64: ^0.4.0
   node-stream-zip: ^1.8.0
   prettier: ^2.1.2
   semantic-release: ^17.2.1
