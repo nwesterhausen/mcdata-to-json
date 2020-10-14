@@ -40,7 +40,7 @@ jobs:
         # Configure git to use the script that passes the passphrase
         - git config gpg.program "/tmp/gpg-with-passphrase"
         # Configure git to sign the commits and tags
-        - git config commit.gpgsign true
+        - git config --global commit.gpgsign true
         # Configure git to use your GPG key
         - git config --global user.signingkey ${GPG_KEY_ID}
         - curl -L https://unpkg.com/@pnpm/self-installer | node
