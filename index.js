@@ -21,8 +21,8 @@ const fs = require("fs");
 
 Log.info(`Starting Log Processing ${Config.LOGS_DIR}`, { domain: DOMAIN });
 LogsParser.parseLogFiles();
-Log.verbose(`Starting jarfile data extractor`, { domain: DOMAIN });
 ServerDataExtractor.checkForData();
+ServerDataExtractor.convertLevelDat();
 
 /**
  * @return {Promise}
