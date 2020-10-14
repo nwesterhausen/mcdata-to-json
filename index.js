@@ -35,7 +35,7 @@ function createJsonForAllRegionDirs() {
         const possibleMcaDirs = fs
           .readdirSync(PATHS.WORLD_DIRS[world], { withFileTypes: true })
           .filter((dirent) => dirent.isDirectory())
-              .map((dirent) => dirent.name);
+          .map((dirent) => dirent.name);
         possibleMcaDirs.push(PATHS.WORLD_DIRS[world]);
         possibleMcaDirs.filter(
           (dir) => fs.readdirSync(dir).filter((fname) => path.extname(fname) === ".mca").length > 0
