@@ -27,6 +27,7 @@
   "repository": "github:nwesterhausen/mcdata-to-json",
   "homepage": "https://github.com/nwesterhausen/mcdata-to-json",
   "dependencies": {
+    "7zip-bin": "^5.0.3",
     "axios": "^0.20.0",
     "cli-progress": "^3.8.2",
     "colors": "^1.3.3",
@@ -39,7 +40,7 @@
     "long": "^4.0.0",
     "mca-js": "^0.1.1",
     "nbt": "^0.8.1",
-    "node-stream-zip": "^1.8.0",
+    "node-7z": "^2.1.2",
     "winston": "^3.3.3",
     "yargs": "^16.0.3"
   },
