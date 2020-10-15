@@ -32,14 +32,22 @@ function createJsonForAllRegionDirs() {
   return new Promise((resolve, reject) => {
     for (const world in PATHS.WORLD_DIRS) {
       if (PATHS.WORLD_DIRS[world]) {
-        const possibleMcaDirs = fs
-          .readdirSync(PATHS.WORLD_DIRS[world], { withFileTypes: true })
-          .filter((dirent) => dirent.isDirectory())
-          .map((dirent) => dirent.name);
-        possibleMcaDirs.push(PATHS.WORLD_DIRS[world]);
-        possibleMcaDirs.filter(
-          (dir) => fs.readdirSync(dir).filter((fname) => path.extname(fname) === ".mca").length > 0
-        );
+        const possibleMcaDirs = [];
+        const worldpath = PATHS.WORLD_DIRS[world];
+        if (fs.readdirSync(worldpath).indexOf("region") === -1) {
+          const subdirs = fs
+            .readdirSync(worldpath, { withFileTypes: true })
+            .filter((dirent) => dirent.isDirectory())
+            .map((dirent) => dirent.name);
+          for (let i = 0; i < subdirs.length; i++) {
+            const dir = subdirs[i];
+            if (fs.existsSync(path.join(worldpath, dir, "region")))
+              possibleMcaDirs.push(path.join(worldpath, dir, "region"));
+          }
+        } else {
+          if (fs.existsSync(path.join(worldpath, "region"))) possibleMcaDirs.push(path.join(worldpath, "region"));
+        }
+        logger.verbose(`Possible MCA dirs under ${worldpath}: ${JSON.stringify(possibleMcaDirs)}`, { domain: DOMAIN });
         if (possibleMcaDirs.length === 0) {
           logger.warn(`World Dir ${world} did not have valid MCA sub dir available (or wasn't itself one)`, {
             domain: DOMAIN,
@@ -227,7 +235,7 @@ ProfileHelper.updateProfiles()
   })
   .then((val) => {
     logger.info(`Compiled player info to ${PATHS.OUTPUT_DIR}`, { domain: DOMAIN });
-    return buildTileEntityList(path.join(PATHS.CACHED_MCA_JSON_DIR, "overworld"));
+    return buildTileEntityList(path.join(PATHS.CACHED_MCA_JSON_DIR, "world"));
   })
   .then((overworldTEJson) => {
     const teWithItems = [];
