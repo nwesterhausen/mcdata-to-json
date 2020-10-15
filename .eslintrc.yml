@@ -8,8 +8,3 @@ extends:
 - "eslint-config-prettier"
 parserOptions:
   ecmaVersion: 8
-rules:
-  sort-keys: 
-    - "error"
-    - "asc" 
-    - {"natural": true}
