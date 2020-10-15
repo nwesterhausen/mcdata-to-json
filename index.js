@@ -24,45 +24,120 @@ const AdvancementsParser = require("./lib/AdvancementsParser");
 
 logger.verbose(`Library imports loaded in ${hrtimefmt(libtime)}`, { domain: DOMAIN });
 
+/** MAIN **/
+/**
+ * It would make sense to have 3 levels of processing.
+ *
+ * 1 Pre-processing: gathering definitions, data used in later steps
+ * 2 Processing: parsing that requires some knowledge from pre-prossessing to work
+ * 3 Post-processing: combining the parsed data into final JSON output
+ */
+
 LogsParser.parseLogFiles();
 ServerDataExtractor.checkForData();
 ServerDataExtractor.convertLevelDat();
 
-/**
- * @return {Promise}
- */
-function createJsonForAllRegionDirs() {
-  return new Promise((resolve, reject) => {
-    for (const world in PATHS.WORLD_DIRS) {
-      if (PATHS.WORLD_DIRS[world]) {
-        const possibleMcaDirs = [];
-        const worldpath = PATHS.WORLD_DIRS[world];
-        if (fs.readdirSync(worldpath).indexOf("region") === -1) {
-          const subdirs = fs
-            .readdirSync(worldpath, { withFileTypes: true })
-            .filter((dirent) => dirent.isDirectory())
-            .map((dirent) => dirent.name);
-          for (let i = 0; i < subdirs.length; i++) {
-            const dir = subdirs[i];
-            if (fs.existsSync(path.join(worldpath, dir, "region")))
-              possibleMcaDirs.push(path.join(worldpath, dir, "region"));
+ProfileHelper.updateProfiles()
+  .then((val) => {
+    // GET PLAYER INFORMATION FROM MOJANG
+    return McaParser.createJsonForAllRegionDirs();
+  })
+  .then((val) => {
+    logger.info("Finished saving chunks to JSON", { domain: DOMAIN });
+    return val;
+  })
+  .then((val) => {
+    return PlayerData.convertPlayerdatFiles(); // CONVERT PLAYER.DAT FILES
+  })
+  .then((val) => {
+    return AdvancementsParser.parseAndSaveAdvancementFiles();
+  })
+  .then((val) => {
+    return AdvancementsParser.createServerAdvancementProgress();
+  })
+  .then(fs.promises.writeFile(path.join(PATHS.OUTPUT_DIR, "uuids.json"), JSON.stringify(Config.PLAYERS)))
+  .then((val) => {
+    return Promise.all(
+      Object.keys(Config.PLAYERS).map((uuid) => {
+        return combinePlayerData(uuid);
+      })
+    );
+  })
+  .then((val) => {
+    logger.info(`Compiled player info to ${PATHS.OUTPUT_DIR}`, { domain: DOMAIN });
+    return McaParser.buildTileEntityList(path.join(PATHS.CACHED_MCA_JSON_DIR, "world"));
+  })
+  .then((overworldTEJson) => {
+    const teWithItems = [];
+    const mobSpawners = [];
+    const signs = [];
+    const lootables = {};
+    overworldTEJson.map((owtejn) => {
+      Object.keys(owtejn).map((tilentid) => {
+        owtejn[tilentid].map((tileent) => {
+          if (tileent.id === "minecraft:mob_spawner") {
+            mobSpawners.push({
+              SpawnData: tileent.SpawnData,
+              pos: [tileent.x, tileent.y, tileent.z],
+            });
+          } else if (tileent.id === "minecraft:sign") {
+            signs.push({
+              Color: tileent.Color,
+              Text: [
+                JSON.parse(tileent.Text1.replace(/\\"/, "'")).text,
+                JSON.parse(tileent.Text2.replace(/\\"/, "'")).text,
+                JSON.parse(tileent.Text3.replace(/\\"/, "'")).text,
+                JSON.parse(tileent.Text4.replace(/\\"/, "'")).text,
+              ],
+              pos: [tileent.x, tileent.y, tileent.z],
+            });
+          } else if (Object.prototype.hasOwnProperty.call(tileent, "Items")) {
+            if (tileent.Items.length > 0) {
+              teWithItems.push({
+                Items: tileent.Items,
+                id: tileent.id,
+                pos: [tileent.x, tileent.y, tileent.z],
+              });
+            }
+          } else if (Object.prototype.hasOwnProperty.call(tileent, "LootTable")) {
+            const loottype = tileent.LootTable.split("/")[1];
+            if (!Object.prototype.hasOwnProperty.call(lootables, loottype)) {
+              lootables[loottype] = [];
+            }
+            lootables[loottype].push({
+              id: tileent.id,
+              pos: [tileent.x, tileent.y, tileent.z],
+              type: loottype,
+            });
           }
-        } else {
-          if (fs.existsSync(path.join(worldpath, "region"))) possibleMcaDirs.push(path.join(worldpath, "region"));
-        }
-        logger.verbose(`Possible MCA dirs under ${worldpath}: ${JSON.stringify(possibleMcaDirs)}`, { domain: DOMAIN });
-        if (possibleMcaDirs.length === 0) {
-          logger.warn(`World Dir ${world} did not have valid MCA sub dir available (or wasn't itself one)`, {
-            domain: DOMAIN,
-          });
-        } else {
-          McaParser.convertRegionDirToJSON(possibleMcaDirs[0]);
-        }
-      }
-    }
-    resolve();
+        });
+      });
+    });
+    const writeJsonPromises = [];
+    writeJsonPromises.push(
+      fs.promises.writeFile(path.join(PATHS.OUTPUT_DIR, "overworld-spawners.json"), JSON.stringify(mobSpawners))
+    );
+    writeJsonPromises.push(
+      fs.promises.writeFile(path.join(PATHS.OUTPUT_DIR, "overworld-inventories.json"), JSON.stringify(teWithItems))
+    );
+    writeJsonPromises.push(
+      fs.promises.writeFile(path.join(PATHS.OUTPUT_DIR, "overworld-loot.json"), JSON.stringify(lootables))
+    );
+    writeJsonPromises.push(
+      fs.promises.writeFile(path.join(PATHS.OUTPUT_DIR, "overworld-signs.json"), JSON.stringify(signs))
+    );
+    writeJsonPromises.push(
+      fs.promises.writeFile(path.join(PATHS.OUTPUT_DIR, "overworld-te.json"), JSON.stringify(overworldTEJson))
+    );
+    return Promise.all(writeJsonPromises);
+  })
+  .then((val) => {
+    logger.info("Compiled tile-entity JSON to output directory", { domain: DOMAIN });
+  })
+  .catch((err) => {
+    logger.error("Caught error in large promise stack..", { domain: DOMAIN });
+    throw err;
   });
-}
 
 /**
  *
@@ -150,164 +225,3 @@ function combinePlayerData(uuid) {
       });
   });
 }
-
-/**
- *
- * @param {string} fileContent
- * @param {string} filepath
- * @return {Promise}
- */
-function parseChunkListJson(fileContent, filepath) {
-  return new Promise((res, rej) => {
-    try {
-      const chunklistJson = JSON.parse(fileContent);
-      const tileEntities = {};
-      chunklistJson.map((chunkjson) => {
-        // regionjson.map((chunkjson) => {
-        if (Object.prototype.hasOwnProperty.call(chunkjson, "TileEntities")) {
-          chunkjson.TileEntities.map((te) => {
-            if (!Object.prototype.hasOwnProperty.call(tileEntities, te.id)) {
-              tileEntities[te.id] = [];
-            }
-            tileEntities[te.id].push(te);
-          });
-        }
-        // });
-      });
-      return res(tileEntities);
-    } catch (e) {
-      logger.warn(`Unable to parse JSON from ${filepath}`, { domain: DOMAIN });
-      logger.debug(e, { domain: DOMAIN });
-      return rej(e);
-    }
-  });
-}
-
-/**
- *
- * @param {string} filepath
- * @return {Promise}
- */
-function readChunkListJson(filepath) {
-  return fs.promises.readFile(filepath).then((filecontent) => {
-    return parseChunkListJson(filecontent, filepath);
-  });
-}
-
-/**
- * @param {string} mcaJsonDir
- * @return {Promise}
- */
-function buildTileEntityList(mcaJsonDir) {
-  if (!fs.existsSync(mcaJsonDir)) fs.mkdirSync(mcaJsonDir);
-  const jsonregionFiles = fs.readdirSync(mcaJsonDir);
-  return Promise.all(
-    jsonregionFiles.map((filename) => {
-      return readChunkListJson(path.join(mcaJsonDir, filename));
-    })
-  );
-}
-
-// /// MAIN ///////
-
-ProfileHelper.updateProfiles()
-  .then((val) => {
-    // GET PLAYER INFORMATION FROM MOJANG
-    return createJsonForAllRegionDirs();
-  })
-  .then((val) => {
-    logger.info("Finished saving chunks to JSON", { domain: DOMAIN });
-    return val;
-  })
-  .then((val) => {
-    return PlayerData.convertPlayerdatFiles(); // CONVERT PLAYER.DAT FILES
-  })
-  .then((val) => {
-    return AdvancementsParser.parseAndSaveAdvancementFiles();
-  })
-  .then((val) => {
-    return AdvancementsParser.createServerAdvancementProgress();
-  })
-  .then(fs.promises.writeFile(path.join(PATHS.OUTPUT_DIR, "uuids.json"), JSON.stringify(Config.PLAYERS)))
-  .then((val) => {
-    return Promise.all(
-      Object.keys(Config.PLAYERS).map((uuid) => {
-        return combinePlayerData(uuid);
-      })
-    );
-  })
-  .then((val) => {
-    logger.info(`Compiled player info to ${PATHS.OUTPUT_DIR}`, { domain: DOMAIN });
-    return buildTileEntityList(path.join(PATHS.CACHED_MCA_JSON_DIR, "world"));
-  })
-  .then((overworldTEJson) => {
-    const teWithItems = [];
-    const mobSpawners = [];
-    const signs = [];
-    const lootables = {};
-    overworldTEJson.map((owtejn) => {
-      Object.keys(owtejn).map((tilentid) => {
-        owtejn[tilentid].map((tileent) => {
-          if (tileent.id === "minecraft:mob_spawner") {
-            mobSpawners.push({
-              SpawnData: tileent.SpawnData,
-              pos: [tileent.x, tileent.y, tileent.z],
-            });
-          } else if (tileent.id === "minecraft:sign") {
-            signs.push({
-              Color: tileent.Color,
-              Text: [
-                JSON.parse(tileent.Text1.replace(/\\"/, "'")).text,
-                JSON.parse(tileent.Text2.replace(/\\"/, "'")).text,
-                JSON.parse(tileent.Text3.replace(/\\"/, "'")).text,
-                JSON.parse(tileent.Text4.replace(/\\"/, "'")).text,
-              ],
-              pos: [tileent.x, tileent.y, tileent.z],
-            });
-          } else if (Object.prototype.hasOwnProperty.call(tileent, "Items")) {
-            if (tileent.Items.length > 0) {
-              teWithItems.push({
-                Items: tileent.Items,
-                id: tileent.id,
-                pos: [tileent.x, tileent.y, tileent.z],
-              });
-            }
-          } else if (Object.prototype.hasOwnProperty.call(tileent, "LootTable")) {
-            const loottype = tileent.LootTable.split("/")[1];
-            if (!Object.prototype.hasOwnProperty.call(lootables, loottype)) {
-              lootables[loottype] = [];
-            }
-            lootables[loottype].push({
-              id: tileent.id,
-              pos: [tileent.x, tileent.y, tileent.z],
-              type: loottype,
-            });
-          }
-        });
-      });
-    });
-    const writeJsonPromises = [];
-    writeJsonPromises.push(
-      fs.promises.writeFile(path.join(PATHS.OUTPUT_DIR, "overworld-spawners.json"), JSON.stringify(mobSpawners))
-    );
-    writeJsonPromises.push(
-      fs.promises.writeFile(path.join(PATHS.OUTPUT_DIR, "overworld-inventories.json"), JSON.stringify(teWithItems))
-    );
-    writeJsonPromises.push(
-      fs.promises.writeFile(path.join(PATHS.OUTPUT_DIR, "overworld-loot.json"), JSON.stringify(lootables))
-    );
-    writeJsonPromises.push(
-      fs.promises.writeFile(path.join(PATHS.OUTPUT_DIR, "overworld-signs.json"), JSON.stringify(signs))
-    );
-    writeJsonPromises.push(
-      fs.promises.writeFile(path.join(PATHS.OUTPUT_DIR, "overworld-te.json"), JSON.stringify(overworldTEJson))
-    );
-    return Promise.all(writeJsonPromises);
-  })
-  .then((val) => {
-    logger.info("Compiled tile-entity JSON to output directory", { domain: DOMAIN });
-  })
-  .catch((err) => {
-    logger.error("Caught error in large promise stack..", { domain: DOMAIN });
-    throw err;
-  });
