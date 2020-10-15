@@ -1,9 +1,8 @@
 ## [0.6.2](https://github.com/nwesterhausen/mcdata-to-json/compare/v0.6.1...v0.6.2) (2020-10-15)
 
-
 ### Performance Improvements
 
-* import shuffle ([8ab1539](https://github.com/nwesterhausen/mcdata-to-json/commit/8ab153948b475deace882dab829670bf4dbdbbcc))
+- import shuffle ([8ab1539](https://github.com/nwesterhausen/mcdata-to-json/commit/8ab153948b475deace882dab829670bf4dbdbbcc))
 
 ## [0.6.1](https://github.com/nwesterhausen/mcdata-to-json/compare/v0.6.0...v0.6.1) (2020-10-15)
 
