@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 const Config = require("./lib/Configuration");
-const PATHS = require("./lib/helpers/PathRefrence").paths;
+const PATHS = require("./lib/helpers/PathReference").paths;
 const logger = require("./lib/helpers/Logger").getLogger();
 
 const DOMAIN = "Main";
