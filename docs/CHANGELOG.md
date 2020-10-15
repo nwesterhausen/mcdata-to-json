@@ -1,10 +1,9 @@
 ## [0.6.1](https://github.com/nwesterhausen/mcdata-to-json/compare/v0.6.0...v0.6.1) (2020-10-15)
 
-
 ### Bug Fixes
 
-* **mcaparsing:** parse all dimension ([c245f38](https://github.com/nwesterhausen/mcdata-to-json/commit/c245f38069c695baba22353ef15961c2b4007369)), closes [#14](https://github.com/nwesterhausen/mcdata-to-json/issues/14)
-* path constant changed ([3cff339](https://github.com/nwesterhausen/mcdata-to-json/commit/3cff33977cca8bc9864747226fe253805b094eee))
+- **mcaparsing:** parse all dimension ([c245f38](https://github.com/nwesterhausen/mcdata-to-json/commit/c245f38069c695baba22353ef15961c2b4007369)), closes [#14](https://github.com/nwesterhausen/mcdata-to-json/issues/14)
+- path constant changed ([3cff339](https://github.com/nwesterhausen/mcdata-to-json/commit/3cff33977cca8bc9864747226fe253805b094eee))
 
 # [0.6.0](https://github.com/nwesterhausen/mcdata-to-json/compare/v0.5.0...v0.6.0) (2020-10-14)
 
