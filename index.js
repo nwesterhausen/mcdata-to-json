@@ -1,13 +1,20 @@
 #!/usr/bin/env node
+const path = require("path");
+const fs = require("fs");
+
+const starttime = process.hrtime();
+const hrtimefmt = function (timeref) {
+  return `${process.hrtime(timeref)[0]}s, ${(process.hrtime(timeref)[1] / 1000000).toFixed(3)}ms`;
+};
 
 const Config = require("./lib/Configuration");
 const PATHS = require("./lib/helpers/PathReference").paths;
 const logger = require("./lib/helpers/Logger").getLogger();
 
 const DOMAIN = "Main";
+logger.verbose(`Configuration, PathReference, and Logger loaded in ${hrtimefmt(starttime)}`, { domain: DOMAIN });
 
-logger.verbose("Begin lib imports.", { domain: DOMAIN });
-
+const libtime = process.hrtime();
 const LogsParser = require("./lib/LogsParser");
 const ServerDataExtractor = require("./lib/ServerDataTool");
 const PlayerData = require("./lib/PlayerData");
@@ -15,12 +22,8 @@ const McaParser = require("./lib/McaParser");
 const ProfileHelper = require("./lib/ProfileHelper");
 const AdvancementsParser = require("./lib/AdvancementsParser");
 
-logger.verbose("Finish lib imports.", { domain: DOMAIN });
+logger.verbose(`Library imports loaded in ${hrtimefmt(libtime)}`, { domain: DOMAIN });
 
-const path = require("path");
-const fs = require("fs");
-
-logger.info(`Starting Log Processing ${PATHS.LOGS_DIR}`, { domain: DOMAIN });
 LogsParser.parseLogFiles();
 ServerDataExtractor.checkForData();
 ServerDataExtractor.convertLevelDat();
