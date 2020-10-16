@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+/* eslint-disable no-unused-vars */
 const path = require("path");
 const fs = require("fs");
 
