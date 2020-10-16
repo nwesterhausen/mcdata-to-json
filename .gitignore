@@ -2,6 +2,7 @@ output
 mcdata_cache
 sample_mcdir
 .env
+.idea
 
 # Logs
 logs
