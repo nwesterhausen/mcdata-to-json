@@ -24,9 +24,115 @@ const AdvancementsParser = require("./lib/AdvancementsParser");
 
 logger.verbose(`Library imports loaded in ${hrtimefmt(libtime)}`, { domain: DOMAIN });
 
+fs.promises.writeFile(path.join(PATHS.OUTPUT_DIR, "uuids.json"), JSON.stringify(Config.PLAYERS)).catch((e) => {
+  throw e;
+});
+
 LogsParser.parseLogFiles();
 ServerDataExtractor.checkForData();
 ServerDataExtractor.convertLevelDat();
+
+PlayerData.convertPlayerdatFiles();
+ProfileHelper.updateProfiles();
+AdvancementsParser.parseAndSaveAdvancementFiles()
+  .then((res) => AdvancementsParser.createServerAdvancementProgress(res))
+  .catch((err) => {
+    throw err;
+  });
+/**
+ProfileHelper.updateProfiles()
+  .then((val) => {
+    // GET PLAYER INFORMATION FROM MOJANG
+    return createJsonForAllRegionDirs();
+  })
+  .then((val) => {
+    logger.info("Finished saving chunks to JSON", { domain: DOMAIN });
+    return val;
+  })
+  .then(fs.promises.writeFile(path.join(PATHS.OUTPUT_DIR, "uuids.json"), JSON.stringify(Config.PLAYERS)))
+  .then((val) => {
+    return Promise.all(
+      Object.keys(Config.PLAYERS).map((uuid) => {
+        return combinePlayerData(uuid);
+      })
+    );
+  })
+  .then((val) => {
+    logger.info(`Compiled player info to ${PATHS.OUTPUT_DIR}`, { domain: DOMAIN });
+    return buildTileEntityList(path.join(PATHS.CACHED_MCA_JSON_DIR, "world"));
+  })
+  .then((overworldTEJson) => {
+    const teWithItems = [];
+    const mobSpawners = [];
+    const signs = [];
+    const lootables = {};
+    overworldTEJson.map((owtejn) => {
+      Object.keys(owtejn).map((tilentid) => {
+        owtejn[tilentid].map((tileent) => {
+          if (tileent.id === "minecraft:mob_spawner") {
+            mobSpawners.push({
+              SpawnData: tileent.SpawnData,
+              pos: [tileent.x, tileent.y, tileent.z],
+            });
+          } else if (tileent.id === "minecraft:sign") {
+            signs.push({
+              Color: tileent.Color,
+              Text: [
+                JSON.parse(tileent.Text1.replace(/\\"/, "'")).text,
+                JSON.parse(tileent.Text2.replace(/\\"/, "'")).text,
+                JSON.parse(tileent.Text3.replace(/\\"/, "'")).text,
+                JSON.parse(tileent.Text4.replace(/\\"/, "'")).text,
+              ],
+              pos: [tileent.x, tileent.y, tileent.z],
+            });
+          } else if (Object.prototype.hasOwnProperty.call(tileent, "Items")) {
+            if (tileent.Items.length > 0) {
+              teWithItems.push({
+                Items: tileent.Items,
+                id: tileent.id,
+                pos: [tileent.x, tileent.y, tileent.z],
+              });
+            }
+          } else if (Object.prototype.hasOwnProperty.call(tileent, "LootTable")) {
+            const loottype = tileent.LootTable.split("/")[1];
+            if (!Object.prototype.hasOwnProperty.call(lootables, loottype)) {
+              lootables[loottype] = [];
+            }
+            lootables[loottype].push({
+              id: tileent.id,
+              pos: [tileent.x, tileent.y, tileent.z],
+              type: loottype,
+            });
+          }
+        });
+      });
+    });
+    const writeJsonPromises = [];
+    writeJsonPromises.push(
+      fs.promises.writeFile(path.join(PATHS.OUTPUT_DIR, "overworld-spawners.json"), JSON.stringify(mobSpawners))
+    );
+    writeJsonPromises.push(
+      fs.promises.writeFile(path.join(PATHS.OUTPUT_DIR, "overworld-inventories.json"), JSON.stringify(teWithItems))
+    );
+    writeJsonPromises.push(
+      fs.promises.writeFile(path.join(PATHS.OUTPUT_DIR, "overworld-loot.json"), JSON.stringify(lootables))
+    );
+    writeJsonPromises.push(
+      fs.promises.writeFile(path.join(PATHS.OUTPUT_DIR, "overworld-signs.json"), JSON.stringify(signs))
+    );
+    writeJsonPromises.push(
+      fs.promises.writeFile(path.join(PATHS.OUTPUT_DIR, "overworld-te.json"), JSON.stringify(overworldTEJson))
+    );
+    return Promise.all(writeJsonPromises);
+  })
+  .then((val) => {
+    logger.info("Compiled tile-entity JSON to output directory", { domain: DOMAIN });
+  })
+  .catch((err) => {
+    logger.error("Caught error in large promise stack..", { domain: DOMAIN });
+    throw err;
+  });
+**/
 
 /**
  * @return {Promise}
@@ -207,107 +313,3 @@ function buildTileEntityList(mcaJsonDir) {
     })
   );
 }
-
-// /// MAIN ///////
-
-ProfileHelper.updateProfiles()
-  .then((val) => {
-    // GET PLAYER INFORMATION FROM MOJANG
-    return createJsonForAllRegionDirs();
-  })
-  .then((val) => {
-    logger.info("Finished saving chunks to JSON", { domain: DOMAIN });
-    return val;
-  })
-  .then((val) => {
-    return PlayerData.convertPlayerdatFiles(); // CONVERT PLAYER.DAT FILES
-  })
-  .then((val) => {
-    return AdvancementsParser.parseAndSaveAdvancementFiles();
-  })
-  .then((val) => {
-    return AdvancementsParser.createServerAdvancementProgress();
-  })
-  .then(fs.promises.writeFile(path.join(PATHS.OUTPUT_DIR, "uuids.json"), JSON.stringify(Config.PLAYERS)))
-  .then((val) => {
-    return Promise.all(
-      Object.keys(Config.PLAYERS).map((uuid) => {
-        return combinePlayerData(uuid);
-      })
-    );
-  })
-  .then((val) => {
-    logger.info(`Compiled player info to ${PATHS.OUTPUT_DIR}`, { domain: DOMAIN });
-    return buildTileEntityList(path.join(PATHS.CACHED_MCA_JSON_DIR, "world"));
-  })
-  .then((overworldTEJson) => {
-    const teWithItems = [];
-    const mobSpawners = [];
-    const signs = [];
-    const lootables = {};
-    overworldTEJson.map((owtejn) => {
-      Object.keys(owtejn).map((tilentid) => {
-        owtejn[tilentid].map((tileent) => {
-          if (tileent.id === "minecraft:mob_spawner") {
-            mobSpawners.push({
-              SpawnData: tileent.SpawnData,
-              pos: [tileent.x, tileent.y, tileent.z],
-            });
-          } else if (tileent.id === "minecraft:sign") {
-            signs.push({
-              Color: tileent.Color,
-              Text: [
-                JSON.parse(tileent.Text1.replace(/\\"/, "'")).text,
-                JSON.parse(tileent.Text2.replace(/\\"/, "'")).text,
-                JSON.parse(tileent.Text3.replace(/\\"/, "'")).text,
-                JSON.parse(tileent.Text4.replace(/\\"/, "'")).text,
-              ],
-              pos: [tileent.x, tileent.y, tileent.z],
-            });
-          } else if (Object.prototype.hasOwnProperty.call(tileent, "Items")) {
-            if (tileent.Items.length > 0) {
-              teWithItems.push({
-                Items: tileent.Items,
-                id: tileent.id,
-                pos: [tileent.x, tileent.y, tileent.z],
-              });
-            }
-          } else if (Object.prototype.hasOwnProperty.call(tileent, "LootTable")) {
-            const loottype = tileent.LootTable.split("/")[1];
-            if (!Object.prototype.hasOwnProperty.call(lootables, loottype)) {
-              lootables[loottype] = [];
-            }
-            lootables[loottype].push({
-              id: tileent.id,
-              pos: [tileent.x, tileent.y, tileent.z],
-              type: loottype,
-            });
-          }
-        });
-      });
-    });
-    const writeJsonPromises = [];
-    writeJsonPromises.push(
-      fs.promises.writeFile(path.join(PATHS.OUTPUT_DIR, "overworld-spawners.json"), JSON.stringify(mobSpawners))
-    );
-    writeJsonPromises.push(
-      fs.promises.writeFile(path.join(PATHS.OUTPUT_DIR, "overworld-inventories.json"), JSON.stringify(teWithItems))
-    );
-    writeJsonPromises.push(
-      fs.promises.writeFile(path.join(PATHS.OUTPUT_DIR, "overworld-loot.json"), JSON.stringify(lootables))
-    );
-    writeJsonPromises.push(
-      fs.promises.writeFile(path.join(PATHS.OUTPUT_DIR, "overworld-signs.json"), JSON.stringify(signs))
-    );
-    writeJsonPromises.push(
-      fs.promises.writeFile(path.join(PATHS.OUTPUT_DIR, "overworld-te.json"), JSON.stringify(overworldTEJson))
-    );
-    return Promise.all(writeJsonPromises);
-  })
-  .then((val) => {
-    logger.info("Compiled tile-entity JSON to output directory", { domain: DOMAIN });
-  })
-  .catch((err) => {
-    logger.error("Caught error in large promise stack..", { domain: DOMAIN });
-    throw err;
-  });
