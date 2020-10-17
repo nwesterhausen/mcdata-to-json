@@ -29,36 +29,24 @@ fs.promises.writeFile(path.join(PATHS.OUTPUT_DIR, "uuids.json"), JSON.stringify(
   throw e;
 });
 
-LogsParser.parseLogFiles();
+const preprocessPromises = [LogsParser.parseLogFiles()];
+
+const processPromises = [
+  PlayerData.convertPlayerdatFiles(),
+  ProfileHelper.updateProfiles(),
+  AdvancementsParser.parseAndSaveAdvancementFiles().then(AdvancementsParser.createServerAdvancementProgress),
+];
+
 ServerDataExtractor.checkForData();
 ServerDataExtractor.convertLevelDat();
 
-PlayerData.convertPlayerdatFiles();
-ProfileHelper.updateProfiles();
-AdvancementsParser.parseAndSaveAdvancementFiles()
-  .then((res) => AdvancementsParser.createServerAdvancementProgress(res))
+Promise.all(preprocessPromises)
+  .then(Promise.all(processPromises))
   .catch((err) => {
     throw err;
   });
 /**
-ProfileHelper.updateProfiles()
-  .then((val) => {
-    // GET PLAYER INFORMATION FROM MOJANG
-    return createJsonForAllRegionDirs();
-  })
-  .then((val) => {
-    logger.info("Finished saving chunks to JSON", { domain: DOMAIN });
-    return val;
-  })
-  .then(fs.promises.writeFile(path.join(PATHS.OUTPUT_DIR, "uuids.json"), JSON.stringify(Config.PLAYERS)))
-  .then((val) => {
-    return Promise.all(
-      Object.keys(Config.PLAYERS).map((uuid) => {
-        return combinePlayerData(uuid);
-      })
-    );
-  })
-  .then((val) => {
+ *   .then((val) => {
     logger.info(`Compiled player info to ${PATHS.OUTPUT_DIR}`, { domain: DOMAIN });
     return buildTileEntityList(path.join(PATHS.CACHED_MCA_JSON_DIR, "world"));
   })
