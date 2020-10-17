@@ -12,6 +12,7 @@ Each entry is an object, and the JSON file is an array of these objects.
 | type        | [One of the log entry types](/lib/helpers/LogConst.js) (will have prefix `TYPE_`) |
 | description | The content from the log message. [Special Cases](#special-description-values)    |
 | severity    | The given severity of the entry (INFO, WARN, ERROR)                               |
+| player      | If a player detected in the log line, that player's uuid                          |
 
 ## Special Description Values
 
