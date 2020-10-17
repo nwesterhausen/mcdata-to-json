@@ -25,26 +25,37 @@ const AdvancementsParser = require("./lib/AdvancementsParser");
 
 logger.verbose(`Library imports loaded in ${hrtimefmt(libtime)}`, { domain: DOMAIN });
 
-fs.promises.writeFile(path.join(PATHS.OUTPUT_DIR, "uuids.json"), JSON.stringify(Config.PLAYERS)).catch((e) => {
-  throw e;
-});
-
-const preprocessPromises = [LogsParser.parseLogFiles()];
-
-const processPromises = [
-  PlayerData.convertPlayerdatFiles(),
-  ProfileHelper.updateProfiles(),
-  AdvancementsParser.parseAndSaveAdvancementFiles().then(AdvancementsParser.createServerAdvancementProgress),
-];
-
-ServerDataExtractor.checkForData();
-ServerDataExtractor.convertLevelDat();
-
-Promise.all(preprocessPromises)
-  .then(Promise.all(processPromises))
-  .catch((err) => {
-    throw err;
+if (ServerDataExtractor.checkForData()) {
+  fs.promises.writeFile(path.join(PATHS.OUTPUT_DIR, "uuids.json"), JSON.stringify(Config.PLAYERS)).catch((e) => {
+    throw e;
   });
+
+  ServerDataExtractor.convertLevelDat()
+    .then((level) => {
+      logger.info(`Running on Minecraft ${level.Data.Version.Name}`, { domain: DOMAIN });
+      if (level.Data.Version.Snapshot !== 0)
+        logger.info(`Minecraft snapshot ${level.Data.Version.Snapshot} detected`, { domain: DOMAIN });
+      if (level.Data.WasModded) logger.info(`Minecraft server was modified from original state`, { domain: DOMAIN });
+      if (level.Data["Bukkit.Version"]) logger.info(level.Data["Bukkit.Version"], { domain: DOMAIN });
+
+      const processPromises = [
+        LogsParser.parseLogFiles(),
+        PlayerData.convertPlayerdatFiles(),
+        ProfileHelper.updateProfiles(),
+        AdvancementsParser.parseAndSaveAdvancementFiles().then(AdvancementsParser.createServerAdvancementProgress),
+      ];
+
+      return Promise.all(processPromises);
+    })
+    .catch((err) => {
+      throw err;
+    });
+} else {
+  logger.info(`Missing or imcomplete cache of extracted data from server.jar`, { domain: DOMAIN });
+  logger.info(`After extraction completes, please re-run mcdata-to-json`, { domain: DOMAIN });
+  ServerDataExtractor.performExtraction();
+}
+
 /**
  *   .then((val) => {
     logger.info(`Compiled player info to ${PATHS.OUTPUT_DIR}`, { domain: DOMAIN });
