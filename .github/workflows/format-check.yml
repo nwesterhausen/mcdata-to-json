@@ -1,4 +1,4 @@
-name: Code Formatting Check
+name: Validation and Publish (if needed)
 
 on:
   push:
@@ -107,3 +107,29 @@ jobs:
           
       - name: check script
         run: pnpx prettier -c index.js README.md docs lib
+  publish:
+    runs-on: ubuntu-latest
+    needs: [lint-check, prettier-check]
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Semantic Release
+      id: semantic
+      uses: cycjimmy/semantic-release-action@v2
+      with:
+        # You can specify specifying version range for the extra plugins if you prefer.
+        extra_plugins: |
+          @semantic-release/changelog
+          @semantic-release/git
+      env:
+        GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+        NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+    
+    - name: Do something when a new release published
+      if: steps.semantic.outputs.new_release_published == 'true'
+      run: |
+        echo ${{ steps.semantic.outputs.new_release_version }}
+        echo ${{ steps.semantic.outputs.new_release_major_version }}
+        echo ${{ steps.semantic.outputs.new_release_minor_version }}
+        echo ${{ steps.semantic.outputs.new_release_patch_version }}
