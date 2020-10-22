@@ -1,0 +1,38 @@
+name: Code Formatting Check
+
+on: 
+  push:
+    branches-ignore: 
+      - gh-pages
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Cache node modules
+      uses: actions/cache@v2
+      env:
+        cache-name: cache-node-modules
+      with:
+        # pnpm cache files are stored in `~/.pnpm-store` on Linux/macOS
+        path: ~/.pnpm-store
+        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/pnpm-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-build-${{ env.cache-name }}-
+          ${{ runner.os }}-build-
+          ${{ runner.os }}-
+          
+    - name: Install Dependencies
+      run: pnpm install
+
+    - name: Lint Check
+      run: pnpm check-lint
+      
+    - name: Prettier Check
+      run: pnpm check-pretty
