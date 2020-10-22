@@ -34,6 +34,7 @@ jobs:
       # uses: pnpm/action-setup@935101478d12d633ea2e71bb8b63d18e00bda099
       uses: pnpm/action-setup@v1.2.0
       with:
+        version: 5.9.3
         # Where to store PNPM files
         dest: ~/.pnpm-store
         # Where to store executables (pnpm and pnpx commands)
