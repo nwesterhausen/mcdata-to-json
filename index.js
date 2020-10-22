@@ -47,6 +47,16 @@ if (ServerDataExtractor.checkForData()) {
 
       return Promise.all(processPromises);
     })
+    .then((res) => {
+      const combineProms = [];
+      for (const uuid of Object.keys(Config.PLAYERS)) {
+        combineProms.push(combinePlayerData(uuid));
+      }
+      return Promise.all(combineProms);
+    })
+    .then((res) => {
+      return createJsonForAllRegionDirs();
+    })
     .catch((err) => {
       throw err;
     });
@@ -173,14 +183,16 @@ function createJsonForAllRegionDirs() {
 /**
  *
  * @param {string} uuid
+ * @return {Promise}
  */
 function combinePlayerData(uuid) {
+  if (!uuid) throw new Error(`ENOUUID: Not given uuid for combining data.`);
   const readjsonPromises = [];
   const STATS_FILE = path.join(PATHS.STATS_DIR, `${uuid}.json`);
-  const ADVANCEMENT_FILE = path.join(PATHS.TEMP_ADVANCEMENT_JSON_DIR, `${uuid}.json`);
-  const PLAYERDATA_FILE = path.join(PATHS.TEMP_PLAYERDATA_JSON_DIR, `${uuid}.json`);
-  const PROFILE_FILE = path.join(PATHS.TEMP_PROFILE_JSON_DIR, `${uuid}.json`);
-  const LOG_FILE = path.join(PATHS.TEMP_LOG_JSON_DIR, `${uuid}.json`);
+  const ADVANCEMENT_FILE = path.join(PATHS.TEMP_PLAYERDATA_DIR, uuid, "advancements.json");
+  const PLAYERDATA_FILE = path.join(PATHS.TEMP_PLAYERDATA_DIR, uuid, "playerdata.json");
+  const PROFILE_FILE = path.join(PATHS.TEMP_PLAYERDATA_DIR, uuid, "profile.json");
+  const LOG_FILE = path.join(PATHS.TEMP_PLAYERDATA_DIR, uuid, "logs.json");
   const PROMISE_FALSE = new Promise((res, rej) => {
     res(false);
   });
@@ -211,50 +223,50 @@ function combinePlayerData(uuid) {
     logger.warn(`No parsed log file exists for ${Config.PLAYERS[uuid]}`, { domain: DOMAIN });
   }
 
-  Promise.all(readjsonPromises).then((val) => {
-    const playerJSON = {
-      advancements: {},
-      data: {},
-      log: {},
-      name: Config.PLAYERS[uuid],
-      profile: {},
-      stats: {},
-      uuid: uuid,
-    };
-    if (val[0]) {
-      playerJSON.stats = JSON.parse(val[0]);
-    }
+  return Promise.all(readjsonPromises)
+    .then((val) => {
+      const playerJSON = {
+        advancements: {},
+        data: {},
+        log: {},
+        name: Config.PLAYERS[uuid],
+        profile: {},
+        stats: {},
+        uuid: uuid,
+      };
+      if (val[0]) {
+        playerJSON.stats = JSON.parse(val[0]);
+      }
 
-    if (val[1]) {
-      playerJSON.advancements = JSON.parse(val[1]);
-    }
-    if (val[2]) {
-      playerJSON.data = JSON.parse(val[2]);
-    }
+      if (val[1]) {
+        playerJSON.advancements = JSON.parse(val[1]);
+      }
+      if (val[2]) {
+        playerJSON.data = JSON.parse(val[2]);
+      }
 
-    if (val[3]) {
-      playerJSON.profile = JSON.parse(val[3]);
-    }
+      if (val[3]) {
+        playerJSON.profile = JSON.parse(val[3]);
+      }
 
-    if (val[4]) {
-      playerJSON.log = JSON.parse(val[4]);
-    }
-    delete playerJSON.advancements.DataVersion;
-    delete playerJSON.data.DataVersion;
-    delete playerJSON.stats.DataVersion;
-    fs.promises
-      .writeFile(path.join(PATHS.OUTPUT_DIR, `${uuid}.json`), JSON.stringify(playerJSON))
-      .then((val) => {
-        logger.verbose(`Wrote output JSON for ${uuid}.`, { domain: DOMAIN });
-        if (val) {
-          logger.debug(val, DOMAIN);
-        }
-      })
-      .catch((err) => {
-        logger.warn(`Failed to build output for ${uuid}.`, { domain: DOMAIN });
-        logger.warn(err, DOMAIN);
-      });
-  });
+      if (val[4]) {
+        playerJSON.log = JSON.parse(val[4]);
+      }
+      delete playerJSON.advancements.DataVersion;
+      delete playerJSON.data.DataVersion;
+      delete playerJSON.stats.DataVersion;
+      return fs.promises.writeFile(path.join(PATHS.OUTPUT_DIR, `${uuid}.json`), JSON.stringify(playerJSON));
+    })
+    .then((val) => {
+      logger.verbose(`Wrote output JSON for ${Config.PLAYERS[uuid]} (${uuid})`, { domain: DOMAIN });
+      if (val) {
+        logger.debug(val, DOMAIN);
+      }
+    })
+    .catch((err) => {
+      logger.warn(`Failed to build output for ${uuid}.`, { domain: DOMAIN });
+      logger.warn(err, DOMAIN);
+    });
 }
 
 /**
