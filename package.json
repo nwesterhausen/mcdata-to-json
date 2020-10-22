@@ -1,6 +1,6 @@
 {
   "name": "mcdata-to-json",
-  "version": "0.6.1",
+  "version": "0.6.2",
   "description": "Node.js app to turn Minecraft .dat and .json files into unified json.",
   "keywords": [
     "minecraft",
@@ -14,10 +14,9 @@
     "mcdata-to-json": "./index.js"
   },
   "scripts": {
-    "check-lint": "pnpx eslint index.js lib",
-    "check-pretty": "pnpx prettier -c index.js lib README.md docs",
+    "check-lint": "eslint index.js lib",
+    "check-pretty": "prettier --check index.js lib README.md docs",
     "lint": "eslint --fix index.js lib",
-    "preinstall": "npx only-allow pnpm",
     "pretty": "prettier --write index.js lib README.md docs",
     "test": "echo \"Error: no test specified\" && exit 0",
     "tidy-up": "pnpm lint && pnpm pretty"
