@@ -9,9 +9,8 @@ on:
       - master
 
 jobs:
-  format-check:
+  cache-dependencies:
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v2
 
@@ -27,7 +26,6 @@ jobs:
           ${{ runner.os }}-build-${{ env.cache-name }}-
           ${{ runner.os }}-build-
           ${{ runner.os }}-
-          
 
     - name: Setup PNPM / Install Dependencies
       # You may pin to the exact commit or the version.
@@ -41,9 +39,65 @@ jobs:
         bin_dest: ~/.pnpm-store/bin
         # If specified, run `pnpm install`
         run_install: true
+        
+  lint-check:
+    runs-on: ubuntu-latest
+    needs: [cache-dependencies]
+    steps:
+    - uses: actions/checkout@v2
 
-    - name: Lint Check
+    - name: Cache node modules
+      uses: actions/cache@v2
+      env:
+        cache-name: cache-node-modules
+      with:
+        # pnpm cache files are stored in `~/.pnpm-store` on Linux/macOS
+        path: ~/.pnpm-store
+        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/pnpm-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-build-${{ env.cache-name }}-
+          ${{ runner.os }}-build-
+          ${{ runner.os }}-
+    - name: Setup PNPM / Install Dependencies
+      # You may pin to the exact commit or the version.
+      # uses: pnpm/action-setup@935101478d12d633ea2e71bb8b63d18e00bda099
+      uses: pnpm/action-setup@v1.2.0
+      with:
+        version: 5.9.3
+        # Where to store PNPM files
+        dest: ~/.pnpm-store
+        # Where to store executables (pnpm and pnpx commands)
+        bin_dest: ~/.pnpm-store/bin
+    - name: run script
       run: pnpm check-lint
-      
-    - name: Prettier Check
+  prettier-check:
+    runs-on: ubuntu-latest
+    needs: [cache-dependencies]
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Cache node modules
+      uses: actions/cache@v2
+      env:
+        cache-name: cache-node-modules
+      with:
+        # pnpm cache files are stored in `~/.pnpm-store` on Linux/macOS
+        path: ~/.pnpm-store
+        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/pnpm-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-build-${{ env.cache-name }}-
+          ${{ runner.os }}-build-
+          ${{ runner.os }}-
+
+    - name: Setup PNPM / Install Dependencies
+      # You may pin to the exact commit or the version.
+      # uses: pnpm/action-setup@935101478d12d633ea2e71bb8b63d18e00bda099
+      uses: pnpm/action-setup@v1.2.0
+      with:
+        version: 5.9.3
+        # Where to store PNPM files
+        dest: ~/.pnpm-store
+        # Where to store executables (pnpm and pnpx commands)
+        bin_dest: ~/.pnpm-store/bin
+    - name: run script
       run: pnpm check-pretty
