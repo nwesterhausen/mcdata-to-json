@@ -68,6 +68,8 @@ jobs:
         dest: ~/.pnpm-store
         # Where to store executables (pnpm and pnpx commands)
         bin_dest: ~/.pnpm-store/bin
+        # If specified, run `pnpm install`
+        run_install: true
     - name: run script
       run: pnpm check-lint
   prettier-check:
@@ -99,5 +101,7 @@ jobs:
         dest: ~/.pnpm-store
         # Where to store executables (pnpm and pnpx commands)
         bin_dest: ~/.pnpm-store/bin
+        # If specified, run `pnpm install`
+        run_install: true
     - name: run script
       run: pnpm check-pretty
