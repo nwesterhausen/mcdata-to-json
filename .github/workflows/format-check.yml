@@ -9,7 +9,7 @@ on:
       - master
 
 jobs:
-  build:
+  format-check:
     runs-on: ubuntu-latest
 
     steps:
@@ -28,8 +28,18 @@ jobs:
           ${{ runner.os }}-build-
           ${{ runner.os }}-
           
-    - name: Install Dependencies
-      run: pnpm install
+
+    - name: Setup PNPM / Install Dependencies
+      # You may pin to the exact commit or the version.
+      # uses: pnpm/action-setup@935101478d12d633ea2e71bb8b63d18e00bda099
+      uses: pnpm/action-setup@v1.2.0
+      with:
+        # Where to store PNPM files
+        dest: ~/.pnpm-store
+        # Where to store executables (pnpm and pnpx commands)
+        bin_dest: ~/.pnpm-store/bin
+        # If specified, run `pnpm install`
+        run_install: true
 
     - name: Lint Check
       run: pnpm check-lint
