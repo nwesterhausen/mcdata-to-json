@@ -14,8 +14,8 @@
     "mcdata-to-json": "./index.js"
   },
   "scripts": {
-    "check-lint": "eslint index.js lib",
-    "check-pretty": "prettier --check index.js lib README.md docs",
+    "check-lint": "pnpx eslint index.js lib",
+    "check-pretty": "pnpx prettier -c index.js lib README.md docs",
     "lint": "eslint --fix index.js lib",
     "preinstall": "npx only-allow pnpm",
     "pretty": "prettier --write index.js lib README.md docs",
