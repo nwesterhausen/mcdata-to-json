@@ -50,7 +50,6 @@ See the [docs](docs/created-files.md) for more information.
 
 Use pnpm for dependency management when developing the project. If you don't have it, install it with either `npm install --global pnpm` or `yarn global add pnpm` then you can clone this repository and do `pnpm install` in the root and install dependencies.
 
-
 ## License
 
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fnwesterhausen%2Fmcdata-to-json.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fnwesterhausen%2Fmcdata-to-json?ref=badge_large)
