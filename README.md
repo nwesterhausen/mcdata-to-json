@@ -3,6 +3,7 @@
 [![npm version](https://badge.fury.io/js/mcdata-to-json.svg)](https://badge.fury.io/js/mcdata-to-json)
 [![Build Status](https://travis-ci.org/nwesterhausen/mcdata-to-json.svg?branch=master)](https://travis-ci.org/nwesterhausen/mcdata-to-json)
 [![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg)](https://github.com/semantic-release/semantic-release)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fnwesterhausen%2Fmcdata-to-json.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fnwesterhausen%2Fmcdata-to-json?ref=badge_shield)
 
 Node.js binary to create JSON from stats, playerdata, advancements, logs and chunks. See explanation of steps it takes to do this [here](docs/what-happens.md).
 
@@ -48,3 +49,7 @@ See the [docs](docs/created-files.md) for more information.
 ## Development
 
 Use pnpm for dependency management when developing the project. If you don't have it, install it with either `npm install --global pnpm` or `yarn global add pnpm` then you can clone this repository and do `pnpm install` in the root and install dependencies.
+
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fnwesterhausen%2Fmcdata-to-json.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fnwesterhausen%2Fmcdata-to-json?ref=badge_large)
