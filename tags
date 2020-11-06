@@ -1,0 +1,422 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_OUTPUT_MODE	u-ctags	/u-ctags or e-ctags/
+!_TAG_PROGRAM_AUTHOR	Universal Ctags Team	//
+!_TAG_PROGRAM_NAME	Universal Ctags	/Derived from Exuberant Ctags/
+!_TAG_PROGRAM_URL	https://ctags.io/	/official site/
+!_TAG_PROGRAM_VERSION	0.0.0	//
+0	package.json	/^            "docs\/CHANGELOG.md",$/;"	s	array:release.plugins.3.1.assets
+0	package.json	/^        "@semantic-release\/changelog",$/;"	s	array:release.plugins.2
+0	package.json	/^        "@semantic-release\/git",$/;"	s	array:release.plugins.3
+0	package.json	/^      "@semantic-release\/commit-analyzer",$/;"	s	array:release.plugins
+0	package.json	/^      "master"$/;"	s	array:release.branches
+0	package.json	/^    "minecraft",$/;"	s	array:keywords
+0	tsconfig.json	/^      "dom",$/;"	s	array:compilerOptions.lib
+0	tsconfig.json	/^    ".\/src\/**\/*.tsx",$/;"	s	array:include
+0	tsconfig.json	/^    "node_modules"$/;"	s	array:exclude
+1	package.json	/^            "package.json"$/;"	s	array:release.plugins.3.1.assets
+1	package.json	/^        {$/;"	o	array:release.plugins.2
+1	package.json	/^        {$/;"	o	array:release.plugins.3
+1	package.json	/^      "@semantic-release\/release-notes-generator",$/;"	s	array:release.plugins
+1	package.json	/^    "json",$/;"	s	array:keywords
+1	tsconfig.json	/^      "es6",$/;"	s	array:compilerOptions.lib
+1	tsconfig.json	/^    ".\/src\/**\/*.ts"$/;"	s	array:include
+2	package.json	/^      [$/;"	a	array:release.plugins
+2	package.json	/^    "nbt",$/;"	s	array:keywords
+2	tsconfig.json	/^      "es2017",$/;"	s	array:compilerOptions.lib
+3	package.json	/^      [$/;"	a	array:release.plugins
+3	package.json	/^    "mca",$/;"	s	array:keywords
+3	tsconfig.json	/^      "esnext.asynciterable"$/;"	s	array:compilerOptions.lib
+4	package.json	/^      "@semantic-release\/github",$/;"	s	array:release.plugins
+4	package.json	/^    "cli"$/;"	s	array:keywords
+5	package.json	/^      "@semantic-release\/npm"$/;"	s	array:release.plugins
+7zip-bin	package.json	/^    "7zip-bin": "^5.0.3",$/;"	s	object:dependencies
+@semantic-release/changelog	package.json	/^    "@semantic-release\/changelog": "^5.0.1",$/;"	s	object:devDependencies
+@semantic-release/git	package.json	/^    "@semantic-release\/git": "^9.0.0",$/;"	s	object:devDependencies
+@types/node	package.json	/^    "@types\/node": "^14.14.6",$/;"	s	object:devDependencies
+ACCEPTABLE_PROFILE_AGE	lib/Configuration.js	/^const ACCEPTABLE_PROFILE_AGE = 1000 * 60 * 60 * 4; \/\/ 4 hours$/;"	C
+ADVANCEMENTS_DIR	lib/helpers/PathReference.js	/^  ADVANCEMENTS_DIR: null,$/;"	p	class:RESOLVED_PATHS
+ANVIL_DEATH	lib/helpers/LogConst.js	/^  ANVIL_DEATH: "death_anvil",$/;"	p	class:module.exports
+ARGV	lib/Configuration.js	/^const ARGV = require("yargs")$/;"	C
+ARROW_DEATH	lib/helpers/LogConst.js	/^  ARROW_DEATH: "death_arrow",$/;"	p	class:module.exports
+AdvancementsParser	index.js	/^const AdvancementsParser = require(".\/lib\/AdvancementsParser");$/;"	C
+AnonymousFunction0f45ef0b0100	lib/NbtTools.js	/^            nbtjson[key].value.value.map(function (listvalue) {$/;"	f
+AnonymousFunction0f45ef0b0200	lib/NbtTools.js	/^            nbtjson[key].value.value.map(function (listvalue) {$/;"	f
+AnonymousFunction8b2f10940100	lib/helpers/PathReference.js	/^      .map(function (fname) {$/;"	f	function:setServerJarPath
+AnonymousFunction8b2f10940200	lib/helpers/PathReference.js	/^      .filter(function (elem) {$/;"	f	function:setServerJarPath
+AnonymousFunction8b2f10940300	lib/helpers/PathReference.js	/^      .sort(function (a, b) {$/;"	f	function:setServerJarPath
+AnonymousFunctionbf4001490100	lib/JarDataExtractor.js	/^    .on("progress", function (data) {$/;"	f
+AnonymousFunctionbf4001490200	lib/JarDataExtractor.js	/^    .on("end", function () {$/;"	f
+AnonymousFunctionbf4001490300	lib/JarDataExtractor.js	/^    .on("error", function (err) {$/;"	f
+Architecture	docs/what-happens.md	/^# Architecture$/;"	c
+Axios	lib/MojangApi.js	/^const Axios = require("axios");$/;"	C
+BASE_API_URL	lib/MojangApi.js	/^const BASE_API_URL = "https:\/\/sessionserver.mojang.com\/session\/minecraft\/profile";$/;"	C
+BASE_PATHS	lib/helpers/PathReference.js	/^const BASE_PATHS = {$/;"	c
+BLUDGEON_DEATH	lib/helpers/LogConst.js	/^  BLUDGEON_DEATH: "death_bludgeon",$/;"	p	class:module.exports
+BREAKING CHANGES	docs/CHANGELOG.md	/^### BREAKING CHANGES$/;"	S
+BUKKIT_LIKE	lib/helpers/PathReference.js	/^  BUKKIT_LIKE: false,$/;"	p	class:DETERMINATIONS
+BasePathsNotSetError	lib/helpers/PathReference.js	/^const BasePathsNotSetError = new Error("BasePathsNotSetError: Before referencing paths, the base/;"	C
+Bug Fixes	docs/CHANGELOG.md	/^### Bug Fixes$/;"	S
+CACHED_MCA_JSON_DIR	lib/helpers/PathReference.js	/^  CACHED_MCA_JSON_DIR: null,$/;"	p	class:RESOLVED_PATHS
+CACTUS_DEATH	lib/helpers/LogConst.js	/^  CACTUS_DEATH: "death_cactus",$/;"	p	class:module.exports
+CLI Options	README.md	/^### CLI Options$/;"	S
+Chat Messages	docs/json/logs.md	/^### Chat Messages$/;"	S
+Chest	docs/json/tile-entities.md	/^### Chest$/;"	S
+Code Refactoring	docs/CHANGELOG.md	/^### Code Refactoring$/;"	S
+Common Variables	README.md	/^#### Common Variables$/;"	t
+Config	index.js	/^const Config = require(".\/lib\/Configuration");$/;"	C
+Created Files	docs/created-files.md	/^# Created Files$/;"	c
+DATAPACKS_DIR	lib/helpers/PathReference.js	/^  DATAPACKS_DIR: null,$/;"	p	class:RESOLVED_PATHS
+DETERMINATIONS	lib/helpers/PathReference.js	/^const DETERMINATIONS = {$/;"	c
+DOMAIN	index.js	/^const DOMAIN = "Main";$/;"	C
+DOMAIN	lib/AdvancementsParser.js	/^const DOMAIN = "Advancements Parser";$/;"	C
+DOMAIN	lib/Configuration.js	/^const DOMAIN = "Configuration";$/;"	C
+DOMAIN	lib/JarDataExtractor.js	/^const DOMAIN = "JarDataExtractor";$/;"	C
+DOMAIN	lib/LogsParser.js	/^const DOMAIN = "LogParser";$/;"	C
+DOMAIN	lib/McaParser.js	/^const DOMAIN = "MCAParser";$/;"	C
+DOMAIN	lib/MojangApi.js	/^const DOMAIN = "MojangAPI Runner";$/;"	C
+DOMAIN	lib/NbtTools.js	/^const DOMAIN = "NbtTools";$/;"	C
+DOMAIN	lib/PlayerData.js	/^const DOMAIN = "PlayerData";$/;"	C
+DOMAIN	lib/ProfileHelper.js	/^const DOMAIN = "Profile Collector";$/;"	C
+DOMAIN	lib/ServerDataTool.js	/^const DOMAIN = "DataExtractor";$/;"	C
+DOMAIN	lib/helpers/PathReference.js	/^const DOMAIN = "PathReference";$/;"	C
+Development	README.md	/^## Development$/;"	s
+ELYTRA_DEATH	lib/helpers/LogConst.js	/^  ELYTRA_DEATH: "death_elytra",$/;"	p	class:module.exports
+EXPLOSION_DEATH	lib/helpers/LogConst.js	/^  EXPLOSION_DEATH: "death_explosion",$/;"	p	class:module.exports
+EXTRACTED_ASSETS_DIR	lib/helpers/PathReference.js	/^  EXTRACTED_ASSETS_DIR: null,$/;"	p	class:RESOLVED_PATHS
+EXTRACTED_DATA_DIR	lib/helpers/PathReference.js	/^  EXTRACTED_DATA_DIR: null,$/;"	p	class:RESOLVED_PATHS
+EXTRACTED_DATA_MINECRAFT_DIR	lib/helpers/PathReference.js	/^  EXTRACTED_DATA_MINECRAFT_DIR: null,$/;"	p	class:RESOLVED_PATHS
+EXTRACTED_DIR	lib/helpers/PathReference.js	/^  EXTRACTED_DIR: null,$/;"	p	class:RESOLVED_PATHS
+Environment Variables	README.md	/^### Environment Variables$/;"	S
+Examples	docs/json/tile-entities.md	/^## Examples$/;"	s
+FALLING_DEATH	lib/helpers/LogConst.js	/^  FALLING_DEATH: "death_falling",$/;"	p	class:module.exports
+FIREBALL_DEATH	lib/helpers/LogConst.js	/^  FIREBALL_DEATH: "death_fireball",$/;"	p	class:module.exports
+FIREWORK_DEATH	lib/helpers/LogConst.js	/^  FIREWORK_DEATH: "death_firework",$/;"	p	class:module.exports
+FIRE_DEATH	lib/helpers/LogConst.js	/^  FIRE_DEATH: "death_fire",$/;"	p	class:module.exports
+Features	docs/CHANGELOG.md	/^### Features$/;"	S
+Furnace	docs/json/tile-entities.md	/^### Furnace$/;"	S
+Generated Files	README.md	/^## Generated Files$/;"	s
+Generated Log JSON	docs/json/logs.md	/^# Generated Log JSON$/;"	c
+Generated Playerdata JSON	docs/json/players.md	/^# Generated Playerdata JSON$/;"	c
+Generated Tile Entity JSON	docs/json/tile-entities.md	/^# Generated Tile Entity JSON$/;"	c
+Helper JSON	docs/created-files.md	/^## Helper JSON$/;"	s
+JarExtractor	lib/ServerDataTool.js	/^const JarExtractor = require(".\/JarDataExtractor");$/;"	C
+KILLED_DEATH	lib/helpers/LogConst.js	/^  KILLED_DEATH: "death_killed",$/;"	p	class:module.exports
+LAVA_DEATH	lib/helpers/LogConst.js	/^  LAVA_DEATH: "death_lava",$/;"	p	class:module.exports
+LEVELDAT_FILE	lib/helpers/PathReference.js	/^  LEVELDAT_FILE: null,$/;"	p	class:RESOLVED_PATHS
+LIGHTNING_DEATH	lib/helpers/LogConst.js	/^  LIGHTNING_DEATH: "death_lightning",$/;"	p	class:module.exports
+LOGS_DIR	lib/helpers/PathReference.js	/^  LOGS_DIR: null,$/;"	p	class:RESOLVED_PATHS
+LOG_LEVEL	lib/helpers/Logger.js	/^  LOG_LEVEL: null,$/;"	p	class:SETTINGS
+LOG_LEVELS	lib/Configuration.js	/^const LOG_LEVELS = ["error", "warn", "info", "verbose", "debug", "silly"];$/;"	C
+License	README.md	/^## License$/;"	s
+Log	lib/Configuration.js	/^const Log = require(".\/helpers\/Logger");$/;"	C
+Log entry format	docs/json/logs.md	/^## Log entry format$/;"	s
+LogLevel	lib/Configuration.js	/^const LogLevel = understandLogLevelFromArgv();$/;"	C
+LogsParser	index.js	/^const LogsParser = require(".\/lib\/LogsParser");$/;"	C
+MAGMA_DEATH	lib/helpers/LogConst.js	/^  MAGMA_DEATH: "death_magma",$/;"	p	class:module.exports
+MCJAR_CLIENT_FILE	lib/helpers/PathReference.js	/^  MCJAR_CLIENT_FILE: null,$/;"	p	class:RESOLVED_PATHS
+MCJAR_SERVER_FILE	lib/helpers/PathReference.js	/^  MCJAR_SERVER_FILE: null,$/;"	p	class:RESOLVED_PATHS
+MC_DIR	lib/helpers/PathReference.js	/^  MC_DIR: null,$/;"	p	class:BASE_PATHS
+MC_DIR	lib/helpers/PathReference.js	/^  MC_DIR: null,$/;"	p	class:RESOLVED_PATHS
+McaParser	index.js	/^const McaParser = require(".\/lib\/McaParser");$/;"	C
+MojangAPI	lib/ProfileHelper.js	/^const MojangAPI = require(".\/MojangApi");$/;"	C
+NbtTools	lib/McaParser.js	/^const NbtTools = require(".\/NbtTools");$/;"	C
+NbtTools	lib/PlayerData.js	/^const NbtTools = require(".\/NbtTools");$/;"	C
+NbtTools	lib/ServerDataTool.js	/^const NbtTools = require(".\/NbtTools");$/;"	C
+OPSLIST_FILE	lib/helpers/PathReference.js	/^  OPSLIST_FILE: null,$/;"	p	class:RESOLVED_PATHS
+OUTPUT_DIR	lib/helpers/PathReference.js	/^  OUTPUT_DIR: null,$/;"	p	class:RESOLVED_PATHS
+OUT_DIR	lib/helpers/PathReference.js	/^  OUT_DIR: null,$/;"	p	class:BASE_PATHS
+Object Representation	docs/json/tile-entities.md	/^## Object Representation$/;"	s
+Optional Keys	docs/json/tile-entities.md	/^### Optional Keys$/;"	S
+PATHS	index.js	/^const PATHS = require(".\/lib\/helpers\/PathReference").paths;$/;"	C
+PATHS	lib/AdvancementsParser.js	/^const PATHS = require(".\/helpers\/PathReference").paths;$/;"	C
+PATHS	lib/Configuration.js	/^const PATHS = pathref.paths;$/;"	C
+PATHS	lib/JarDataExtractor.js	/^const PATHS = require(".\/helpers\/PathReference").paths;$/;"	C
+PATHS	lib/LogsParser.js	/^const PATHS = require(".\/helpers\/PathReference").paths;$/;"	C
+PATHS	lib/McaParser.js	/^const PATHS = require(".\/helpers\/PathReference").paths;$/;"	C
+PATHS	lib/PlayerData.js	/^const PATHS = require(".\/helpers\/PathReference").paths;$/;"	C
+PATHS	lib/ProfileHelper.js	/^const PATHS = require(".\/helpers\/PathReference").paths;$/;"	C
+PATHS	lib/ServerDataTool.js	/^const PATHS = require(".\/helpers\/PathReference").paths;$/;"	C
+PLAYERDATA_DIR	lib/helpers/PathReference.js	/^  PLAYERDATA_DIR: null,$/;"	p	class:RESOLVED_PATHS
+PLAYERS	lib/Configuration.js	/^const PLAYERS = players;$/;"	C
+POITION_DEATH	lib/helpers/LogConst.js	/^  POITION_DEATH: "death_potion",$/;"	p	class:module.exports
+PROPERTIES_FILE	lib/helpers/PathReference.js	/^  PROPERTIES_FILE: null,$/;"	p	class:RESOLVED_PATHS
+Performance Improvements	docs/CHANGELOG.md	/^### Performance Improvements$/;"	S
+Player Advancements	docs/json/players.md	/^## Player Advancements$/;"	s
+Player Data	docs/json/players.md	/^## Player Data$/;"	s
+Player Logs	docs/json/players.md	/^## Player Logs$/;"	s
+Player Profile	docs/json/players.md	/^## Player Profile$/;"	s
+Player Stats	docs/json/players.md	/^## Player Stats$/;"	s
+PlayerData	index.js	/^const PlayerData = require(".\/lib\/PlayerData");$/;"	C
+Process Flow	docs/what-happens.md	/^## Process Flow$/;"	s
+ProfileHelper	index.js	/^const ProfileHelper = require(".\/lib\/ProfileHelper");$/;"	C
+RESOLVED_PATHS	lib/helpers/PathReference.js	/^const RESOLVED_PATHS = {$/;"	c
+RUNNING_DIR	lib/Configuration.js	/^const RUNNING_DIR = process.cwd();$/;"	C
+Root Keys	docs/json/players.md	/^## Root Keys$/;"	s
+SETTINGS	lib/helpers/Logger.js	/^const SETTINGS = {$/;"	c
+SEV_ERROR	lib/helpers/LogConst.js	/^  SEV_ERROR: "sev_error",$/;"	p	class:module.exports
+SEV_INFO	lib/helpers/LogConst.js	/^  SEV_INFO: "sev_info",$/;"	p	class:module.exports
+SEV_WARN	lib/helpers/LogConst.js	/^  SEV_WARN: "sev_warn",$/;"	p	class:module.exports
+STARVE_DEATH	lib/helpers/LogConst.js	/^  STARVE_DEATH: "death_starve",$/;"	p	class:module.exports
+STATS_DIR	lib/helpers/PathReference.js	/^  STATS_DIR: null,$/;"	p	class:RESOLVED_PATHS
+SUFFOCATE_DEATH	lib/helpers/LogConst.js	/^  SUFFOCATE_DEATH: "death_suffocate",$/;"	p	class:module.exports
+ServerDataExtractor	index.js	/^const ServerDataExtractor = require(".\/lib\/ServerDataTool");$/;"	C
+Sign	docs/json/tile-entities.md	/^### Sign$/;"	S
+Special Description Values	docs/json/logs.md	/^## Special Description Values$/;"	s
+TEMP_LOG_JSON_DIR	lib/helpers/PathReference.js	/^  TEMP_LOG_JSON_DIR: null,$/;"	p	class:RESOLVED_PATHS
+TEMP_PLAYERDATA_DIR	lib/helpers/PathReference.js	/^  TEMP_PLAYERDATA_DIR: null,$/;"	p	class:RESOLVED_PATHS
+THORNS_DEATH	lib/helpers/LogConst.js	/^  THORNS_DEATH: "death_thorns",$/;"	p	class:module.exports
+TYPE_ADVANCEMENT	lib/helpers/LogConst.js	/^  TYPE_ADVANCEMENT: "completed_advancement",$/;"	p	class:module.exports
+TYPE_CHALLENGE	lib/helpers/LogConst.js	/^  TYPE_CHALLENGE: "completed_challenge",$/;"	p	class:module.exports
+TYPE_CHAT	lib/helpers/LogConst.js	/^  TYPE_CHAT: "chat",$/;"	p	class:module.exports
+TYPE_COMMAND	lib/helpers/LogConst.js	/^  TYPE_COMMAND: "command",$/;"	p	class:module.exports
+TYPE_ERROR	lib/helpers/LogConst.js	/^  TYPE_ERROR: "type_error",$/;"	p	class:module.exports
+TYPE_GOAL	lib/helpers/LogConst.js	/^  TYPE_GOAL: "completed_goal",$/;"	p	class:module.exports
+TYPE_KEEPENTITY	lib/helpers/LogConst.js	/^  TYPE_KEEPENTITY: "type_keepentity",$/;"	p	class:module.exports
+TYPE_LOGIN	lib/helpers/LogConst.js	/^  TYPE_LOGIN: "login",$/;"	p	class:module.exports
+TYPE_LOGOFF	lib/helpers/LogConst.js	/^  TYPE_LOGOFF: "logoff",$/;"	p	class:module.exports
+TYPE_OVERLOADED	lib/helpers/LogConst.js	/^  TYPE_OVERLOADED: "type_overloaded",$/;"	p	class:module.exports
+TYPE_PLAYERUUID	lib/helpers/LogConst.js	/^  TYPE_PLAYERUUID: "player_uuid",$/;"	p	class:module.exports
+TYPE_SERVERINFO	lib/helpers/LogConst.js	/^  TYPE_SERVERINFO: "serverinfo",$/;"	p	class:module.exports
+TYPE_SERVERREADY	lib/helpers/LogConst.js	/^  TYPE_SERVERREADY: "serverready",$/;"	p	class:module.exports
+TYPE_SERVERSTOP	lib/helpers/LogConst.js	/^  TYPE_SERVERSTOP: "serverstop",$/;"	p	class:module.exports
+Tag Object	docs/json/tile-entities.md	/^### Tag Object$/;"	S
+USERCACHE_FILE	lib/helpers/PathReference.js	/^  USERCACHE_FILE: null,$/;"	p	class:RESOLVED_PATHS
+Usage	README.md	/^## Usage$/;"	s
+VERSION	lib/Configuration.js	/^const VERSION = require("..\/package.json").version;$/;"	C
+VOID_DEATH	lib/helpers/LogConst.js	/^  VOID_DEATH: "death_void",$/;"	p	class:module.exports
+WATER_DEATH	lib/helpers/LogConst.js	/^  WATER_DEATH: "death_water",$/;"	p	class:module.exports
+WITHER_DEATH	lib/helpers/LogConst.js	/^  WITHER_DEATH: "death_withered",$/;"	p	class:module.exports
+WORK_DIR	lib/helpers/PathReference.js	/^  WORK_DIR: null,$/;"	p	class:BASE_PATHS
+WORK_DIR	lib/helpers/PathReference.js	/^  WORK_DIR: null,$/;"	p	class:RESOLVED_PATHS
+WORLDDATA_DIR	lib/helpers/PathReference.js	/^  WORLDDATA_DIR: null,$/;"	p	class:RESOLVED_PATHS
+WORLD_DIRS	lib/helpers/PathReference.js	/^  WORLD_DIRS: null,$/;"	p	class:RESOLVED_PATHS
+WRITE_DEBUG_LOG	lib/helpers/Logger.js	/^  WRITE_DEBUG_LOG: false,$/;"	p	class:SETTINGS
+Zip	lib/JarDataExtractor.js	/^const Zip = require("node-7z");$/;"	C
+[0.5.0](https://github.com/nwesterhausen/mcdata-to-json/compare/v0.4.0...v0.5.0) (2020-10-14)	docs/CHANGELOG.md	/^# [0.5.0](https:\/\/github.com\/nwesterhausen\/mcdata-to-json\/compare\/v0.4.0...v0.5.0) (2020-1/;"	c
+[0.6.0](https://github.com/nwesterhausen/mcdata-to-json/compare/v0.5.0...v0.6.0) (2020-10-14)	docs/CHANGELOG.md	/^# [0.6.0](https:\/\/github.com\/nwesterhausen\/mcdata-to-json\/compare\/v0.5.0...v0.6.0) (2020-1/;"	c
+[0.6.1](https://github.com/nwesterhausen/mcdata-to-json/compare/v0.6.0...v0.6.1) (2020-10-15)	docs/CHANGELOG.md	/^## [0.6.1](https:\/\/github.com\/nwesterhausen\/mcdata-to-json\/compare\/v0.6.0...v0.6.1) (2020-/;"	s
+[0.6.2](https://github.com/nwesterhausen/mcdata-to-json/compare/v0.6.1...v0.6.2) (2020-10-15)	docs/CHANGELOG.md	/^## [0.6.2](https:\/\/github.com\/nwesterhausen\/mcdata-to-json\/compare\/v0.6.1...v0.6.2) (2020-/;"	s
+[1.0.0](https://github.com/nwesterhausen/mcdata-to-json/compare/v0.6.2...v1.0.0) (2020-10-22)	docs/CHANGELOG.md	/^# [1.0.0](https:\/\/github.com\/nwesterhausen\/mcdata-to-json\/compare\/v0.6.2...v1.0.0) (2020-1/;"	c
+[Log JSON](json/logs.md)	docs/created-files.md	/^## [Log JSON](json\/logs.md)$/;"	s
+[Player JSON](json/players.md)	docs/created-files.md	/^## [Player JSON](json\/players.md)$/;"	s
+[Tile Entitiy JSON](json/tile-entities.md)	docs/created-files.md	/^## [Tile Entitiy JSON](json\/tile-entities.md)$/;"	s
+advancementRE	lib/helpers/LogsRegex.js	/^  advancementRE: new RegExp(\/\\]: (.+has made the advancement \\[.+\\])$\/),$/;"	p	class:module.exports
+advancementsExported	lib/ServerDataTool.js	/^let advancementsExported = false;$/;"	v
+allowSyntheticDefaultImports	tsconfig.json	/^    "allowSyntheticDefaultImports": true,$/;"	b	object:compilerOptions
+anvildeathRE	lib/helpers/LogsRegex.js	/^  anvildeathRE: new RegExp(\/]: .+(squashed).+$\/),$/;"	p	class:module.exports
+appendLogActionTo	lib/LogsParser.js	/^function appendLogActionTo(dest, actionarray) {$/;"	f
+arrowdeathRE	lib/helpers/LogsRegex.js	/^  arrowdeathRE: new RegExp(\/]: .+(was shot by).+$\/),$/;"	p	class:module.exports
+assets	package.json	/^          "assets": [$/;"	a	object:release.plugins.3.1
+author	package.json	/^  "author": "Nicholas Westerhausen",$/;"	s
+axios	package.json	/^    "axios": "^0.20.0",$/;"	s	object:dependencies
+baseUrl	tsconfig.json	/^    "baseUrl": "."$/;"	s	object:compilerOptions
+bin	package.json	/^  "bin": {$/;"	o
+bludgeondeathRE	lib/helpers/LogsRegex.js	/^  bludgeondeathRE: new RegExp(\/]: .+(was pummeled by).+$\/),$/;"	p	class:module.exports
+branches	package.json	/^    "branches": [$/;"	a	object:release
+buildTileEntityList	index.js	/^function buildTileEntityList(mcaJsonDir) {$/;"	f
+buildWinstonLogger	lib/helpers/Logger.js	/^function buildWinstonLogger(withLogFile) {$/;"	f
+cactusdeathRE	lib/helpers/LogsRegex.js	/^  cactusdeathRE: new RegExp(\/]: .+(was pricked to death|hugged a cactus|walked into a cactus).+/;"	p	class:module.exports
+challengeRE	lib/helpers/LogsRegex.js	/^  challengeRE: new RegExp(\/\\]: (.+has completed the challenge \\[.+\\])$\/),$/;"	p	class:module.exports
+changelogFile	package.json	/^          "changelogFile": "docs\/CHANGELOG.md"$/;"	s	object:release.plugins.2.1
+check-lint	package.json	/^    "check-lint": "eslint index.js lib",$/;"	s	object:scripts
+check-pretty	package.json	/^    "check-pretty": "prettier --check index.js lib README.md docs",$/;"	s	object:scripts
+checkForData	lib/ServerDataTool.js	/^function checkForData() {$/;"	f
+combinePlayerData	index.js	/^function combinePlayerData(uuid) {$/;"	f
+commandRE	lib/helpers/LogsRegex.js	/^  commandRE: new RegExp(\/\\[[A-Za-z0-9_-]+: (?:Given|Set).+\\]\/),$/;"	p	class:module.exports
+compilerOptions	tsconfig.json	/^  "compilerOptions": {$/;"	o
+condenseNbt	lib/NbtTools.js	/^function condenseNbt(nbtjson) {$/;"	f
+convertChunksFromRegionfile	lib/McaParser.js	/^function convertChunksFromRegionfile(rawfile, filename) {$/;"	f
+convertLevelDat	lib/ServerDataTool.js	/^function convertLevelDat() {$/;"	f
+convertLongToInt	lib/NbtTools.js	/^function convertLongToInt(bigEndianLongArray) {$/;"	f
+convertPlayerdatFiles	lib/PlayerData.js	/^function convertPlayerdatFiles() {$/;"	f
+convertRegionDirToJSON	lib/McaParser.js	/^function convertRegionDirToJSON(regionDir) {$/;"	f
+createJsonForAllRegionDirs	index.js	/^function createJsonForAllRegionDirs() {$/;"	f
+createServerAdvancementProgress	lib/AdvancementsParser.js	/^function createServerAdvancementProgress(parsedFiles) {$/;"	f
+dataExtractionProgress	lib/JarDataExtractor.js	/^const dataExtractionProgress = { fileCount: 0, percent: 0 };$/;"	c
+dataProgressCheck	lib/ServerDataTool.js	/^function dataProgressCheck() {$/;"	f
+deepmerge	package.json	/^    "deepmerge": "^4.2.2",$/;"	s	object:dependencies
+dependencies	package.json	/^  "dependencies": {$/;"	o
+description	package.json	/^  "description": "Node.js app to turn Minecraft .dat and .json files into unified json.",$/;"	s
+determineIfBukkitlike	lib/helpers/PathReference.js	/^function determineIfBukkitlike() {$/;"	f
+devDependencies	package.json	/^  "devDependencies": {$/;"	o
+dotenv	package.json	/^    "dotenv": "^8.2.0",$/;"	s	object:dependencies
+elytradeathRE	lib/helpers/LogsRegex.js	/^  elytradeathRE: new RegExp(\/]: .+(experienced kinetic energy|removed an elytra).+$\/),$/;"	p	class:module.exports
+emitDecoratorMetadata	tsconfig.json	/^    "emitDecoratorMetadata": true,$/;"	b	object:compilerOptions
+ensureDirSync	lib/helpers/PathReference.js	/^function ensureDirSync(dirPath) {$/;"	f
+esModuleInterop	tsconfig.json	/^    "esModuleInterop": true,$/;"	b	object:compilerOptions
+eslint	package.json	/^    "eslint": "^7.12.1",$/;"	s	object:devDependencies
+eslint-config-google	package.json	/^    "eslint-config-google": "^0.14.0",$/;"	s	object:devDependencies
+eslint-config-prettier	package.json	/^    "eslint-config-prettier": "^6.15.0",$/;"	s	object:devDependencies
+exclude	tsconfig.json	/^  "exclude": [$/;"	a
+experimentalDecorators	tsconfig.json	/^    "experimentalDecorators": true,$/;"	b	object:compilerOptions
+explosiondeathRE	lib/helpers/LogsRegex.js	/^  explosiondeathRE: new RegExp(\/]: .+(blew up|was blown up).+$\/),$/;"	p	class:module.exports
+exports	lib/helpers/LogConst.js	/^module.exports = {$/;"	c	class:module
+exports	lib/helpers/Logger.js	/^module.exports = {$/;"	c	class:module
+exports	lib/helpers/LogsRegex.js	/^module.exports = {$/;"	c	class:module
+exports	lib/helpers/PathReference.js	/^module.exports = {$/;"	c	class:module
+extractDataFromJar	lib/JarDataExtractor.js	/^function extractDataFromJar() {$/;"	f
+fallingdeathRE	lib/helpers/LogsRegex.js	/^  fallingdeathRE: new RegExp($/;"	p	class:module.exports
+fileCount	lib/JarDataExtractor.js	/^const dataExtractionProgress = { fileCount: 0, percent: 0 };$/;"	p	class:dataExtractionProgress
+filenameRE	lib/helpers/LogsRegex.js	/^  filenameRE: new RegExp(\/\\[Filename:(.+)\\]\/),$/;"	p	class:module.exports
+fireballRE	lib/helpers/LogsRegex.js	/^  fireballRE: new RegExp(\/]: .+(fireballed by).+$\/),$/;"	p	class:module.exports
+firedeathRE	lib/helpers/LogsRegex.js	/^  firedeathRE: new RegExp(\/]: .+(went up in flames|burned to death|burnt to a crisp|walked into/;"	p	class:module.exports
+fireworkdeathRE	lib/helpers/LogsRegex.js	/^  fireworkdeathRE: new RegExp(\/]: .+(went off with a bang).+$\/),$/;"	p	class:module.exports
+fs	index.js	/^const fs = require("fs");$/;"	C
+fs	lib/AdvancementsParser.js	/^const fs = require("fs");$/;"	C
+fs	lib/Configuration.js	/^const fs = require("fs");$/;"	C
+fs	lib/LogsParser.js	/^const fs = require("fs");$/;"	C
+fs	lib/McaParser.js	/^const fs = require("fs");$/;"	C
+fs	lib/PlayerData.js	/^const fs = require("fs");$/;"	C
+fs	lib/ProfileHelper.js	/^const fs = require("fs");$/;"	C
+fs	lib/ServerDataTool.js	/^const fs = require("fs");$/;"	C
+fs	lib/helpers/PathReference.js	/^const fs = require("fs");$/;"	C
+fulljson	lib/MojangApi.js	/^  const fulljson = {$/;"	c	class:jsonFromProfileResp
+getDateFromFilename	lib/LogsParser.js	/^function getDateFromFilename(filename) {$/;"	f
+getLogger	lib/helpers/Logger.js	/^  getLogger: function () {$/;"	m	class:module.exports
+getProfileForUUID	lib/MojangApi.js	/^const getProfileForUUID = function (uuid) {$/;"	f
+getTimestampFromHHMMSSAndBasedate	lib/LogsParser.js	/^function getTimestampFromHHMMSSAndBasedate(timeString, basedate) {$/;"	f
+getTreeFromAdvancementJSON	lib/AdvancementsParser.js	/^function getTreeFromAdvancementJSON(advJsonObj) {$/;"	f
+goalRE	lib/helpers/LogsRegex.js	/^  goalRE: new RegExp(\/\\]: (.+has reached the goal \\[.+\\])$\/),$/;"	p	class:module.exports
+homepage	package.json	/^  "homepage": "https:\/\/github.com\/nwesterhausen\/mcdata-to-json",$/;"	s
+hrtimefmt	index.js	/^const hrtimefmt = function (timeref) {$/;"	f
+id	lib/MojangApi.js	/^    id: resp.id,$/;"	p	class:jsonFromProfileResp.fulljson
+include	tsconfig.json	/^  "include": [$/;"	a
+int64	lib/NbtTools.js	/^const int64 = require("int64-napi");$/;"	C
+int64-napi	package.json	/^    "int64-napi": "^1.0.1",$/;"	s	object:dependencies
+jsonFromLogfilePromise	lib/LogsParser.js	/^function jsonFromLogfilePromise(filepath) {$/;"	f
+jsonFromProfileResp	lib/MojangApi.js	/^const jsonFromProfileResp = function (resp) {$/;"	f
+keepentityRE	lib/helpers/LogsRegex.js	/^  keepentityRE: new RegExp(\/\\]: Keeping entity [a-zA-Z:]+ that already exists\/),$/;"	p	class:module.exports
+keywords	package.json	/^  "keywords": [$/;"	a
+killeddeathRE	lib/helpers/LogsRegex.js	/^  killeddeathRE: new RegExp(\/]: .+(slain by|finished off by).+$\/),$/;"	p	class:module.exports
+lavadeathRE	lib/helpers/LogsRegex.js	/^  lavadeathRE: new RegExp(\/]: .+(swim in lava).+$\/),$/;"	p	class:module.exports
+lib	tsconfig.json	/^    "lib": [$/;"	a	object:compilerOptions
+libtime	index.js	/^const libtime = process.hrtime();$/;"	C
+license	package.json	/^  "license": "MIT",$/;"	s
+lightningdeathRE	lib/helpers/LogsRegex.js	/^  lightningdeathRE: new RegExp(\/]: .+(struck by lightning).+$\/),$/;"	p	class:module.exports
+lint	package.json	/^    "lint": "eslint --fix index.js lib",$/;"	s	object:scripts
+locateAndAssignWorlds	lib/helpers/PathReference.js	/^function locateAndAssignWorlds() {$/;"	f
+lodash	package.json	/^    "lodash": "^4.17.20",$/;"	s	object:dependencies
+logconst	lib/LogsParser.js	/^const logconst = require(".\/helpers\/LogConst");$/;"	C
+logfiles	lib/LogsParser.js	/^let logfiles = [];$/;"	v
+logger	index.js	/^const logger = require(".\/lib\/helpers\/Logger").getLogger();$/;"	C
+logger	lib/AdvancementsParser.js	/^const logger = require(".\/helpers\/Logger").getLogger();$/;"	C
+logger	lib/Configuration.js	/^const logger = Log.getLogger();$/;"	C
+logger	lib/JarDataExtractor.js	/^const logger = require(".\/helpers\/Logger").getLogger();$/;"	C
+logger	lib/LogsParser.js	/^const logger = require(".\/helpers\/Logger").getLogger();$/;"	C
+logger	lib/McaParser.js	/^const logger = require(".\/helpers\/Logger").getLogger();$/;"	C
+logger	lib/MojangApi.js	/^const logger = require(".\/helpers\/Logger").getLogger();$/;"	C
+logger	lib/NbtTools.js	/^const logger = require(".\/helpers\/Logger").getLogger();$/;"	C
+logger	lib/PlayerData.js	/^const logger = require(".\/helpers\/Logger").getLogger();$/;"	C
+logger	lib/ProfileHelper.js	/^const logger = require(".\/helpers\/Logger").getLogger();$/;"	C
+logger	lib/ServerDataTool.js	/^const logger = require(".\/helpers\/Logger").getLogger();$/;"	C
+logger	lib/helpers/PathReference.js	/^const logger = require(".\/Logger").getLogger();$/;"	C
+logregx	lib/LogsParser.js	/^const logregx = require(".\/helpers\/LogsRegex");$/;"	C
+loottablesExported	lib/ServerDataTool.js	/^let loottablesExported = false;$/;"	v
+magmadeathRE	lib/helpers/LogsRegex.js	/^  magmadeathRE: new RegExp(\/]: .+(floor was lava).+$\/),$/;"	p	class:module.exports
+main	package.json	/^  "main": "index.js",$/;"	s
+mca	lib/McaParser.js	/^const mca = require("mca-js");$/;"	C
+mca-js	package.json	/^    "mca-js": "^0.1.1",$/;"	s	object:dependencies
+mcdata-to-json	README.md	/^# mcdata-to-json$/;"	c
+mcdata-to-json	package.json	/^    "mcdata-to-json": ".dist\/index.js"$/;"	s	object:bin
+merge	lib/AdvancementsParser.js	/^const merge = require("deepmerge");$/;"	C
+module	tsconfig.json	/^    "module": "commonjs",$/;"	s	object:compilerOptions
+moduleResolution	tsconfig.json	/^    "moduleResolution": "node",$/;"	s	object:compilerOptions
+name	lib/MojangApi.js	/^    name: resp.name,$/;"	p	class:jsonFromProfileResp.fulljson
+name	package.json	/^  "name": "mcdata-to-json",$/;"	s
+nbt	lib/McaParser.js	/^const nbt = require("nbt");$/;"	C
+nbt	lib/NbtTools.js	/^const nbt = require("nbt");$/;"	C
+nbt	package.json	/^    "nbt": "^0.8.1",$/;"	s	object:dependencies
+noFallthroughCasesInSwitch	tsconfig.json	/^    "noFallthroughCasesInSwitch": true,$/;"	b	object:compilerOptions
+noImplicitAny	tsconfig.json	/^    "noImplicitAny": true,$/;"	b	object:compilerOptions
+noImplicitReturns	tsconfig.json	/^    "noImplicitReturns": true,$/;"	b	object:compilerOptions
+noImplicitThis	tsconfig.json	/^    "noImplicitThis": true,$/;"	b	object:compilerOptions
+noUnusedLocals	tsconfig.json	/^    "noUnusedLocals": true,$/;"	b	object:compilerOptions
+noUnusedParameters	tsconfig.json	/^    "noUnusedParameters": true,$/;"	b	object:compilerOptions
+node-7z	package.json	/^    "node-7z": "^2.1.2",$/;"	s	object:dependencies
+objFromPath	lib/AdvancementsParser.js	/^function objFromPath(pathArr, endValue) {$/;"	f
+onlyUnique	lib/McaParser.js	/^function onlyUnique(value, index, self) {$/;"	f
+outDir	tsconfig.json	/^    "outDir": ".\/dist",$/;"	s	object:compilerOptions
+overloadedRE	lib/helpers/LogsRegex.js	/^  overloadedRE: new RegExp(\/\\]: Can't keep up! Is the server overloaded?\/),$/;"	p	class:module.exports
+parseAndSaveAdvancementFiles	lib/AdvancementsParser.js	/^function parseAndSaveAdvancementFiles() {$/;"	f
+parseChunkListJson	index.js	/^function parseChunkListJson(fileContent, filepath) {$/;"	f
+parseLogFiles	lib/LogsParser.js	/^function parseLogFiles() {$/;"	f
+parseLogLine	lib/LogsParser.js	/^function parseLogLine(basedate, logline) {$/;"	f
+path	index.js	/^const path = require("path");$/;"	C
+path	lib/AdvancementsParser.js	/^const path = require("path");$/;"	C
+path	lib/Configuration.js	/^const path = require("path");$/;"	C
+path	lib/LogsParser.js	/^const path = require("path");$/;"	C
+path	lib/McaParser.js	/^const path = require("path");$/;"	C
+path	lib/PlayerData.js	/^const path = require("path");$/;"	C
+path	lib/ProfileHelper.js	/^const path = require("path");$/;"	C
+path	lib/ServerDataTool.js	/^const path = require("path");$/;"	C
+path	lib/helpers/PathReference.js	/^const path = require("path");$/;"	C
+pathref	lib/Configuration.js	/^const pathref = require(".\/helpers\/PathReference");$/;"	C
+paths	lib/helpers/PathReference.js	/^  paths: RESOLVED_PATHS,$/;"	p	class:module.exports
+percent	lib/JarDataExtractor.js	/^const dataExtractionProgress = { fileCount: 0, percent: 0 };$/;"	p	class:dataExtractionProgress
+performExtraction	lib/ServerDataTool.js	/^function performExtraction() {$/;"	f
+playerNameGrabRE	lib/helpers/LogsRegex.js	/^  playerNameGrabRE: new RegExp(\/(\\w+) .+\/),$/;"	p	class:module.exports
+playerchatRE	lib/helpers/LogsRegex.js	/^  playerchatRE: new RegExp(\/\\]: <(.+)> .+$\/),$/;"	p	class:module.exports
+playerdatFiles	lib/Configuration.js	/^const playerdatFiles = fs.readdirSync(PATHS.PLAYERDATA_DIR);$/;"	C
+playerjoinRE	lib/helpers/LogsRegex.js	/^  playerjoinRE: new RegExp(\/\\]: (.+joined the game)$\/),$/;"	p	class:module.exports
+playerleftRE	lib/helpers/LogsRegex.js	/^  playerleftRE: new RegExp(\/\\]: (.+left the game)$\/),$/;"	p	class:module.exports
+players	lib/Configuration.js	/^const players = {};$/;"	C
+plugins	package.json	/^    "plugins": [$/;"	a	object:release
+potiondeathRE	lib/helpers/LogsRegex.js	/^  potiondeathRE: new RegExp(\/]: .+(killed by magic|using magic).+$\/),$/;"	p	class:module.exports
+prepareLogFiles	lib/LogsParser.js	/^function prepareLogFiles() {$/;"	f
+prettier	package.json	/^    "prettier": "^2.1.2",$/;"	s	object:devDependencies
+pretty	package.json	/^    "pretty": "prettier --write index.js lib README.md docs",$/;"	s	object:scripts
+promiseCondenseNbtJson	lib/NbtTools.js	/^function promiseCondenseNbtJson(nbtjson) {$/;"	f
+promiseNbtJson	lib/NbtTools.js	/^function promiseNbtJson(rawnbt) {$/;"	f
+promiseParse	lib/helpers/JsonPromises.js	/^function promiseParse(strObj) {$/;"	f
+promiseStringify	lib/helpers/JsonPromises.js	/^function promiseStringify(obj) {$/;"	f
+properties	lib/MojangApi.js	/^    properties: {},$/;"	p	class:jsonFromProfileResp.fulljson
+rawlogJSON	lib/LogsParser.js	/^const rawlogJSON = [];$/;"	C
+readChunkListJson	index.js	/^function readChunkListJson(filepath) {$/;"	f
+readline	lib/LogsParser.js	/^const readline = require("readline");$/;"	C
+ready	lib/helpers/PathReference.js	/^  ready: resolvedStatus,$/;"	p	class:module.exports
+recipesExported	lib/ServerDataTool.js	/^let recipesExported = false;$/;"	v
+release	package.json	/^  "release": {$/;"	o
+removeComments	tsconfig.json	/^    "removeComments": true,$/;"	b	object:compilerOptions
+repository	package.json	/^  "repository": "github:nwesterhausen\/mcdata-to-json",$/;"	s
+resolveJsonModule	tsconfig.json	/^    "resolveJsonModule": true,$/;"	b	object:compilerOptions
+resolvePaths	lib/helpers/PathReference.js	/^function resolvePaths() {$/;"	f
+resolvedStatus	lib/helpers/PathReference.js	/^let resolvedStatus = false;$/;"	v
+scripts	package.json	/^  "scripts": {$/;"	o
+serverreadyRE	lib/helpers/LogsRegex.js	/^  serverreadyRE: new RegExp(\/\\]: Done \\([0-9.]+s\\)! For help, type "help" or "?"\/),$/;"	p	class:module.exports
+serverstopRE	lib/helpers/LogsRegex.js	/^  serverstopRE: new RegExp(\/\\]: Stopping server\/),$/;"	p	class:module.exports
+setBasePaths	lib/helpers/PathReference.js	/^  setBasePaths: function (mcdir, outdir, workdir) {$/;"	m	class:module.exports
+setLoglevel	lib/helpers/Logger.js	/^  setLoglevel: function (level) {$/;"	m	class:module.exports
+setServerJarPath	lib/helpers/PathReference.js	/^function setServerJarPath() {$/;"	f
+severityRE	lib/helpers/LogsRegex.js	/^  severityRE: new RegExp(\/\\[.+\\\/([A-Z]+)\\]\/),$/;"	p	class:module.exports
+sourceMap	tsconfig.json	/^    "sourceMap": true,$/;"	b	object:compilerOptions
+starttime	index.js	/^const starttime = process.hrtime();$/;"	C
+starvedeathRE	lib/helpers/LogsRegex.js	/^  starvedeathRE: new RegExp(\/]: .+(starved to death).+$\/),$/;"	p	class:module.exports
+strictFunctionTypes	tsconfig.json	/^    "strictFunctionTypes": true,$/;"	b	object:compilerOptions
+strictNullChecks	tsconfig.json	/^    "strictNullChecks": true,$/;"	b	object:compilerOptions
+suffocatedeathRE	lib/helpers/LogsRegex.js	/^  suffocatedeathRE: new RegExp(\/]: .+(suffocated|squished too much).+$\/),$/;"	p	class:module.exports
+tagsExported	lib/ServerDataTool.js	/^let tagsExported = false;$/;"	v
+target	tsconfig.json	/^    "target": "es6",$/;"	s	object:compilerOptions
+test	package.json	/^    "test": "echo \\"Error: no test specified\\" && exit 0",$/;"	s	object:scripts
+thornsdeathRE	lib/helpers/LogsRegex.js	/^  thornsdeathRE: new RegExp(\/]: .+(killed while trying to hurt).+$\/),$/;"	p	class:module.exports
+tidy-up	package.json	/^    "tidy-up": "pnpm lint && pnpm pretty",$/;"	s	object:scripts
+timestampRE	lib/helpers/LogsRegex.js	/^  timestampRE: new RegExp(\/[0-9]{2}:[0-9]{2}:[0-9]{2}\/),$/;"	p	class:module.exports
+typescript	package.json	/^    "typescript": "^4.0.5"$/;"	s	object:devDependencies
+understandLogLevelFromArgv	lib/Configuration.js	/^function understandLogLevelFromArgv() {$/;"	f
+unzippedFiles	lib/LogsParser.js	/^const unzippedFiles = [];$/;"	C
+updateProfiles	lib/ProfileHelper.js	/^function updateProfiles(honorCache = true) {$/;"	f
+uriDecodeUUID	lib/MojangApi.js	/^const uriDecodeUUID = function (uuid) {$/;"	f
+uriEncodeUUID	lib/MojangApi.js	/^const uriEncodeUUID = function (uuid) {$/;"	f
+uuid	lib/Configuration.js	/^    const uuid = f.replace(\/.dat\/, "");$/;"	C
+uuiddescRE	lib/helpers/LogsRegex.js	/^  uuiddescRE: new RegExp(\/(UUID of player ).+$\/),$/;"	p	class:module.exports
+validatePaths	lib/helpers/PathReference.js	/^function validatePaths() {$/;"	f
+version	package.json	/^  "version": "1.0.0",$/;"	s
+voiddeathRE	lib/helpers/LogsRegex.js	/^  voiddeathRE: new RegExp(\/]: .+(fell out of the world).+$\/),$/;"	p	class:module.exports
+watch	package.json	/^    "watch": "tsc -w"$/;"	s	object:scripts
+waterdeathRE	lib/helpers/LogsRegex.js	/^  waterdeathRE: new RegExp(\/]: .+(drowned).+$\/),$/;"	p	class:module.exports
+winston	package.json	/^    "winston": "^3.3.3",$/;"	s	object:dependencies
+winstonLogger	lib/helpers/Logger.js	/^let winstonLogger = null;$/;"	v
+witherdeathRE	lib/helpers/LogsRegex.js	/^  witherdeathRE: new RegExp(\/]: .+(withered away).+$\/),$/;"	p	class:module.exports
+writeDebugLog	lib/helpers/Logger.js	/^  writeDebugLog: function () {$/;"	m	class:module.exports
+yargs	package.json	/^    "yargs": "^16.1.0"$/;"	s	object:dependencies
+zlib	lib/LogsParser.js	/^const zlib = require("zlib");$/;"	C
