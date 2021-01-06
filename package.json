@@ -27,7 +27,7 @@
   "homepage": "https://github.com/nwesterhausen/mcdata-to-json",
   "dependencies": {
     "7zip-bin": "^5.0.3",
-    "axios": "^0.20.0",
+    "axios": "^0.21.1",
     "deepmerge": "^4.2.2",
     "dotenv": "^8.2.0",
     "int64-napi": "^1.0.1",
